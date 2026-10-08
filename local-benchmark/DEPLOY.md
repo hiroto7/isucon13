@@ -14,3 +14,5 @@ Final: record persisted entities, reboot, verify reads BEFORE initialize, then r
 DNS candidate: transfer config/dns-index.sql and execute with sudo mysql after baseline provisioning. Confirm SHOW INDEX FROM isudns.records. Rollback DROP INDEX nametype_index ON isudns.records. Zone initialization keeps the table and index.
 
 Accepted relational indexes: apply config/relational-indexes.sql once to baseline database; rollback with config/rollback-relational-indexes.sql. Definitions also in webapp/sql/initdb.d/10_schema.sql for fresh schema. Normal initialization truncates data but preserves indexes.
+
+DNS-cache candidate (not adopted): config/pdns-performance.conf, 2s positive/packet TTL, no negative-query caching, zone metadata60s and zone list10s. Existing localhost API flushes new usernames; init waits3s to expire removed names. No group/permission change. Rollback config/pdns-before-cache.conf and webapp to bae7069. Official API supports exact cache flush only in installed4.5.3; verified source https://raw.githubusercontent.com/PowerDNS/pdns/auth-4.5.3/pdns/ws-auth.cc . Performance reference https://doc.powerdns.com/authoritative/performance.html .

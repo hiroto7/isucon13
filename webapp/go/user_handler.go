@@ -281,6 +281,11 @@ func registerHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, string(out)+": "+err.Error())
 	}
 
+	// Purge negative packet-cache answers before acknowledging a new DNS name.
+	if err := purgeDNSName(ctx, req.Name+".u.isucon.dev"); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to flush DNS name: "+err.Error())
+	}
+
 	user, err := fillUserResponse(ctx, tx, userModel)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())

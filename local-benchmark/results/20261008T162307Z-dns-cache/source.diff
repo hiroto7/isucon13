@@ -1,0 +1,98 @@
+diff --git a/local-benchmark/config/pdns-performance.conf b/local-benchmark/config/pdns-performance.conf
+new file mode 100644
+index 0000000..211f633
+--- /dev/null
++++ b/local-benchmark/config/pdns-performance.conf
+@@ -0,0 +1,23 @@
++api=yes
++api-key=isudns
++webserver=yes
++include-dir=/etc/powerdns/pdns.d
++launch=gmysql
++gmysql-port=3306
++gmysql-user=isudns
++gmysql-dbname=isudns
++gmysql-password=isudns
++local-port=53
++security-poll-suffix=
++setgid=pdns
++setuid=pdns
++cache-ttl=2
++negquery-cache-ttl=0
++query-cache-ttl=2
++zone-cache-refresh-interval=10
++zone-metadata-cache-ttl=60
++
++log-dns-queries=no
++loglevel=4
++log-dns-details=no
++
+diff --git a/webapp/go/dns_cache.go b/webapp/go/dns_cache.go
+new file mode 100644
+index 0000000..abbcd3a
+--- /dev/null
++++ b/webapp/go/dns_cache.go
+@@ -0,0 +1,35 @@
++package main
++
++import (
++	"context"
++	"fmt"
++	"io"
++	"net/http"
++	"net/url"
++	"os"
++	"time"
++)
++
++var dnsAPIClient = &http.Client{Timeout: 2 * time.Second}
++
++func purgeDNSName(ctx context.Context, name string) error {
++	req, err := http.NewRequestWithContext(ctx, http.MethodPut, "http://127.0.0.1:8081/api/v1/servers/localhost/cache/flush?domain="+url.QueryEscape(name+"."), nil)
++	if err != nil {
++		return err
++	}
++	key := os.Getenv("ISUCON13_POWERDNS_API_KEY")
++	if key == "" {
++		key = "isudns"
++	}
++	req.Header.Set("X-API-Key", key)
++	resp, err := dnsAPIClient.Do(req)
++	if err != nil {
++		return err
++	}
++	defer resp.Body.Close()
++	io.Copy(io.Discard, resp.Body)
++	if resp.StatusCode != http.StatusOK {
++		return fmt.Errorf("DNS cache flush status %d", resp.StatusCode)
++	}
++	return nil
++}
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index 35352cc..5b1f0d4 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -281,6 +281,11 @@ func registerHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, string(out)+": "+err.Error())
+ 	}
+ 
++	// Purge negative packet-cache answers before acknowledging a new DNS name.
++	if err := purgeDNSName(ctx, req.Name+".u.isucon.dev"); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to flush DNS name: "+err.Error())
++	}
++
+ 	user, err := fillUserResponse(ctx, tx, userModel)
+ 	if err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())
+diff --git a/webapp/pdns/init_zone.sh b/webapp/pdns/init_zone.sh
+index 6602191..ff1b98d 100755
+--- a/webapp/pdns/init_zone.sh
++++ b/webapp/pdns/init_zone.sh
+@@ -14,3 +14,7 @@ trap 'rm -rf $temp_dir' EXIT
+ sed 's/<ISUCON_SUBDOMAIN_ADDRESS>/'$ISUCON_SUBDOMAIN_ADDRESS'/g' u.isucon.dev.zone > ${temp_dir}/u.isucon.dev.zone
+ pdnsutil load-zone u.isucon.dev ${temp_dir}/u.isucon.dev.zone
+ 
++
++# The positive DNS caches expire within two seconds. Wait before initialization
++# acknowledges replacement of the entire zone, including removed user names.
++sleep 3

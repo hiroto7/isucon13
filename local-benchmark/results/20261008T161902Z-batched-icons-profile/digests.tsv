@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	11488	178.405	0
+START TRANSACTION	25184	25.248	0
+SELECT `slot` FROM `reservation_slots` WHERE `start_at` = ? AND `end_at` = ?	2148	15.211	18814332
+SELECT * FROM `users` WHERE NAME = ?	13972	13.495	13971
+SELECT `id` , `image_hash` FROM `icons` WHERE `user_id` = ?	13619	12.936	12083
+COMMIT	316	11.963	0
+SELECT * FROM `themes` WHERE `user_id` IN (...) ORDER BY `id`	10185	11.255	2338691
+SELECT `user_id` , `image_hash` FROM `icons` WHERE `user_id` IN (...) ORDER BY `id`	10185	10.586	84106
+ROLLBACK	13696	10.319	0
+SELECT `lt` . `livestream_id` , `t` . `id` , `t` . `name` FROM `livestream_tags` `lt` LEFT JOIN `tags` `t` ON `t` . `id` = `lt` . `tag_id` WHERE `lt` . `livestream_id` IN (...) ORDER BY `lt` . `id`	7144	9.836	667871
+SELECT * FROM `users` WHERE `id` IN (...)	10184	9.562	46053
+SELECT * FROM `livestreams` WHERE `id` = ?	6824	4.425	6824
+UPDATE `reservation_slots` SET `slot` = `slot` - ? WHERE `start_at` >= ? AND `end_at` <= ?	228	2.928	1997052
+INSERT INTO `livecomments` ( `user_id` , `livestream_id` , COMMENT , `tip` , `created_at` ) VALUES (...)	1710	2.608	0
+INSERT INTO `icons` ( `user_id` , `image` ) VALUES ( ? , (_charset) ? )	331	2.524	0
+SELECT * FROM `reservation_slots` WHERE `start_at` >= ? AND `end_at` <= ? FOR UPDATE	229	2.358	2005811
+SELECT * FROM `livestreams` WHERE `id` IN (...)	2500	2.245	2500
+SELECT EXISTS ( SELECT ? FROM `ng_words` WHERE `user_id` = ? AND `livestream_id` = ? AND CONVERT ( ? USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` LIKE `CONCAT` ( ? , CONVERT ( `word` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` , ? ) )	1711	1.956	5375
+INSERT INTO `livestream_tags` ( `livestream_id` , `tag_id` ) VALUES (...)	1062	1.816	0
+INSERT INTO `users` ( `id` , NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1000	1.78	0
+SELECT * FROM `livestreams` WHERE `id` = ? FOR UPDATE	1711	1.632	1711
+SELECT * FROM `reactions` WHERE `livestream_id` = ? ORDER BY `created_at` DESC	1273	1.451	13334
+INSERT INTO `reactions` ( `user_id` , `livestream_id` , `emoji_name` , `created_at` ) VALUES (...)	1255	1.316	0
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED	632	1.307	0
+SELECT * FROM `livecomments` WHERE `livestream_id` = ? ORDER BY `created_at` DESC	1238	1.16	15422
+SELECT * FROM `livecomment_reports` WHERE `livestream_id` = ?	1151	0.958	207
+SELECT * FROM `livestreams` ORDER BY `id` DESC LIMIT ?	841	0.861	42050
+DELETE FROM `livecomments` WHERE `livestream_id` = ? AND EXISTS ( SELECT ? FROM `ng_words` WHERE `livestream_id` = ? AND CONVERT ( `livecomments` . `comment` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` LIKE `CONCAT` ( ? , CONVERT ( `word` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` , ? ) )	458	0.852	17683
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , TRUE )	510	0.844	0
+SELECT * FROM `ng_words` WHERE `user_id` = ? AND `livestream_id` = ? ORDER BY `created_at` DESC	823	0.831	3466

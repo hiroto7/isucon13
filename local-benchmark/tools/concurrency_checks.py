@@ -18,8 +18,12 @@ suffix=str(time.time_ns())
 users=[]
 for n in range(8):
  name='concurrency'+suffix+str(n); op=client()
+ missing=subprocess.check_output(['dig','@127.0.0.1',name+'.u.isucon.dev','A','+noall','+comments'],text=True)
+ assert 'NXDOMAIN' in missing,missing
  expect(op,'/api/register',dict(name=name,display_name=name,description='',password='local-test',theme={'dark_mode':True}),201)
  expect(op,'/api/login',dict(username=name,password='local-test'),200)
+ answer=subprocess.check_output(['dig','@127.0.0.1',name+'.u.isucon.dev','A','+short'],text=True).strip()
+ assert answer=='192.168.2.7',answer
  users.append((name,op))
 image=pathlib.Path('/home/isucon/webapp/img/NoImage.jpg').read_bytes()
 def update(pair,n):
