@@ -1,0 +1,6 @@
+{
+  "total_cpu_percent": 379.2,
+  "vm_cpu_percent": 196.8,
+  "max_other_process_cpu_percent": 87.3,
+  "note": "ps snapshot before trial, per-core percentages; raw process names retained locally only"
+}

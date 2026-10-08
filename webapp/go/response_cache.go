@@ -10,25 +10,32 @@ import (
 
 type responseCacheKey struct{}
 type responseCache struct {
-	generation uint64
-	users      map[int64]User
-	streams    map[int64]Livestream
-	tags       map[int64][]Tag
+	generation       uint64
+	streamGeneration uint64
+	pendingStreams   map[int64]streamMetadata
+	users            map[int64]User
+	streams          map[int64]Livestream
+	tags             map[int64][]Tag
 }
 
 func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		_, _, generation := cachedIconHash("")
-		cache := &responseCache{generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
+		cache := &responseCache{generation: generation, streamGeneration: currentStreamGeneration(), pendingStreams: make(map[int64]streamMetadata), users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
-		return next(c)
+		err := next(c)
+		if err == nil && c.Response().Status >= 200 && c.Response().Status < 300 {
+			publishStreamMetadata(cache.pendingStreams, cache.streamGeneration)
+		}
+		return err
 	}
 }
 func responses(ctx context.Context) *responseCache {
 	return ctx.Value(responseCacheKey{}).(*responseCache)
 }
 
-// Every query uses the caller's transaction. No data survives the request.
+// SQL reads use the caller transaction. Immutable metadata is published only
+// after the handler succeeds; mutable owner/icon metadata is loaded separately.
 func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 	cache := responses(ctx)
 	seen := make(map[int64]bool)
@@ -125,15 +132,19 @@ func prefetchStreams(ctx context.Context, tx *sqlx.Tx, models []*LivestreamModel
 	var ids, owners []int64
 	for _, model := range models {
 		if _, ok := cache.streams[model.ID]; !ok {
-			ids = append(ids, model.ID)
 			owners = append(owners, model.UserID)
+			if entry, ok := cachedStreamMetadata(model.ID, cache.streamGeneration); ok {
+				cache.tags[model.ID] = entry.tags
+			} else {
+				ids = append(ids, model.ID)
+			}
 		}
-	}
-	if len(ids) == 0 {
-		return nil
 	}
 	if err := prefetchUsers(ctx, tx, owners); err != nil {
 		return err
+	}
+	if len(ids) == 0 {
+		return nil
 	}
 	var tags []struct {
 		StreamID int64          `db:"livestream_id"`
@@ -156,11 +167,18 @@ func prefetchStreams(ctx context.Context, tx *sqlx.Tx, models []*LivestreamModel
 		}
 		cache.tags[tag.StreamID] = append(cache.tags[tag.StreamID], Tag{ID: tag.ID.Int64, Name: tag.Name.String})
 	}
+	for _, model := range models {
+		cache.pendingStreams[model.ID] = streamMetadata{model: *model, tags: cache.tags[model.ID]}
+	}
 	return nil
 }
 func loadLivestreamResponse(ctx context.Context, tx *sqlx.Tx, id int64) (Livestream, error) {
 	if stream, ok := responses(ctx).streams[id]; ok {
 		return stream, nil
+	}
+	if entry, ok := cachedStreamMetadata(id, responses(ctx).streamGeneration); ok {
+		responses(ctx).tags[id] = entry.tags
+		return fillLivestreamResponse(ctx, tx, entry.model)
 	}
 	var model LivestreamModel
 	if err := tx.GetContext(ctx, &model, "SELECT * FROM livestreams WHERE id = ?", id); err != nil {
@@ -176,19 +194,29 @@ func prefetchReferencedResponses(ctx context.Context, tx *sqlx.Tx, streamIDs, us
 	}
 	unique := make(map[int64]bool)
 	ids := make([]int64, 0, len(streamIDs))
+	var models []*LivestreamModel
 	for _, id := range streamIDs {
 		if !unique[id] {
 			unique[id] = true
-			ids = append(ids, id)
+			if entry, ok := cachedStreamMetadata(id, responses(ctx).streamGeneration); ok {
+				model := entry.model
+				models = append(models, &model)
+				responses(ctx).tags[id] = entry.tags
+			} else {
+				ids = append(ids, id)
+			}
 		}
 	}
-	query, args, err := sqlx.In("SELECT * FROM livestreams WHERE id IN (?)", ids)
-	if err != nil {
-		return err
-	}
-	var models []*LivestreamModel
-	if err := tx.SelectContext(ctx, &models, query, args...); err != nil {
-		return err
+	if len(ids) > 0 {
+		query, args, err := sqlx.In("SELECT * FROM livestreams WHERE id IN (?)", ids)
+		if err != nil {
+			return err
+		}
+		var missing []*LivestreamModel
+		if err := tx.SelectContext(ctx, &missing, query, args...); err != nil {
+			return err
+		}
+		models = append(models, missing...)
 	}
 	for _, model := range models {
 		userIDs = append(userIDs, model.UserID)

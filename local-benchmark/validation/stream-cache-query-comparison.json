@@ -1,0 +1,32 @@
+{
+  "20261008T212904Z-final-after-reboot": {
+    "total_commands": 492289,
+    "queries": {
+      "SELECT `lt` . `livestream_id` , `t` . `id` , `t` . `name` FROM `livestream_tags` `lt` LEFT JOIN `tags` `t` ON `t` . `id` = `lt` . `tag_id` WHERE `lt` . `livestream_id` IN (...) ORDER BY `lt` . `id`": {
+        "count": 60770,
+        "seconds": 10.566
+      },
+      "SELECT * FROM `livestreams` WHERE `id` = ?": {
+        "count": 55435,
+        "seconds": 3.313
+      },
+      "SELECT * FROM `livestreams` WHERE `id` IN (...)": {
+        "count": 23773,
+        "seconds": 1.526
+      }
+    }
+  },
+  "20261008T235057Z-immutable-stream-tags-and-search-join": {
+    "total_commands": 407265,
+    "queries": {
+      "SELECT * FROM `livestreams` WHERE `id` = ?": {
+        "count": 11377,
+        "seconds": 0.89
+      },
+      "SELECT `lt` . `livestream_id` , `t` . `id` , `t` . `name` FROM `livestream_tags` `lt` LEFT JOIN `tags` `t` ON `t` . `id` = `lt` . `tag_id` WHERE `lt` . `livestream_id` IN (...) ORDER BY `lt` . `id`": {
+        "count": 1497,
+        "seconds": 0.225
+      }
+    }
+  }
+}

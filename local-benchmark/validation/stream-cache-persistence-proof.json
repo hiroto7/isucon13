@@ -1,0 +1,222 @@
+{
+  "name": "persist1791503555386336768",
+  "sid": 8895,
+  "cookie": "SESSIONID=MTc5MTUwMzU1NXxEWDhFQVFMX2dBQUJFQUVRQUFEX3ZQLUFBQVFHYzNSeWFXNW5EQWtBQjBWWVVFbFNSVk1GYVc1ME5qUUVCZ0Q4MVpCMXBnWnpkSEpwYm1jTUN3QUpVMFZUVTBsUFRrbEVCbk4wY21sdVp3d21BQ1F4TmpWaU9ESmpaQzAyT1RBMkxUUTFORFl0T0RJMllTMWpNRFU0TWpBek1qSmxPVGNHYzNSeWFXNW5EQWdBQmxWVFJWSkpSQVZwYm5RMk5BUUVBUDRXRUFaemRISnBibWNNQ2dBSVZWTkZVazVCVFVVR2MzUnlhVzVuREJ3QUduQmxjbk5wYzNReE56a3hOVEF6TlRVMU16ZzJNek0yTnpZNHzvMUo4VgEqnkDn2UlKf82zw83oIbpPKr0txDHTdSiQ4g==",
+  "snapshot": {
+    "/api/user/me": {
+      "id": 2824,
+      "name": "persist1791503555386336768",
+      "display_name": "Persistent user",
+      "description": "Before reboot",
+      "theme": {
+        "id": 2823,
+        "dark_mode": true
+      },
+      "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+    },
+    "/api/user/persist1791503555386336768/livestream": [
+      {
+        "id": 8895,
+        "owner": {
+          "id": 2824,
+          "name": "persist1791503555386336768",
+          "display_name": "Persistent user",
+          "description": "Before reboot",
+          "theme": {
+            "id": 2823,
+            "dark_mode": true
+          },
+          "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+        },
+        "title": "Persisted stream",
+        "description": "Reboot verification",
+        "playlist_url": "https://example.com/list",
+        "thumbnail_url": "https://example.com/image",
+        "tags": [
+          {
+            "id": 1,
+            "name": "ライブ配信"
+          }
+        ],
+        "start_at": 1700877600,
+        "end_at": 1700881200
+      }
+    ],
+    "/api/livestream/8895/livecomment": [
+      {
+        "id": 16529,
+        "user": {
+          "id": 2824,
+          "name": "persist1791503555386336768",
+          "display_name": "Persistent user",
+          "description": "Before reboot",
+          "theme": {
+            "id": 2823,
+            "dark_mode": true
+          },
+          "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+        },
+        "livestream": {
+          "id": 8895,
+          "owner": {
+            "id": 2824,
+            "name": "persist1791503555386336768",
+            "display_name": "Persistent user",
+            "description": "Before reboot",
+            "theme": {
+              "id": 2823,
+              "dark_mode": true
+            },
+            "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+          },
+          "title": "Persisted stream",
+          "description": "Reboot verification",
+          "playlist_url": "https://example.com/list",
+          "thumbnail_url": "https://example.com/image",
+          "tags": [
+            {
+              "id": 1,
+              "name": "ライブ配信"
+            }
+          ],
+          "start_at": 1700877600,
+          "end_at": 1700881200
+        },
+        "comment": "persisted comment",
+        "tip": 123,
+        "created_at": 1791503555
+      }
+    ],
+    "/api/livestream/8895/reaction": [
+      {
+        "id": 14447,
+        "emoji_name": "persistence-emoji",
+        "user": {
+          "id": 2824,
+          "name": "persist1791503555386336768",
+          "display_name": "Persistent user",
+          "description": "Before reboot",
+          "theme": {
+            "id": 2823,
+            "dark_mode": true
+          },
+          "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+        },
+        "livestream": {
+          "id": 8895,
+          "owner": {
+            "id": 2824,
+            "name": "persist1791503555386336768",
+            "display_name": "Persistent user",
+            "description": "Before reboot",
+            "theme": {
+              "id": 2823,
+              "dark_mode": true
+            },
+            "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+          },
+          "title": "Persisted stream",
+          "description": "Reboot verification",
+          "playlist_url": "https://example.com/list",
+          "thumbnail_url": "https://example.com/image",
+          "tags": [
+            {
+              "id": 1,
+              "name": "ライブ配信"
+            }
+          ],
+          "start_at": 1700877600,
+          "end_at": 1700881200
+        },
+        "created_at": 1791503555
+      }
+    ],
+    "/api/livestream/8895/ngwords": [
+      {
+        "id": 19986,
+        "user_id": 2824,
+        "livestream_id": 8895,
+        "word": "do-not-allow",
+        "created_at": 1791503555
+      }
+    ],
+    "/api/livestream/8895/report": [
+      {
+        "id": 61,
+        "reporter": {
+          "id": 2824,
+          "name": "persist1791503555386336768",
+          "display_name": "Persistent user",
+          "description": "Before reboot",
+          "theme": {
+            "id": 2823,
+            "dark_mode": true
+          },
+          "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+        },
+        "livecomment": {
+          "id": 16529,
+          "user": {
+            "id": 2824,
+            "name": "persist1791503555386336768",
+            "display_name": "Persistent user",
+            "description": "Before reboot",
+            "theme": {
+              "id": 2823,
+              "dark_mode": true
+            },
+            "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+          },
+          "livestream": {
+            "id": 8895,
+            "owner": {
+              "id": 2824,
+              "name": "persist1791503555386336768",
+              "display_name": "Persistent user",
+              "description": "Before reboot",
+              "theme": {
+                "id": 2823,
+                "dark_mode": true
+              },
+              "icon_hash": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7"
+            },
+            "title": "Persisted stream",
+            "description": "Reboot verification",
+            "playlist_url": "https://example.com/list",
+            "thumbnail_url": "https://example.com/image",
+            "tags": [
+              {
+                "id": 1,
+                "name": "ライブ配信"
+              }
+            ],
+            "start_at": 1700877600,
+            "end_at": 1700881200
+          },
+          "comment": "persisted comment",
+          "tip": 123,
+          "created_at": 1791503555
+        },
+        "created_at": 1791503555
+      }
+    ],
+    "/api/livestream/8895/statistics": {
+      "rank": 765,
+      "viewers_count": 1,
+      "total_reactions": 1,
+      "total_reports": 1,
+      "max_tip": 123
+    },
+    "/api/user/persist1791503555386336768/statistics": {
+      "rank": 218,
+      "viewers_count": 1,
+      "total_reactions": 1,
+      "total_livecomments": 1,
+      "total_tip": 123,
+      "favorite_emoji": "persistence-emoji"
+    },
+    "icon_sha256": "fd7dacd9437b3275217afdea5e76d6fc99b0d9d6112256df136b1ff0b8a135d7",
+    "dns": "192.168.2.7",
+    "inventory": "users\t2823\t3987895\nthemes\t2823\t3986076\nicons\t1814\t2321233\nlivestreams\t8895\t39564960\nlivestream_tags\t17881\t159874021\nreservation_slots\t8759\t38364420\nlivestream_viewers_history\t11\t12724\nlivecomments\t16506\t136572754\nreactions\t14447\t104365128\nng_words\t19986\t199730091\nlivecomment_reports\t61\t1891\n"
+  }
+}

@@ -1,0 +1,326 @@
+diff --git a/webapp/go/livestream_handler.go b/webapp/go/livestream_handler.go
+index 9ece8cf..c424d3f 100644
+--- a/webapp/go/livestream_handler.go
++++ b/webapp/go/livestream_handler.go
+@@ -180,27 +180,13 @@ func searchLivestreamsHandler(c echo.Context) error {
+ 	var livestreamModels []*LivestreamModel
+ 	if c.QueryParam("tag") != "" {
+ 		// タグによる取得
+-		var tagIDList []int
+-		if err := tx.SelectContext(ctx, &tagIDList, "SELECT id FROM tags WHERE name = ?", keyTagName); err != nil {
+-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get tags: "+err.Error())
+-		}
+-
+-		query, params, err := sqlx.In("SELECT * FROM livestream_tags WHERE tag_id IN (?) ORDER BY livestream_id DESC", tagIDList)
+-		if err != nil {
+-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to construct IN query: "+err.Error())
+-		}
+-		var keyTaggedLivestreams []*LivestreamTagModel
+-		if err := tx.SelectContext(ctx, &keyTaggedLivestreams, query, params...); err != nil {
+-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get keyTaggedLivestreams: "+err.Error())
+-		}
+-
+-		for _, keyTaggedLivestream := range keyTaggedLivestreams {
+-			ls := LivestreamModel{}
+-			if err := tx.GetContext(ctx, &ls, "SELECT * FROM livestreams WHERE id = ?", keyTaggedLivestream.LivestreamID); err != nil {
+-				return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+-			}
+-
+-			livestreamModels = append(livestreamModels, &ls)
++		// Preserve one result per matching tag relation, including duplicates,
++		// and the reference ordering; load stream rows in the same snapshot.
++		query := `SELECT l.* FROM tags t JOIN livestream_tags lt ON lt.tag_id=t.id
++          JOIN livestreams l ON l.id=lt.livestream_id
++          WHERE t.name=? ORDER BY lt.livestream_id DESC`
++		if err := tx.SelectContext(ctx, &livestreamModels, query, keyTagName); err != nil {
++			return echo.NewHTTPError(http.StatusInternalServerError, "failed to search tagged livestreams: "+err.Error())
+ 		}
+ 	} else {
+ 		// 検索条件なし
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 2145ca6..b579a7f 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -116,6 +116,8 @@ func initializeHandler(c echo.Context) error {
+ 	defer dnsLifecycle.Unlock()
+ 	clearIconHashes()
+ 	defer clearIconHashes()
++	clearStreamMetadata()
++	defer clearStreamMetadata()
+ 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
+ 		c.Logger().Warnf("init.sh failed with err=%s", string(out))
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
+diff --git a/webapp/go/response_cache.go b/webapp/go/response_cache.go
+index 3b8c6e7..32920eb 100644
+--- a/webapp/go/response_cache.go
++++ b/webapp/go/response_cache.go
+@@ -10,25 +10,32 @@ import (
+ 
+ type responseCacheKey struct{}
+ type responseCache struct {
+-	generation uint64
+-	users      map[int64]User
+-	streams    map[int64]Livestream
+-	tags       map[int64][]Tag
++	generation       uint64
++	streamGeneration uint64
++	pendingStreams   map[int64]streamMetadata
++	users            map[int64]User
++	streams          map[int64]Livestream
++	tags             map[int64][]Tag
+ }
+ 
+ func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+ 	return func(c echo.Context) error {
+ 		_, _, generation := cachedIconHash("")
+-		cache := &responseCache{generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
++		cache := &responseCache{generation: generation, streamGeneration: currentStreamGeneration(), pendingStreams: make(map[int64]streamMetadata), users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
+ 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
+-		return next(c)
++		err := next(c)
++		if err == nil && c.Response().Status >= 200 && c.Response().Status < 300 {
++			publishStreamMetadata(cache.pendingStreams, cache.streamGeneration)
++		}
++		return err
+ 	}
+ }
+ func responses(ctx context.Context) *responseCache {
+ 	return ctx.Value(responseCacheKey{}).(*responseCache)
+ }
+ 
+-// Every query uses the caller's transaction. No data survives the request.
++// SQL reads use the caller transaction. Immutable metadata is published only
++// after the handler succeeds; mutable owner/icon metadata is loaded separately.
+ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 	cache := responses(ctx)
+ 	seen := make(map[int64]bool)
+@@ -125,16 +132,20 @@ func prefetchStreams(ctx context.Context, tx *sqlx.Tx, models []*LivestreamModel
+ 	var ids, owners []int64
+ 	for _, model := range models {
+ 		if _, ok := cache.streams[model.ID]; !ok {
+-			ids = append(ids, model.ID)
+ 			owners = append(owners, model.UserID)
++			if entry, ok := cachedStreamMetadata(model.ID, cache.streamGeneration); ok {
++				cache.tags[model.ID] = entry.tags
++			} else {
++				ids = append(ids, model.ID)
++			}
+ 		}
+ 	}
+-	if len(ids) == 0 {
+-		return nil
+-	}
+ 	if err := prefetchUsers(ctx, tx, owners); err != nil {
+ 		return err
+ 	}
++	if len(ids) == 0 {
++		return nil
++	}
+ 	var tags []struct {
+ 		StreamID int64          `db:"livestream_id"`
+ 		ID       sql.NullInt64  `db:"id"`
+@@ -156,12 +167,19 @@ func prefetchStreams(ctx context.Context, tx *sqlx.Tx, models []*LivestreamModel
+ 		}
+ 		cache.tags[tag.StreamID] = append(cache.tags[tag.StreamID], Tag{ID: tag.ID.Int64, Name: tag.Name.String})
+ 	}
++	for _, model := range models {
++		cache.pendingStreams[model.ID] = streamMetadata{model: *model, tags: cache.tags[model.ID]}
++	}
+ 	return nil
+ }
+ func loadLivestreamResponse(ctx context.Context, tx *sqlx.Tx, id int64) (Livestream, error) {
+ 	if stream, ok := responses(ctx).streams[id]; ok {
+ 		return stream, nil
+ 	}
++	if entry, ok := cachedStreamMetadata(id, responses(ctx).streamGeneration); ok {
++		responses(ctx).tags[id] = entry.tags
++		return fillLivestreamResponse(ctx, tx, entry.model)
++	}
+ 	var model LivestreamModel
+ 	if err := tx.GetContext(ctx, &model, "SELECT * FROM livestreams WHERE id = ?", id); err != nil {
+ 		return Livestream{}, err
+@@ -176,19 +194,29 @@ func prefetchReferencedResponses(ctx context.Context, tx *sqlx.Tx, streamIDs, us
+ 	}
+ 	unique := make(map[int64]bool)
+ 	ids := make([]int64, 0, len(streamIDs))
++	var models []*LivestreamModel
+ 	for _, id := range streamIDs {
+ 		if !unique[id] {
+ 			unique[id] = true
+-			ids = append(ids, id)
++			if entry, ok := cachedStreamMetadata(id, responses(ctx).streamGeneration); ok {
++				model := entry.model
++				models = append(models, &model)
++				responses(ctx).tags[id] = entry.tags
++			} else {
++				ids = append(ids, id)
++			}
+ 		}
+ 	}
+-	query, args, err := sqlx.In("SELECT * FROM livestreams WHERE id IN (?)", ids)
+-	if err != nil {
+-		return err
+-	}
+-	var models []*LivestreamModel
+-	if err := tx.SelectContext(ctx, &models, query, args...); err != nil {
+-		return err
++	if len(ids) > 0 {
++		query, args, err := sqlx.In("SELECT * FROM livestreams WHERE id IN (?)", ids)
++		if err != nil {
++			return err
++		}
++		var missing []*LivestreamModel
++		if err := tx.SelectContext(ctx, &missing, query, args...); err != nil {
++			return err
++		}
++		models = append(models, missing...)
+ 	}
+ 	for _, model := range models {
+ 		userIDs = append(userIDs, model.UserID)
+diff --git a/webapp/go/stream_cache.go b/webapp/go/stream_cache.go
+new file mode 100644
+index 0000000..1a8ddd2
+--- /dev/null
++++ b/webapp/go/stream_cache.go
+@@ -0,0 +1,54 @@
++package main
++
++import "sync"
++
++// Stream rows and tags never change after reservation. Do not cache the owner
++// DTO here: its icon hash can change. SQL remains the persistent source of truth.
++type streamMetadata struct {
++	model LivestreamModel
++	tags  []Tag
++}
++
++var streamCache = struct {
++	sync.RWMutex
++	generation uint64
++	entries    map[int64]streamMetadata
++}{entries: make(map[int64]streamMetadata)}
++
++func cloneStreamMetadata(entry streamMetadata) streamMetadata {
++	entry.tags = append([]Tag{}, entry.tags...)
++	return entry
++}
++func currentStreamGeneration() uint64 {
++	streamCache.RLock()
++	defer streamCache.RUnlock()
++	return streamCache.generation
++}
++func cachedStreamMetadata(id int64, generation uint64) (streamMetadata, bool) {
++	streamCache.RLock()
++	defer streamCache.RUnlock()
++	if generation != streamCache.generation {
++		return streamMetadata{}, false
++	}
++	entry, ok := streamCache.entries[id]
++	return cloneStreamMetadata(entry), ok
++}
++func publishStreamMetadata(entries map[int64]streamMetadata, generation uint64) {
++	streamCache.Lock()
++	defer streamCache.Unlock()
++	if generation != streamCache.generation {
++		return
++	}
++	for id, entry := range entries {
++		if len(streamCache.entries) >= 65536 {
++			break
++		}
++		streamCache.entries[id] = cloneStreamMetadata(entry)
++	}
++}
++func clearStreamMetadata() {
++	streamCache.Lock()
++	defer streamCache.Unlock()
++	streamCache.generation++
++	streamCache.entries = make(map[int64]streamMetadata)
++}
+diff --git a/webapp/go/stream_cache_test.go b/webapp/go/stream_cache_test.go
+new file mode 100644
+index 0000000..1a76890
+--- /dev/null
++++ b/webapp/go/stream_cache_test.go
+@@ -0,0 +1,81 @@
++package main
++
++import (
++	"errors"
++	"fmt"
++	"net/http"
++	"net/http/httptest"
++	"sync"
++	"testing"
++
++	"github.com/labstack/echo/v4"
++)
++
++func TestStreamCachePublicationAndInitializationFence(t *testing.T) {
++	clearStreamMetadata()
++	generation := currentStreamGeneration()
++	input := streamMetadata{model: LivestreamModel{ID: 1, UserID: 2, Title: "committed"}, tags: []Tag{{ID: 3, Name: "tag"}}}
++	publishStreamMetadata(map[int64]streamMetadata{1: input}, generation)
++	input.tags[0].Name = "changed"
++	got, ok := cachedStreamMetadata(1, generation)
++	if !ok || got.tags[0].Name != "tag" {
++		t.Fatal("caller mutated published tags")
++	}
++	got.tags[0].Name = "changed again"
++	again, _ := cachedStreamMetadata(1, generation)
++	if again.tags[0].Name != "tag" {
++		t.Fatal("reader mutated cache")
++	}
++	clearStreamMetadata()
++	publishStreamMetadata(map[int64]streamMetadata{1: input}, generation)
++	if _, ok := cachedStreamMetadata(1, currentStreamGeneration()); ok {
++		t.Fatal("old request repopulated ID after initialize")
++	}
++	if _, ok := cachedStreamMetadata(1, generation); ok {
++		t.Fatal("old request read new generation")
++	}
++}
++func TestStreamCacheOnlyPublishesAfterSuccessfulHandler(t *testing.T) {
++	for _, fail := range []bool{true, false} {
++		clearStreamMetadata()
++		e := echo.New()
++		c := e.NewContext(httptest.NewRequest(http.MethodGet, "/", nil), httptest.NewRecorder())
++		err := responseCacheMiddleware(func(c echo.Context) error {
++			state := responses(c.Request().Context())
++			state.pendingStreams[10] = streamMetadata{model: LivestreamModel{ID: 10, Title: "reservation"}, tags: []Tag{}}
++			if _, ok := cachedStreamMetadata(10, state.streamGeneration); ok {
++				t.Fatal("published before handler commit/success")
++			}
++			if fail {
++				return errors.New("rollback")
++			}
++			return c.NoContent(http.StatusCreated)
++		})(c)
++		_, present := cachedStreamMetadata(10, currentStreamGeneration())
++		if present == fail || (err != nil) != fail {
++			t.Fatal("failed request published or successful request lost")
++		}
++	}
++}
++func TestStreamCacheConcurrentReadersAndInitialization(t *testing.T) {
++	clearStreamMetadata()
++	var group sync.WaitGroup
++	for n := 0; n < 8; n++ {
++		group.Add(1)
++		go func(n int) {
++			defer group.Done()
++			for j := 0; j < 200; j++ {
++				generation := currentStreamGeneration()
++				id := int64(n*200 + j)
++				publishStreamMetadata(map[int64]streamMetadata{id: {model: LivestreamModel{ID: id, Title: fmt.Sprint(id)}, tags: []Tag{}}}, generation)
++				if got, ok := cachedStreamMetadata(id, generation); ok && got.model.ID != id {
++					t.Error("wrong cached ID")
++				}
++			}
++		}(n)
++	}
++	for n := 0; n < 100; n++ {
++		clearStreamMetadata()
++	}
++	group.Wait()
++}

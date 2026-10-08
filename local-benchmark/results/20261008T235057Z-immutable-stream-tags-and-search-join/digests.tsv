@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	110701	11.072	0
+INSERT INTO `icons` ( `user_id` , `image` ) VALUES ( ? , (_charset) ? )	2310	3.85	0
+UPDATE `reservation_slots` SET `slot` = `slot` - ? WHERE `start_at` >= ? AND `end_at` <= ?	1398	3.774	12245082
+START TRANSACTION	114422	2.495	0
+SELECT `l` . `id` AS `livestreamid` , `IFNULL` ( `r` . `reactions` , ? ) + `IFNULL` ( `c` . `tips` , ? ) AS `score` FROM `livestreams` `l` LEFT JOIN ( SELECT `livestream_id` , COUNT ( * ) AS `reactions` FROM `reactions` GROUP BY `livestream_id` ) `r` ON `r` . `livestream_id` = `l` . `id` LEFT JOIN ( SELECT `livestream_id` , SUM ( `tip` ) AS `tips` FROM `livecomments` GROUP BY `livestream_id` ) `c` ON `c` . `livestream_id` = `l` . `id`	129	2.197	1532881
+SELECT EXISTS ( SELECT ? FROM `ng_words` WHERE `user_id` = ? AND `livestream_id` = ? AND CONVERT ( ? USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` LIKE `CONCAT` ( ? , CONVERT ( `word` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` , ? ) )	15519	2.179	57697
+SELECT `u` . `name` AS `username` , `IFNULL` ( `r` . `reactions` , ? ) + `IFNULL` ( `c` . `tips` , ? ) AS `score` FROM `users` `u` LEFT JOIN ( SELECT `l` . `user_id` , COUNT ( * ) AS `reactions` FROM `livestreams` `l` INNER JOIN `reactions` `r` ON `r` . `livestream_id` = `l` . `id` GROUP BY `l` . `user_id` ) `r` ON `r` . `user_id` = `u` . `id` LEFT JOIN ( SELECT `l` . `user_id` , SUM ( `c` . `tip` ) AS `tips` FROM `livestreams` `l` INNER JOIN `livecomments` `c` ON `c` . `livestream_id` = `l` . `id` GROUP BY `l` . `user_id` ) `c` ON `c` . `user_id` = `u` . `id`	129	2.04	437242
+SELECT * FROM `livecomments` WHERE `livestream_id` = ? ORDER BY `created_at` DESC	13429	1.875	174293
+SELECT * FROM `reactions` WHERE `livestream_id` = ? ORDER BY `created_at` DESC	13459	1.808	166844
+INSERT INTO `reactions` ( `user_id` , `livestream_id` , `emoji_name` , `created_at` ) VALUES (...)	13444	1.512	0
+INSERT INTO `livecomments` ( `user_id` , `livestream_id` , COMMENT , `tip` , `created_at` ) VALUES (...)	15524	1.474	0
+SELECT * FROM `livestreams` WHERE `id` = ? FOR UPDATE	15519	1.315	15525
+DELETE FROM `livecomments` WHERE `livestream_id` = ? AND EXISTS ( SELECT ? FROM `ng_words` WHERE `livestream_id` = ? AND CONVERT ( `livecomments` . `comment` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` LIKE `CONCAT` ( ? , CONVERT ( `word` USING `utf8mb4` ) COLLATE `utf8mb4_general_ci` , ? ) )	5648	1.26	188864
+SELECT * FROM `livestreams` ORDER BY `id` DESC LIMIT ?	8556	1.079	427900
+SELECT * FROM `ng_words` WHERE `user_id` = ? AND `livestream_id` = ? ORDER BY `created_at` DESC	8428	0.999	39078
+SELECT * FROM `livestreams` WHERE `id` = ?	11377	0.89	11377
+SELECT * FROM `livecomment_reports` WHERE `livestream_id` = ?	11182	0.879	142
+SELECT * FROM `reservation_slots` WHERE `start_at` >= ? AND `start_at` < ? AND `end_at` <= ? FOR UPDATE	4750	0.652	61221
+SELECT * FROM `livestreams` WHERE `id` = ? AND `user_id` = ? FOR UPDATE	5648	0.51	5648
+INSERT INTO `ng_words` ( `user_id` , `livestream_id` , `word` , `created_at` ) VALUES (...)	5648	0.51	0
+COMMIT	1822	0.468	0
+INSERT INTO `livestream_tags` ( `livestream_id` , `tag_id` ) VALUES (...)	6912	0.454	0
+SELECT * FROM `tags`	4853	0.435	499859
+SELECT * FROM `livestreams` WHERE `user_id` = ?	3371	0.366	10331
+SELECT `r` . `name` , `r` . `type` , `r` . `content` , `r` . `ttl` FROM `records` `r` JOIN `domains` `d` ON `d` . `id` = `r` . `domain_id` WHERE `d` . `name` = ? AND `r` . `disabled` = ? AND `r` . `id` > ? ORDER BY `r` . `id`	1821	0.316	1821
+INSERT INTO `users` ( NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1822	0.273	0
+SELECT * FROM `users` WHERE NAME = ?	2321	0.243	2320
+SELECT `lt` . `livestream_id` , `t` . `id` , `t` . `name` FROM `livestream_tags` `lt` LEFT JOIN `tags` `t` ON `t` . `id` = `lt` . `tag_id` WHERE `lt` . `livestream_id` IN (...) ORDER BY `lt` . `id`	1497	0.225	43224
+SELECT * FROM `themes` WHERE `user_id` = ?	1982	0.196	1982
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED	3644	0.193	0

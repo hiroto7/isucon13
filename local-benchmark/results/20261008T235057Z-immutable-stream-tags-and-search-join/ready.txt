@@ -1,0 +1,22 @@
+active
+active
+active
+Netid State  Recv-Q Send-Q                    Local Address:Port  Peer Address:PortProcess                                                                                                                    
+udp   UNCONN 0      0                    192.168.2.7%enp0s1:68         0.0.0.0:*    users:(("systemd-network",pid=616,fd=18))                                                                                 
+udp   UNCONN 0      0                                     *:53               *:*    users:(("isupipe",pid=175933,fd=9))                                                                                       
+udp   UNCONN 0      0      [fe80::5054:ff:fe11:159e]%enp0s1:546           [::]:*    users:(("systemd-network",pid=616,fd=15))                                                                                 
+tcp   LISTEN 0      128                             0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=724,fd=3))                                                                                             
+tcp   LISTEN 0      511                             0.0.0.0:80         0.0.0.0:*    users:(("nginx",pid=732,fd=6),("nginx",pid=731,fd=6),("nginx",pid=730,fd=6),("nginx",pid=729,fd=6),("nginx",pid=728,fd=6))
+tcp   LISTEN 0      511                             0.0.0.0:443        0.0.0.0:*    users:(("nginx",pid=732,fd=7),("nginx",pid=731,fd=7),("nginx",pid=730,fd=7),("nginx",pid=729,fd=7),("nginx",pid=728,fd=7))
+tcp   LISTEN 0      151                           127.0.0.1:3306       0.0.0.0:*    users:(("mysqld",pid=737,fd=26))                                                                                          
+tcp   LISTEN 0      70                            127.0.0.1:33060      0.0.0.0:*    users:(("mysqld",pid=737,fd=20))                                                                                          
+tcp   LISTEN 0      4096                          127.0.0.1:6060       0.0.0.0:*    users:(("isupipe",pid=175933,fd=7))                                                                                       
+tcp   LISTEN 0      4096                                  *:53               *:*    users:(("isupipe",pid=175933,fd=10))                                                                                      
+tcp   LISTEN 0      128                                [::]:22            [::]:*    users:(("sshd",pid=724,fd=4))                                                                                             
+tcp   LISTEN 0      4096                                  *:8080             *:*    users:(("isupipe",pid=175933,fd=11))                                                                                      
+92a27bdd5e9d232b77fa7b235877e9c76b3fe321046091ef4efa465d2746fbad  /home/isucon/webapp/go/isupipe
+/home/isucon/webapp/go/isupipe
+aa2939c403831aa6bbd8bc1d2da9c5f9fa42ebdff4888ebf5bfa6319b6f7c5ef  /etc/powerdns/pdns.conf
+c4347220313b700cf1b94d1368e073def29fe11d25a93089cf159b489cb50a80  /etc/nginx/sites-available/isupipe.conf
+64d4d3cc42f496f3a40b9dd75bcbde0d6da8f15c97558bd19a271a664b26734f  /home/isucon/env.sh
+611b3b7e30c8423f8505a64f8ca0815ab7a0b67b998297f72aaeb8e0fcd7f8ac  /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf
