@@ -50,10 +50,12 @@ def main():
         (out/'ready.txt').write_text(ready.stdout)
         stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
         (out/'dbstats-before.json').write_text(stats.stdout)
+        batches = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/write-batches'],capture_output=True,text=True,timeout=10)
+        (out/'write-batches-before.json').write_text(batches.stdout)
         schema = mp('exec', args.app, '--', 'sudo', 'mysql', '-e',
-            "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections'); "
+            "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections','auto_increment_increment','innodb_redo_log_capacity','log_bin'); "
             "SHOW INDEX FROM isudns.records; SHOW CREATE TABLE isupipe.icons; SHOW CREATE TABLE isupipe.livecomments; "
-            "SHOW CREATE TABLE isupipe.ng_words", capture_output=True)
+            "SHOW CREATE TABLE isupipe.reservation_slots; SHOW CREATE TABLE isupipe.ng_words", capture_output=True)
         (out/'schema.txt').write_text(schema.stdout)
         mp('exec', args.bench, '--', 'sudo', 'mkdir', '-p', '/opt/trial')
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
@@ -116,6 +118,8 @@ def main():
         row['messages'] = official.get('messages')
         stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
         (out/'dbstats-after.json').write_text(stats.stdout)
+        batches = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/write-batches'],capture_output=True,text=True,timeout=10)
+        (out/'write-batches-after.json').write_text(batches.stdout)
         mp('exec',args.app,'--','sudo','sh','-c',
            'mysql -B -e "SELECT DIGEST_TEXT,COUNT_STAR,ROUND(SUM_TIMER_WAIT/1e12,3) seconds,SUM_ROWS_EXAMINED '
            'FROM performance_schema.events_statements_summary_by_digest ORDER BY SUM_TIMER_WAIT DESC LIMIT 30" '

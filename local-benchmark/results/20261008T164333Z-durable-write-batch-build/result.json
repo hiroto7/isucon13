@@ -1,0 +1,11 @@
+{
+  "started_at": "20261008T164333Z",
+  "stage": "durable-write-batch-build",
+  "decision": "not_applicable",
+  "status": "preparation_failed",
+  "score": null,
+  "reported_score": null,
+  "commit": "412fafbd4dd314966351a035176f0aa677e250fc",
+  "diff_sha256": "52f38d308a6cbc492b3a08d86892666239ce42d2625a8bc426e3ef09736a777c",
+  "error": "Go build: write_batch.go unused net/http import; corrected before official trial"
+}

@@ -79,6 +79,29 @@ for n in range(10):
  expect(op,f'/api/livestream/{sid}/livecomment',dict(comment=word,tip=0),400)
 print('PASS: 10 moderation races, 160 concurrent posts, no surviving spam')
 
+# Verify IDs and fields from multi-row inserts under simultaneous mixed writes.
+def mixed(n):
+ pair=users[n%8]; author=pair[0]; peer=pair[1]
+ if n%2==0:
+  text='batchcheck'+suffix+str(n)
+  value=json.loads(expect(peer,f'/api/livestream/{sid}/livecomment',{'comment':text,'tip':n},201))
+  assert value['comment']==text and value['tip']==n and value['user']['name']==author,value
+  return ('comment',value['id'],text,n,author)
+ emoji='batch-emoji-'+str(n)
+ value=json.loads(expect(peer,f'/api/livestream/{sid}/reaction',{'emoji_name':emoji},201))
+ assert value['emoji_name']==emoji and value['user']['name']==author,value
+ return ('reaction',value['id'],emoji,0,author)
+with concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
+ values=list(pool.map(mixed,range(128)))
+comments={v['id']:v for v in json.loads(expect(op,f'/api/livestream/{sid}/livecomment',None,200))}
+reactions={v['id']:v for v in json.loads(expect(op,f'/api/livestream/{sid}/reaction',None,200))}
+for kind,ident,text,tip,author in values:
+ actual=comments[ident] if kind=='comment' else reactions[ident]
+ assert actual['user']['name']==author and actual['livestream']['id']==sid,actual
+ if kind=='comment': assert actual['comment']==text and actual['tip']==tip,actual
+ else: assert actual['emoji_name']==text,actual
+print('PASS: 128 concurrent mixed writes, exact committed IDs/authors/tips/content match returned payloads')
+
 # A fixture with one remaining slot must have exactly one concurrent winner.
 mysql=['mysql','-uisucon','-pisucon','-h127.0.0.1','isupipe','-Nse']
 start,end=map(int,slot)
