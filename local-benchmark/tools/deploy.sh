@@ -15,6 +15,8 @@ multipass exec "$app" -- sudo bash -c 'set -euo pipefail
 systemctl stop isupipe-go
 find /home/isucon/webapp/go /home/isucon/webapp/sql /home/isucon/webapp/pdns -type f -name "._*" -delete
 find /home/isucon/webapp/go -maxdepth 1 -name "*.go" -delete
+# The PDNS directory contains managed source only; generated zones live in /home/isucon/dns.
+find /home/isucon/webapp/pdns -maxdepth 1 -type f -delete
 tar xzf /tmp/source.tar.gz -C /home/isucon
 chown -R isucon:isucon /home/isucon/webapp
 cd /home/isucon/webapp/go

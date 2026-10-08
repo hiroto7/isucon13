@@ -1,0 +1,1 @@
+{"pass":false,"score":0,"messages":["初期化が失敗しました","initialize へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)"],"language":"unknown","resolved_count":0}

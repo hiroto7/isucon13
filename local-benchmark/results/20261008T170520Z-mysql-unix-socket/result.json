@@ -1,0 +1,26 @@
+{
+  "started_at": "20261008T170520Z",
+  "stage": "mysql-unix-socket",
+  "decision": "pending",
+  "commit": "799123b630ecf870263487c7f723e97dd0ae5de5",
+  "diff_sha256": "5c5b195388fa40d3685a8c9740eb918270ce42f9582b954f73407cd84e1f5795",
+  "status": "failed",
+  "score": null,
+  "reported_score": 0,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "cpu_profile": false,
+  "db_profile": false,
+  "profiler_execution": "none",
+  "max_sampling_gap_seconds": 6.9141387939453125e-06,
+  "exit_code": 0,
+  "resolved_count": 0,
+  "messages": [
+    "\u521d\u671f\u5316\u304c\u5931\u6557\u3057\u307e\u3057\u305f",
+    "initialize \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)"
+  ],
+  "finished_at": "2026-10-08T17:05:22.984456+00:00"
+}

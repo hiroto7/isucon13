@@ -12,9 +12,5 @@ ISUCON_SUBDOMAIN_ADDRESS=${ISUCON13_POWERDNS_SUBDOMAIN_ADDRESS:-127.0.0.1}
 temp_dir=$(mktemp -d)
 trap 'rm -rf $temp_dir' EXIT
 sed 's/<ISUCON_SUBDOMAIN_ADDRESS>/'$ISUCON_SUBDOMAIN_ADDRESS'/g' u.isucon.dev.zone > ${temp_dir}/u.isucon.dev.zone
-if [ "${ISUCON13_POWERDNS_BACKEND:-mysql}" = "bind" ]; then
-    python3 publish_zone.py load "${temp_dir}/u.isucon.dev.zone"
-else
-    pdnsutil load-zone u.isucon.dev "${temp_dir}/u.isucon.dev.zone"
-fi
+pdnsutil load-zone u.isucon.dev ${temp_dir}/u.isucon.dev.zone
 

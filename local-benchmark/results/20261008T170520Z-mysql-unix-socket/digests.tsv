@@ -1,0 +1,10 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+SHOW VARIABLES WHERE `Variable_name` IN (...)	1	0.001	6
+TRUNCATE TABLE `performance_schema` . `events_statements_summary_by_digest`	1	0.001	0
+SHOW INDEX FROM `isudns` . `records`	1	0.001	42
+SHOW CREATE TABLE `isupipe` . `icons`	1	0	0
+SELECT @@`version_comment` LIMIT ?	2	0	2
+SHOW CREATE TABLE `isupipe` . `reservation_slots`	1	0	0
+SHOW CREATE TABLE `isupipe` . `livecomments`	1	0	0
+SHOW CREATE TABLE `isupipe` . `ng_words`	1	0	0
+SELECT `VERSION` ( )	1	0	1

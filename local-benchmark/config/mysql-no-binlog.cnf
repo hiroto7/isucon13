@@ -1,0 +1,4 @@
+[mysqld]
+# This standalone guest has no replica or point-in-time-recovery requirement.
+# Keep InnoDB redo enabled and innodb_flush_log_at_trx_commit=1.
+skip-log-bin

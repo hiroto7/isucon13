@@ -1,0 +1,151 @@
+diff --git a/local-benchmark/config/mysql-unix-env.txt b/local-benchmark/config/mysql-unix-env.txt
+new file mode 100644
+index 0000000..18762fa
+--- /dev/null
++++ b/local-benchmark/config/mysql-unix-env.txt
+@@ -0,0 +1,2 @@
++ISUCON13_MYSQL_DIALCONFIG_NET="unix"
++ISUCON13_MYSQL_DIALCONFIG_ADDRESS="/var/run/mysqld/mysqld.sock"
+diff --git a/webapp/go/dns_backend.go b/webapp/go/dns_backend.go
+deleted file mode 100644
+index c055941..0000000
+--- a/webapp/go/dns_backend.go
++++ /dev/null
+@@ -1,17 +0,0 @@
+-package main
+-
+-import (
+-	"os"
+-	"os/exec"
+-	"sync"
+-)
+-
+-// Initialization cannot truncate users while a registration is publishing DNS.
+-var dnsLifecycle sync.RWMutex
+-
+-func addDNSRecord(name string) *exec.Cmd {
+-	if os.Getenv("ISUCON13_POWERDNS_BACKEND") == "bind" {
+-		return exec.Command("python3", "../pdns/publish_zone.py", "add", name, powerDNSSubdomainAddress)
+-	}
+-	return exec.Command("pdnsutil", "add-record", "u.isucon.dev", name, "A", "0", powerDNSSubdomainAddress)
+-}
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 001644a..ee39caf 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -72,7 +72,9 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ 		conf.Net = v
+ 	}
+ 	if addr, ok := os.LookupEnv(addrEnvKey); ok {
+-		if port, ok2 := os.LookupEnv(portEnvKey); ok2 {
++		if conf.Net == "unix" {
++			conf.Addr = addr
++		} else if port, ok2 := os.LookupEnv(portEnvKey); ok2 {
+ 			conf.Addr = net.JoinHostPort(addr, port)
+ 		} else {
+ 			conf.Addr = net.JoinHostPort(addr, "3306")
+@@ -110,8 +112,6 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ }
+ 
+ func initializeHandler(c echo.Context) error {
+-	dnsLifecycle.Lock()
+-	defer dnsLifecycle.Unlock()
+ 	clearIconHashes()
+ 	defer clearIconHashes()
+ 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index de8d35d..fc2e255 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -6,6 +6,7 @@ import (
+ 	"encoding/json"
+ 	"errors"
+ 	"net/http"
++	"os/exec"
+ 	"time"
+ 
+ 	"github.com/google/uuid"
+@@ -237,8 +238,6 @@ func getMeHandler(c echo.Context) error {
+ // ユーザ登録API
+ // POST /api/register
+ func registerHandler(c echo.Context) error {
+-	dnsLifecycle.RLock()
+-	defer dnsLifecycle.RUnlock()
+ 	ctx := c.Request().Context()
+ 	defer c.Request().Body.Close()
+ 
+@@ -289,7 +288,7 @@ func registerHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert user theme: "+err.Error())
+ 	}
+ 
+-	if out, err := addDNSRecord(req.Name).CombinedOutput(); err != nil {
++	if out, err := exec.Command("pdnsutil", "add-record", "u.isucon.dev", req.Name, "A", "0", powerDNSSubdomainAddress).CombinedOutput(); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, string(out)+": "+err.Error())
+ 	}
+ 
+diff --git a/webapp/pdns/init_zone.sh b/webapp/pdns/init_zone.sh
+index 42ebd87..6602191 100755
+--- a/webapp/pdns/init_zone.sh
++++ b/webapp/pdns/init_zone.sh
+@@ -12,9 +12,5 @@ ISUCON_SUBDOMAIN_ADDRESS=${ISUCON13_POWERDNS_SUBDOMAIN_ADDRESS:-127.0.0.1}
+ temp_dir=$(mktemp -d)
+ trap 'rm -rf $temp_dir' EXIT
+ sed 's/<ISUCON_SUBDOMAIN_ADDRESS>/'$ISUCON_SUBDOMAIN_ADDRESS'/g' u.isucon.dev.zone > ${temp_dir}/u.isucon.dev.zone
+-if [ "${ISUCON13_POWERDNS_BACKEND:-mysql}" = "bind" ]; then
+-    python3 publish_zone.py load "${temp_dir}/u.isucon.dev.zone"
+-else
+-    pdnsutil load-zone u.isucon.dev "${temp_dir}/u.isucon.dev.zone"
+-fi
++pdnsutil load-zone u.isucon.dev ${temp_dir}/u.isucon.dev.zone
+ 
+diff --git a/webapp/pdns/publish_zone.py b/webapp/pdns/publish_zone.py
+deleted file mode 100644
+index 5dc7302..0000000
+--- a/webapp/pdns/publish_zone.py
++++ /dev/null
+@@ -1,45 +0,0 @@
+-#!/usr/bin/env python3
+-"""Keep the SQL registry canonical; durably publish a complete BIND zone."""
+-import fcntl
+-import os
+-from pathlib import Path
+-import subprocess
+-import sys
+-import tempfile
+-
+-ROOT = Path("/home/isucon/dns")
+-CLI = ["pdnsutil", "--config-dir=" + str(ROOT / "admin")]
+-ZONE = "u.isucon.dev"
+-
+-# Across registrations and initialization, no export can overwrite newer records.
+-with (ROOT / "publish.lock").open("a") as lock:
+-    fcntl.flock(lock, fcntl.LOCK_EX)
+-    if sys.argv[1] == "add":
+-        subprocess.run(CLI + ["add-record", ZONE, sys.argv[2], "A", "0", sys.argv[3]], check=True)
+-    elif sys.argv[1] == "load":
+-        subprocess.run(CLI + ["load-zone", ZONE, sys.argv[2]], check=True)
+-    elif sys.argv[1] != "export":
+-        raise ValueError("unknown operation")
+-    data = subprocess.check_output(CLI + ["list-zone", ZONE])
+-    fd, temporary = tempfile.mkstemp(prefix=".zone-", dir=ROOT)
+-    try:
+-        with os.fdopen(fd, "wb") as output:
+-            os.fchmod(output.fileno(), 0o644)
+-            output.write(data)
+-            output.flush()
+-            os.fsync(output.fileno())
+-        os.replace(temporary, ROOT / "active.zone")
+-        directory = os.open(ROOT, os.O_RDONLY | os.O_DIRECTORY)
+-        try:
+-            os.fsync(directory)
+-        finally:
+-            os.close(directory)
+-    finally:
+-        if os.path.exists(temporary):
+-            os.unlink(temporary)
+-    if sys.argv[1] != "export":
+-        subprocess.run(["pdns_control", "bind-reload-now", ZONE], check=True)
+-        status = subprocess.check_output(["pdns_control", "bind-domain-status", ZONE], text=True)
+-        print(status, end="")
+-        if "parsed into memory" not in status:
+-            raise RuntimeError("zone reload failed")

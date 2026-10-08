@@ -72,7 +72,9 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
 		conf.Net = v
 	}
 	if addr, ok := os.LookupEnv(addrEnvKey); ok {
-		if port, ok2 := os.LookupEnv(portEnvKey); ok2 {
+		if conf.Net == "unix" {
+			conf.Addr = addr
+		} else if port, ok2 := os.LookupEnv(portEnvKey); ok2 {
 			conf.Addr = net.JoinHostPort(addr, port)
 		} else {
 			conf.Addr = net.JoinHostPort(addr, "3306")
@@ -110,8 +112,6 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
 }
 
 func initializeHandler(c echo.Context) error {
-	dnsLifecycle.Lock()
-	defer dnsLifecycle.Unlock()
 	clearIconHashes()
 	defer clearIconHashes()
 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
