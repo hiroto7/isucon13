@@ -1,0 +1,16 @@
+{
+  "started_at": "20261008T150824Z",
+  "stage": "baseline-1",
+  "decision": "baseline",
+  "commit": "25f201e09c29d73027ff6351f7e75b5cb2ffe25e",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "aborted",
+  "score": null,
+  "reported_score": null,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "finished_at": "2026-10-08T15:09:17.119571+00:00"
+}

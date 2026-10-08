@@ -42,9 +42,9 @@ def main():
         (out/'ready.txt').write_text(ready.stdout)
         mp('exec', args.bench, '--', 'sudo', 'mkdir', '-p', '/opt/trial')
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json')
-        mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'vmstat 1 150 > /opt/trial/vmstat.txt &')
+        mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-           ': > /var/log/nginx/access.log; vmstat 1 150 > /tmp/trial-vmstat.txt &')
+           ': > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
             'cd /opt/isucon13/bench && /opt/bench run --enable-ssl --target https://pipe.u.isucon.dev '
             f'--nameserver {args.ip} --result-path /opt/trial/result.json '
