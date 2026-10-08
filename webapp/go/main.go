@@ -120,6 +120,7 @@ func initializeHandler(c echo.Context) error {
 
 func main() {
 	e := echo.New()
+	e.Use(responseCacheMiddleware)
 	e.Debug = true
 	e.Logger.SetLevel(echolog.DEBUG)
 	e.Use(middleware.Logger())

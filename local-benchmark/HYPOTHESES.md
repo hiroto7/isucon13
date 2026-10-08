@@ -13,3 +13,5 @@ These are official-code observations. No ISUCON13 external solutions have been r
 Stats batching: passed 8454, user statistics mean 59.75ms vs initial exploratory 10694ms. Score not beyond variation, adoption pending.
 DNS name/type index: passed 7102, DNS responses 30895 vs 9291. Not a score improvement; adoption pending in combination, record concurrent diagnostic build.
 Moderation: replace all-words x all-comments DELETE round trips with one SQL EXISTS/DELETE, preserve utf8mb4_general_ci and LIKE wildcards verified with same Go driver connection (case, accent, percent/underscore/escape, Japanese, empty).
+
+Request-local response batching adopted: official32448 vs15589, same transaction snapshot; targeted concurrent write checks passed. Next: SQL driver interpolation to eliminate repeated Prepare/CloseStmt commands documented in full DB profile.

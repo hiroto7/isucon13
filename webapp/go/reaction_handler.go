@@ -66,6 +66,14 @@ func getReactionsHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "failed to get reactions")
 	}
 
+	var streamIDs, userIDs []int64
+	for _, model := range reactionModels {
+		streamIDs = append(streamIDs, model.LivestreamID)
+		userIDs = append(userIDs, model.UserID)
+	}
+	if err := prefetchReferencedResponses(ctx, tx, streamIDs, userIDs); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch responses: "+err.Error())
+	}
 	reactions := make([]Reaction, len(reactionModels))
 	for i := range reactionModels {
 		reaction, err := fillReactionResponse(ctx, tx, reactionModels[i])
@@ -142,20 +150,11 @@ func postReactionHandler(c echo.Context) error {
 }
 
 func fillReactionResponse(ctx context.Context, tx *sqlx.Tx, reactionModel ReactionModel) (Reaction, error) {
-	userModel := UserModel{}
-	if err := tx.GetContext(ctx, &userModel, "SELECT * FROM users WHERE id = ?", reactionModel.UserID); err != nil {
-		return Reaction{}, err
-	}
-	user, err := fillUserResponse(ctx, tx, userModel)
+	user, err := loadUserResponse(ctx, tx, reactionModel.UserID)
 	if err != nil {
 		return Reaction{}, err
 	}
-
-	livestreamModel := LivestreamModel{}
-	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", reactionModel.LivestreamID); err != nil {
-		return Reaction{}, err
-	}
-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel)
+	livestream, err := loadLivestreamResponse(ctx, tx, reactionModel.LivestreamID)
 	if err != nil {
 		return Reaction{}, err
 	}

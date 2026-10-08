@@ -1,0 +1,638 @@
+
+# 26.3s user time, 80ms system time, 30.89M rss, 37.95M vsz
+# Current date: Thu Oct  8 16:01:39 2026
+# Hostname: isucon13-app
+# Files: /var/lib/mysql/trial-slow.log
+# Overall: 869.26k total, 71 unique, 13.80k QPS, 2.71x concurrency _______
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:13
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time           171s     1us      2s   196us   568us     3ms    25us
+# Lock time          533ms       0    17ms       0     1us    33us       0
+# Rows sent        363.69k       0   7.53k    0.43    0.99    9.08       0
+# Rows examine      21.40M       0   9.52k   25.82    0.99  465.87       0
+# Query size        70.65M       5 195.89k   85.22  124.25   1.76k   31.70
+
+# Profile
+# Rank Query ID                     Response time Calls  R/Call V/M   Item
+# ==== ============================ ============= ====== ====== ===== ====
+#    1 0xFFFCA4D67EA0A788813031B... 43.8713 25.7%   5589 0.0078  0.13 COMMIT
+#    2 0xDA556F9115773A1A99AA016... 29.0123 17.0% 236797 0.0001  0.00 ADMIN PREPARE
+#    3 0xFBC5564AE716EAE82F20BFB... 12.9215  7.6%  90467 0.0001  0.00 SELECT tags
+#    4 0x84B457C910C4A79FC9EBECB... 11.9045  7.0%  35831 0.0003  0.01 SELECT icons
+#    5 0x22279D81D51006139E0C764...  9.3156  5.5%  41719 0.0002  0.00 SELECT domains domainmetadata
+#    6 0x42EF7D7D98FBCC9723BF896...  9.0433  5.3%  34553 0.0003  0.00 SELECT records
+#    7 0x59F1B6DD8D9FEC059E55B3B...  8.0196  4.7%   2114 0.0038  0.00 SELECT reservation_slots
+#    8 0x8F7679D452333ED3C7D60D2...  7.6985  4.5%  61294 0.0001  0.00 ADMIN RESET STMT
+#    9 0x3D83BC87F3B3A00D571FFC8...  7.6856  4.5%  23903 0.0003  0.07 SELECT records
+#   10 0x38BC86A45F31C6B1EE32467...  6.3325  3.7%  30127 0.0002  0.02 SELECT themes
+#   11 0xEA1E6309EEEFF9A6831AD2F...  4.8591  2.8%  29726 0.0002  0.00 SELECT users
+#   12 0xF7144185D9A142A426A36DC...  4.3583  2.6%  19635 0.0002  0.00 SELECT livestream_tags
+#   13 0x07890000813C4CC7111FD2D...  2.0645  1.2% 209845 0.0000  0.06 ADMIN CLOSE STMT
+#   14 0xD6032FE08E1FE706A928B8B...  1.8789  1.1%  11469 0.0002  0.00 SELECT livestreams
+#   15 0xA3401CA3ABCC04C3AB221DB...  1.6220  0.9%    202 0.0080  0.01 UPDATE reservation_slots
+#   16 0x3A2B0EDA41C4E3576FCA6DA...  1.6166  0.9%    419 0.0039  0.01 INSERT icons
+#   17 0x7F9C0C0BA9473953B723EE1...  1.4146  0.8%    202 0.0070  0.00 SELECT reservation_slots
+#   18 0x3F155F5E71EFF856F0CF7B8...  1.2484  0.7%   6126 0.0002  0.00 SELECT users
+#   19 0x9E2DA589A20EC24C34E11DD...  1.0583  0.6%  10932 0.0001  0.00 START
+#   20 0xFFF66E9B3D962FA319C8068...  0.9216  0.5%   5727 0.0002  0.00 ROLLBACK
+# MISC 0xMISC                        3.9040  2.3%  12584 0.0003   0.0 <51 ITEMS>
+
+# Query 1: 94.73 QPS, 0.74x concurrency, ID 0xFFFCA4D67EA0A788813031B8BBC3B329 at byte 4980696
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.13
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    5589
+# Exec time     25     44s     4us      2s     8ms    23ms    32ms     4ms
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     0  32.75k       6       6       6       6       0       6
+# String:
+# Databases    isupipe (5195/92%), isudns (394/7%)
+# Hosts        localhost
+# Users        isucon (5195/92%), isudns (394/7%)
+# Query_time distribution
+#   1us  ########
+#  10us  #######################################################
+# 100us  ######################
+#   1ms  ################################################################
+#  10ms  ####################################################
+# 100ms  #
+#    1s  #
+#  10s+
+COMMIT\G
+
+# Query 2: 3.95k QPS, 0.48x concurrency, ID 0xDA556F9115773A1A99AA0165670CE848 at byte 4862368
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         27  236797
+# Exec time     16     29s     4us    74ms   122us   445us   545us    27us
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     9   6.77M      30      30      30      30       0      30
+# String:
+# Databases    isupipe (234433/99%), isudns (2364/0%)
+# Hosts        localhost
+# Users        isucon (234433/99%), isudns (2364/0%)
+# Query_time distribution
+#   1us  ###############
+#  10us  ################################################################
+# 100us  #############
+#   1ms  ##
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+administrator command: Prepare\G
+
+# Query 3: 1.53k QPS, 0.22x concurrency, ID 0xFBC5564AE716EAE82F20BFB45F6C37E7 at byte 4851924
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         10   90467
+# Exec time      7     13s     5us   166ms   142us   541us   819us    33us
+# Lock time     25   134ms       0    17ms     1us     1us    63us       0
+# Rows sent     24  88.35k       1       1       1       1       0       1
+# Rows examine   0  88.35k       1       1       1       1       0       1
+# Query size     3   2.76M      31      33   31.94   31.70    0.43   31.70
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  ##########
+#  10us  ################################################################
+# 100us  #################
+#   1ms  ##
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'tags'\G
+#    SHOW CREATE TABLE `isupipe`.`tags`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM tags WHERE id = 94\G
+
+# Query 4: 607.31 QPS, 0.20x concurrency, ID 0x84B457C910C4A79FC9EBECB8B1065C66 at byte 4851678
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.01
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          4   35831
+# Exec time      6     12s     9us   166ms   332us     1ms     1ms    98us
+# Lock time      9    48ms       0     3ms     1us     1us    26us     1us
+# Rows sent      8  31.90k       0       1    0.91    0.99    0.28    0.99
+# Rows examine   0  31.90k       0       1    0.91    0.99    0.28    0.99
+# Query size     2   1.50M      41      44   43.92   42.48    0.17   42.48
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  #
+#  10us  ################################################################
+# 100us  #######################################################
+#   1ms  ########
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'icons'\G
+#    SHOW CREATE TABLE `isupipe`.`icons`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT image FROM icons WHERE user_id = 1024\G
+
+# Query 5: 695.32 QPS, 0.16x concurrency, ID 0x22279D81D51006139E0C76405B54C261 at byte 55979623
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          4   41719
+# Exec time      5      9s    12us    46ms   223us   839us   643us    80us
+# Lock time     15    85ms       0     7ms     2us     1us    45us     1us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     6   4.54M     114     114     114     114       0     114
+# String:
+# Databases    isudns
+# Hosts        localhost
+# Users        isudns
+# Query_time distribution
+#   1us
+#  10us  ################################################################
+# 100us  ########################################
+#   1ms  ####
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isudns` LIKE 'domains'\G
+#    SHOW CREATE TABLE `isudns`.`domains`\G
+#    SHOW TABLE STATUS FROM `isudns` LIKE 'domainmetadata'\G
+#    SHOW CREATE TABLE `isudns`.`domainmetadata`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select kind,content from domains, domainmetadata where domainmetadata.domain_id=domains.id and name='u.isucon.dev'\G
+
+# Query 6: 575.88 QPS, 0.15x concurrency, ID 0x42EF7D7D98FBCC9723BF896EBFC51D24 at byte 5989522
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          3   34553
+# Exec time      5      9s    15us    41ms   261us   972us   713us    93us
+# Lock time      9    49ms       0     6ms     1us     1us    36us     1us
+# Rows sent      0   3.05k       0       1    0.09    0.99    0.28       0
+# Rows examine   0   3.05k       0       1    0.09    0.99    0.28       0
+# Query size     6   4.70M     129     220  142.64  158.58   12.39  136.99
+# String:
+# Databases    isudns
+# Hosts        localhost
+# Users        isudns
+# Query_time distribution
+#   1us
+#  10us  ################################################################
+# 100us  ######################################################
+#   1ms  ######
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isudns` LIKE 'records'\G
+#    SHOW CREATE TABLE `isudns`.`records`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT content,ttl,prio,type,domain_id,disabled,name,auth FROM records WHERE disabled=0 and name='*.u.isucon.dev' and domain_id=1\G
+
+# Query 7: 35.83 QPS, 0.14x concurrency, ID 0x59F1B6DD8D9FEC059E55B3BFD624E8C3 at byte 66556316
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    2114
+# Exec time      4      8s   702us    76ms     4ms    10ms     4ms     3ms
+# Lock time      1     6ms       0     2ms     2us     1us    57us     1us
+# Rows sent      0   2.06k       1       1       1       1       0       1
+# Rows examine  82  17.66M   8.55k   8.55k   8.55k   8.55k       0   8.55k
+# Query size     0 177.54k      86      86      86      86       0      86
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us
+# 100us  #########
+#   1ms  ################################################################
+#  10ms  ####
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'reservation_slots'\G
+#    SHOW CREATE TABLE `isupipe`.`reservation_slots`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT slot FROM reservation_slots WHERE start_at = 1701446400 AND end_at = 1701450000\G
+
+# Query 8: 1.02k QPS, 0.13x concurrency, ID 0x8F7679D452333ED3C7D60D22131CEFD4 at byte 61088553
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          7   61294
+# Exec time      4      8s     3us    88ms   125us   445us   679us    23us
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     2   1.93M      33      33      33      33       0      33
+# String:
+# Databases    isudns
+# Hosts        localhost
+# Users        isudns
+# Query_time distribution
+#   1us  ########
+#  10us  ################################################################
+# 100us  ############
+#   1ms  #
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+administrator command: Reset stmt\G
+
+# Query 9: 398.38 QPS, 0.13x concurrency, ID 0x3D83BC87F3B3A00D571FFC8104A6E50C at byte 4862849
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.07
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          2   23903
+# Exec time      4      8s    14us   722ms   321us     1ms     5ms   108us
+# Lock time      7    43ms       0     4ms     1us     1us    34us     1us
+# Rows sent      3  11.71k       0       1    0.50    0.99    0.50    0.99
+# Rows examine   0  11.71k       0       1    0.50    0.99    0.50    0.99
+# Query size     4   3.11M     126     219  136.58  151.03   11.80  124.25
+# String:
+# Databases    isudns
+# Hosts        localhost
+# Users        isudns
+# Query_time distribution
+#   1us
+#  10us  #########################################################
+# 100us  ################################################################
+#   1ms  #######
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isudns` LIKE 'records'\G
+#    SHOW CREATE TABLE `isudns`.`records`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT content,ttl,prio,type,domain_id,disabled,name,auth FROM records WHERE disabled=0 and type='SOA' and name='u.isucon.dev'\G
+
+# Query 10: 510.63 QPS, 0.11x concurrency, ID 0x38BC86A45F31C6B1EE324671506C898A at byte 4857576
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.02
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          3   30127
+# Exec time      3      6s     9us   378ms   210us   725us     2ms    60us
+# Lock time      6    37ms       0     5ms     1us     1us    31us     1us
+# Rows sent      8  29.42k       1       1       1       1       0       1
+# Rows examine   0  29.42k       1       1       1       1       0       1
+# Query size     1   1.18M      38      41   40.95   40.45    0.42   40.45
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  #
+#  10us  ################################################################
+# 100us  ##########################
+#   1ms  ###
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'themes'\G
+#    SHOW CREATE TABLE `isupipe`.`themes`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM themes WHERE user_id = 1016\G
+
+# Query 11: 503.83 QPS, 0.08x concurrency, ID 0xEA1E6309EEEFF9A6831AD2FB940FC23C at byte 101767591
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          3   29726
+# Exec time      2      5s     7us    32ms   163us   596us   589us    42us
+# Lock time      7    42ms       0     9ms     1us     1us    52us     1us
+# Rows sent      7  29.03k       1       1       1       1       0       1
+# Rows examine   0  29.03k       1       1       1       1       0       1
+# Query size     1 1014.43k      32      35   34.95   34.95    0.41   34.95
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  ##
+#  10us  ################################################################
+# 100us  ##################
+#   1ms  ##
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'users'\G
+#    SHOW CREATE TABLE `isupipe`.`users`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM users WHERE id = 1108\G
+
+# Query 12: 332.80 QPS, 0.07x concurrency, ID 0xF7144185D9A142A426A36DC55C1D2623 at byte 55974552
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          2   19635
+# Exec time      2      4s    12us    16ms   221us   839us   619us    66us
+# Lock time      4    26ms       0     3ms     1us     1us    26us     1us
+# Rows sent     24  88.35k       0      11    4.61    4.96    1.17    4.96
+# Rows examine   0  88.35k       0      11    4.61    4.96    1.17    4.96
+# Query size     1   1.05M      54      56   55.99   54.21    0.08   54.21
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us  ################################################################
+# 100us  ##############################
+#   1ms  ####
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'livestream_tags'\G
+#    SHOW CREATE TABLE `isupipe`.`livestream_tags`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM livestream_tags WHERE livestream_id = 7544\G
+
+# Query 13: 3.50k QPS, 0.03x concurrency, ID 0x07890000813C4CC7111FD2D3F3B3B4EB at byte 4864846
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.06
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         24  209845
+# Exec time      1      2s     1us   347ms     9us     8us   757us     2us
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     9   6.60M      33      33      33      33       0      33
+# String:
+# Databases    isupipe (207481/98%), isudns (2364/1%)
+# Hosts        localhost
+# Users        isucon (207481/98%), isudns (2364/1%)
+# Query_time distribution
+#   1us  ################################################################
+#  10us  ##
+# 100us  #
+#   1ms  #
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+administrator command: Close stmt\G
+
+# Query 14: 194.39 QPS, 0.03x concurrency, ID 0xD6032FE08E1FE706A928B8B7CBA06B85 at byte 91423986
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          1   11469
+# Exec time      1      2s     8us    21ms   163us   626us   548us    44us
+# Lock time      2    16ms       0     3ms     1us     1us    29us     1us
+# Rows sent      3  11.20k       1       1       1       1       0       1
+# Rows examine   0  11.20k       1       1       1       1       0       1
+# Query size     0 459.03k      39      41   40.98   40.45    0.23   40.45
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  #
+#  10us  ################################################################
+# 100us  ##################
+#   1ms  ##
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'livestreams'\G
+#    SHOW CREATE TABLE `isupipe`.`livestreams`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM livestreams WHERE id = 7536\G
+
+# Query 15: 3.42 QPS, 0.03x concurrency, ID 0xA3401CA3ABCC04C3AB221DB8AD5CBF26 at byte 70185040
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.01
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     202
+# Exec time      0      2s     2ms    66ms     8ms    16ms     6ms     6ms
+# Lock time      0   123us       0     2us       0     1us       0     1us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   7   1.69M   8.55k   8.55k   8.55k   8.55k       0   8.55k
+# Query size     0  19.33k      98      98      98      98       0      98
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  ################################################################
+#  10ms  ###########################
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'reservation_slots'\G
+#    SHOW CREATE TABLE `isupipe`.`reservation_slots`\G
+UPDATE reservation_slots SET slot = slot - 1 WHERE start_at >= 1701478800 AND end_at <= 1701536400\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  slot = slot - 1 from reservation_slots where  start_at >= 1701478800 AND end_at <= 1701536400\G
+
+# Query 16: 7.10 QPS, 0.03x concurrency, ID 0x3A2B0EDA41C4E3576FCA6DA29A9B91DF at byte 94899884
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.01
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     419
+# Exec time      0      2s   471us    51ms     4ms    12ms     6ms     2ms
+# Lock time      0   342us       0     5us       0     1us       0     1us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size    46  33.03M  45.10k 195.89k  80.72k 101.89k  16.07k  79.83k
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us
+# 100us  ############
+#   1ms  ################################################################
+#  10ms  ######
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'icons'\G
+#    SHOW CREATE TABLE `isupipe`.`icons`\G
+INSERT INTO icons (user_id, image) VALUES (1173, 'ÿ\Øÿ\à\0JFIF\0\0\0\ð\0\ð\0\0ÿ\áŠExif\0\0MM\0*\0\0\0\0\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0†\0\0\0\0\0\0\0Œ\0\0\0\0\0\0\0\Z\0\0\0\0\0\0\0˜\0\0\0\0\0\0\0 (\0\0\0\0\0\0\01\0\0\0\0$\0\0\0¨2\0\0\0\0\0\0\0Ì‡i\0\0\0\0\0\0\0\à\0\0\0\0SONY\0\0DSC-RX100M3\0\0\0\0\ð\0\0\0\0\0\0\ð\0\0\0Adobe Photoshop CC 2019 (Macintosh)\02019:08:03 11:25:25\0\0&‚š\0\0\0\0\0\0®‚\0\0\0\0\0\0¶ˆ\"\0\0\0\0\0\0\0ˆ\'\0\0\0\0\0}\0\0ˆ0\0\0\0\0\0\0\0ˆ2\0\0\0\0\0\0\0}\0\0\0\0\00230\0\0\0\0\0\0¾\0\0\0\0\0\0Ò’\0\n\0\0\0\0\0\æ’\0\0\0\0\0\0\î’\0\n\0\0\0\0\0\ö’\0\n\0\0\0\0\0þ’\0\0\0\0\0\0’\0\0\0\0\0\0\0’\0\0\0\0\0\0\0\0’	\0\0\0\0\0\0\0’\n\0\0\0\0\0\0 \0\0\0\0\0\0\0 \0\0\0\0\0\0\ô \0\0\0\0\0\0\ô¢\0\0\0\0\0\0¢\0\0\0\0\0\0¢\0\0\0\0\0\0\0£\0\0\0\0\0\0\0\0£\0\0\0\0\0\0\0¤\0\0\0\0\0\0\0\0¤\0\0\0\0\0\0\0\0¤\0\0\0\0\0\0\0\0¤\0\0\0\0\0\0&¤\0\0\0\0\0\0\0¤\0\0\0\0\0\0\0\0¤\0\0\0\0\0\0\0\0¤	\0\0\0\0\0\0\0\0¤\n\0\0\0\0\0\0\0\0¤ \0\0\0\0!\0\0.¤2\0\0\0\0\0\0P¤4\0\0\0\0\0\0p\0\0\0\0\0\0\0\0\0\0P\0\0\0\0\0\02015:05:29 10:49:54\02015:05:29 10:49:54\0\0\0S\0\0\0\r!\0\0¿˜\0\05\0\0\Z¡\0\0\0\0\0\0\0\0\0\0\0\0\0\Ù\0\0\0€\0\0\0,\0\0\0ž \Ã\0\0“ž \Ã\0\0“\0\0\0\0\0\058e836338719ad160000000000000000\0\0\0\0\0,\0\0\0\03e\æ\0ÿû\0\0\0	\0\0\0\0\0\0\0\0\024-70mm F1.8-2.8\0\0ÿ\á\n°http://ns.adobe.com/xap/1.0/\0<?xpacket begin=\"ï»¿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 5.4.0\"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:aux=\"http://ns.adobe.com/exif/1.0/aux/\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" aux:LensInfo=\"44/5 3368422/131067 9/5 14/5\" aux:Lens=\"24-70mm F1.8-2.8\" xmp:CreateDate=\"2015-05-29T10:49:54\" xmp:ModifyDate=\"2019-08-03T11:25:25\" xmp:Rating=\"5\" xmp:CreatorTool=\"Adobe Photoshop CC 2019 (Macintosh)\" photoshop:DateCreated=\"2015-05-29T10:49:54\"/> </rdf:RDF> </x:xmpmeta>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <?xpacket end=\"w\"?>\0ÿ\í\0xPhotoshop 3.0\08BIM\0\0\0\0\0?Z\0%G\0\0\0?\0104954>\0201505297\020150529<\0104954\08BIM%\0\0\0\0\0…a\ÖM¥VrUB²Ÿÿ\0¹ÿÀ\0\ô\ô\"\0ÿ\Ä\0\0\0\0\0\0\0\0\0\0\0	\nÿ\Ä\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ÁR\Ñ\ð$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹º\Â\Ã\Ä\Å\Æ\Ç\È\É\Ê\Ò\Ó\Ô\Õ\Ö\×\Ø\Ù\Ú\á\â\ã\ä\å\æ\ç\è\é\ê\ñ\ò\ó\ô\õ\ö\÷øùúÿ\Ä\0\0\0\0\0\0\0\0	\nÿ\Ä\0µ\0\0w\0!1AQaq\"2B‘¡±Á	#3R\ðbr\Ñ\n$4\á%\ñ\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰Š’“”•–—˜™š¢£¤¥¦§¨©ª²³´µ¶·¸¹º\Â\Ã\Ä\Å\Æ\Ç\È\É\Ê\Ò\Ó\Ô\Õ\Ö\×\Ø\Ù\Ú\â\ã\ä\å\æ\ç\è\é\ê\ò\ó\ô\õ\ö\÷øùúÿ\Û\0C\0\n\n\n\n\n\n\n\n\nÿ\Û\0C	ÿ\Ý\0\0 ÿ\Ú\0\0\0?\0ûž<ª*ž Sµ\ëJ¼p+È¹\Ö\Ç\äzS\Æj\ÜT \æŽar’\æŽ\ÔÀ{\ZS\ìsCcD«Hx\ëMŽ´¹\âÆž9¬]v\Â\ÛT\Ó\'°»ŒI\ÊU\Ô\ò=m`5#F®¥gu˜\'ø\à·}\ñ[”Aü*N?z\'¾øs\Â\×\ãL´X\ä\È\Éü\Ï5\ê`€\rXŽ¢U\Å%~£Ljžž•qI5\Õ±O)ˆ\ñN\ÍE“N\É\åšU$u¤8Ç­§pHu¤\ö\Ì\óK‘šh¤\Çz*:	È¦!p=k:\â\Æ†\ÞÜµ]\'ŠL\ö¥kŸŸ.FH\ïW¶Œ\çÒ“Œ\ÐXt\'\"X™8\Å)=)»…7Œ\òE1¤\'´…Xžü¨\0À4\Â:\Ó\ÊHO*•!ú\ôüh#Ö˜\äSŸj\õe\Ü\ÕvxÁ™?:m\ZÁ\Ó\×Ú“|#Ÿ3\ò—Î·\Ç%›\è)\0)*\'¹{7\è?­@\÷\Ñ\à\'\ñ i\É\ô\æ¿7ÿ\0jûž8yûIm~#\é_¡o¨/$F?:ø\ö§˜\Í\âˆ\Ø\ñ‹d\é\õ?\ã_I\ÂSk\Z¾g\Ë\ñ…4\ð2¹\ð¤\ë\×=j“\nÐ˜ÍZ¢\êk\÷h«#ù\ö›$ƒ=\r^Q\ÅR‹=j\ð<}+Ö¡±•bU§¼t¦nãŠ‘z\n\êH\ägÞŸ±%\Î/|Kh_\0\Ç\àž2\r~³\Ä?\å¨\Ç\âk\óo\ö6™\ÓÄš\ì`ü­l„ø~ƒ´ÃŠþn\ãø¨\æ•;iù\Ñü&\òºw\óü\ÍÁ<?9?ALvù»\Øý1X~v=©\ër§\å\Ï\ò¯‹r>\È\ÛûLc¬~¸¥ûR\öL\Ö0s…\äý*\Ê\ÐQp5>ÕžUQ\ö·8\0(ü*–\\™Hú\ñü\ê2\ç¨ÛvW\Ð\r#s7b\áMk‰qÌ„j\Ë{”Qþ²?¦\ìÿ\0*§qz‰m$\Þ`Tžÿ\0>+9\ÔQ‹l¨F\ì\ð@yšŒ®OWcú\Õ\è7•Q´ÅRI«\ð\ÆM\ñMuR¼Ÿ™û~<°H´¤“š´˜\É\ïU\ã\ëZ€A‚¾O+b#\óüFB[n\ÓD‡Œc*©šŽe5Ï‹—¼ÊE£\çƒI\åŸSS9¤\ØkÏ»4?ÿ\Ðû”iA¦\éO\\\ô\Åx\ç]µ$4\ï¥3kbœC\Ð\Z.H\âžiž[\Ïý)pˆø\Ð\óŠ\\šg\ÉÔº©§n„}\é ¥8sšgn\ß\'\è)\Ðv$\Ñ`%\ÐÒ—\Ç\Ô\â\È:\r\Ìc¤­\0OJ*µž¢0)>\Ôý€ü©\ØW-ŒŽM8d\ôSTþ\Ó\'®>‚\çJy\ÞqùSQ\Ë{\\\ô\Ï\åN\Øù\ä~5K\Ìs\÷˜\ã\ëL$ƒ\ó6i´;\Z[O^?:Bup?\Z\Í\Í&E	hþzM2@§–\Ï\Ðf¨\â˜d\0b†\ã4\0\ç\æü)Ÿj€º\Ç\ñ\Åf´€t¨šoJ.46»’±\ñ\îj»^ž\0œe\ã5L:h¸4iýºL\ð\åI\öÙº‚\Ðð¬¦@\ÎqM–l\0rh¹&°»œŸ¼G\éNY\äo\ãj\ÍU›)?©\ãIO\ðþ¢‹d\È\ÍÁ<{ši|pi»€ûÌ‹\õqý*»\\À3™W\ð¥>b¬JüŽ•]±YsŠb\Þ\ÄT³\É\òE9ýj¤š¾˜£>c7oº72‹å‡LSXyj¤šº€V7r}\Æ> UW\ÔSvÁ\É\õcP\æ4‹SJH\ÏJ¢\Óc¸ª·7Ò˜b‰ˆ\õüj°º¸h€eXÜŒü£\"³r.Å³!n\äšø?\ö˜˜¿Šd\\ÿ\0«·Œ:û\Î\ÔB“«Ï¶+\ó\×\ã\î©5\çŠ\õ#1\Ü\ÈQ:\ç\î¨\õ¼I\Ë¼—\ê|‡\Ö\ä\Ë\åýt>W•Ac\ØUNs[©\'Ú©´`W\ô(\ì<S¨A\Z\ó\Å[Šj¨\n˜¯\ÛF©+ŒŒTª3H9Oj\ÜÁ\Èû\öB>_‰\õ¹6eQ\÷¶ÿ\0}\ìoDg\Ü(=2\Äÿ\0*øO\öFµ\óuM~cœ£\\s_sCiLDŽ\ì{W\óWˆz\æ•>_‘ý\áüZÊ©\ß\Ï\óú¤Š„$Q‡\í\Æ$zŽ¦\Ì0bQ\ß\0túTmY3\å¯×½H†\Ö?¿\Æ+\âµC§\Ôuy\Ù\Ç`ƒ¥,7sÜ©\Ò\äq\ËX[‹pp	\Ú)\Æ\ÚB\ÞnN\Ó\é\ÇøÐ›†D\Z4*\ì\Ì	þ#“OT·˜”\É\È\é\Éü\êÇ“xp]\È:TRùxT\0vù»úSORPß³0RC6¯8¬\íA\Ú;I›“a<`\ô\éZŠ\Ì\Ã\õ\Å`\ë·*\Ö&ÁR\ì2 \í^\'\âý†µn\Ñ\ðÜº—=hG»<\í\É/µkF$ÚŸ5B#PÄžj\âjþÍª\óMúŸµa\ã¢\Z¸Ž\õr7;\ñ\ê*˜;I\æ‹v\ß{\å“ü$×‡„w«O\áf\Ü|\Ó&¥Lƒ“P¸&¹q²jL\Ò6±\èh\ò\ßÖ¦\Æ8¢¸=«,ÿ\Ñûw\írg\å\ÛùP.®?½\ÅQ;žž¼S„ }+\È;w\íÿ\0xþtÆ•\É\É\'\ó5TÈ£øº\Ò\ÇL\ä\Ò‹E·®\×9Ï©4ÀB€«\ÐUs,‡\î©\'\Ó1¶\éJ\è|¥­\àŒ\ZxsY‚v\ÜT\÷€©ÀdŒþ\Ø\'\ò£™æ»±¬\Ãwýù}?\ÈT¦ú\Í@/q€º¤Ó¸‹¤Ž€Ó†Oj\Í}F\É|\É\Ó\å\Æj/\íkp›¼¹{°\Èf—:+•›ü¨\rŽ3X?\Ú\é\Éhp§ûÅøTZ¹\ÜVˆU¹¥Î„\àÎ—ztÝŠw˜½¹úf¹\Øu-BU;¢X}\ÑU¦\×.£m¯pªd\ëC¨‡U—\'\'\ÜOTŽ6©\ãù\×\'ü\×d\Èfr^M,¨\'\\\Üs\Ô\æŽq\òƒA–*¿V]¦~\ô\Ñûü\Ù?¥r[¥°;d?79füºÕ¸\í\ã–3$ °\êM.a(›F\æ×½Â &«µ\õ˜831\ÏpŸ\âk¬m\É,2‹\ÔMG\å($pÞ‡½>a¤m½\í¡\äy¤þ4Ÿl…2­cþÿ\0Ê±b2–\ãiqÁÿ\0\Z\Ð@\æ%1žŸ5Jw‡5\ó»j¼\ñƒ“ý¥\'Ú®\ÈH\Óþ*R¤¬A\÷ª©m\Ën—*Ç¿oj\Ç`7W\ìù‡ž˜\0~½j€7©¹\Úi7ÿ\0\Ç\åZ\Âv1)N?:‹\Ê\Üû\09:\Õr“s?\ì\×\Ìû@\Çpy\ëS˜üœ0m\ÍR}Ž4\ÊÄ¤\ä’I\ç¿Z}½ž\Ü\á‡_\â?Ê„Ø¡\Æ\ç\Û Ÿ`x©r…nv\Ø\ð?\Z\Ð\"ky€Uk\Þ\È7‚Y±I½FŠ¢	{\\+E=\êdŽV92z\äu¢Dš$\ó#R\áyÀ¨b¾¼“).¹\ë\Æ)¦\Z	%ˆ\Æ\ÌW\ÔŠ\Æ6\ÑN\ZÍƒ\õ\É\÷­\è\\‘)\Êúcæ§¼P\ïS\Î\Ðq\ô W3v[\ôe ûg­W–\Ì\íbŽ\Üúq[3i\Ú~7#±c\ëž=x\íYr[l\n``1\ó1Ç½5Á\ÌQ_6\Ö®\è\×$–<ŒW\å\×Ä½P\êz\ö¡u\×Î¸¦\ãŠý\ñþª4jš‰bYadLŸ\ãq_•ú\å\Ã\Ïv\åŽq_¨xk€rJ\Ö\Óc\ò³.JP ž¯S–‘0N*«-_`MW)_·FüV!T\Î1Rm9©F*L1]0¦¬™\\­\Õ.\r&(t\Çs\î\Ï\Ù\×f•\â\÷`›¥Ž0O°\Í}¦Í¹D`ƒ\ï_~\Íi\à)§\rwr\Ì	ÿ\0gŠ\÷\Ó&¤Œ%{Œ®zú\×\ò\Ïb9\ó*\Ï\Î\ßqýAÁÔ¹2\Ú1\òü\Î\ê@°¨2¡s\ê¿Ö’\â;i\0WQ\"Ÿl\\\Ä\Þ\Ï\÷d<\Õ\ð·„d•\'±95\ò¬úb\Ó\\CfŽÕ—ß®jÖœ”`{\ð*X¦&?*\ã\æa\ÝFEGq^^\å9oLRÆ‰#\ÖnXyQ\ðÇ§^ŸJS}p8-‚9Á\\\ZËŽÁg”3H3\Û/\çW~\Â!û­¹‰\îsú\ÖnL|¤²j\Å0®™=GÖ±\õ;Ö»dV\ê5zKy\ðBŒŸNµ\ËjFþ\Ê\ï\ÌhZXg\åû\Ê{\ñÞ¾#\Ä,>\"¦YRž]¶®–\ö=\ì…\ÓX…)½‰„D\ÍR…À\Íe\Ûjú}\Ç2ƒý\ÖùXp\Ø5£\æ£}\Ò}+ø«3\ÂÖ„\ÜjE§\æ¬~±‡œZ¼Zb8À\ÍP\Ó\ä\óu9\÷­M,‚8\ÙÙº~•\ÎøF\è\ßêº¬\êw—\ôÝ‚\ÍY\äø\'QÔ¨¶‚ü\ÚF•§h¥\Ü\ôX\ÈŽ¸¦KsÒ•\0\íK“ž+\Æ\ÅF\í›BD/\÷©¿…2sšM¾\õ\æ8£cÿ\Òú\Ï\í‚@Lp…\Ç]\ìLTŸ\Ún·L\ã®	ªAap<Œ’Þ½\rJ7‚†zW‰s¾À5­\à\0£>‹\Ó\ó§»\Ïù\é·\éP\ÜC$™£\äf¬}—‡l\Û¤;i\ïe\ó‡p\rT•&PsWKo1‚¨\èG§l\Ò`6%€¥a™‚\Ñ	!uŽãŠ“û8nVûA\ÏLsù\ÕÇ³·iw\á\Øý~_ÊšlžgŒr;{P\×a\Üc$H›A.\Ý}1.nœ\ì€\í¶´Œ@Ÿ2g°\ÅG²Bsœ\ÎGs	»·Ÿ\"œm®\àFm‹©\òe\n8\ã­H\äÜž~lž•^I \ÈRÚ¢\å­¬¬#½]Ž\ÎTŽW·5¦\î?q{úÖ¢™\öº9çŸ›¦?\n.…r_³«\ÆY»{\õªR\ÚÀ\çA¸¸À5´\ëG‰g9#\é\ö±[NNù\ïJ»\\“6[üŒ»q\ë\É>\ÕhyRº}\é\×¶‘‘\å6\æ\ïUå‡•\òS\×qÀªH—!\óY© Ç¿4°¤¨‰\\\ô\íR(\0e”“Q\Ü\"\ç\Í\Ð\ç‘I¦;’K\Äl,«\ë‘É¨\Ò\Ûk’5 w\õª\è—1+Jd\0p¢œf”aL\ãÛµ?Rnh\r¸\ÌQ\ä}*3b@1ü…>4•†LuúR\Ëq™\Üg¯¡ª°\\©(EmŽ[\'ÛŠŒY!7\ëI<\Ãj˜³\Ó\ñù\Õy®Yœ+)%z•Q`L¿4¬‘\äª*\ã¯LTb\æ\ÅP–#{‚Âª3y®¾fIî“‘øÓ’\Ú\Ø`´®G\ÄXk‹HÔ£g$p8¨|\ÔTù@ù¿:±,R4aPˆ\É?)ž{Vú\\ˆÌ‚å·ž\à€G\Ð\r\ZWvf³\âP¥úûú\ÕH\ç¸20’5\ò”qŽ¢¹±\á\rP%—‰.P·?¼Dp=¹¦ax\Þ\Ýÿ\0u­Z\Ü/B$€†ÿ\0\ÇH©¿‘\Ý\õJv\÷j\ÅùjŸ\åo\Ä\ë~W|Fnú\Õy\ö!µ\n7¶1LŽ;Ø¤FžS9\\Ú¡F}ª\óœ\ï;‘I\ç½h­c‚Z;¿j¸û².\ÇÁ<r?:ûD£“\Ù\àÔ³ª´ŒªÌ‹ÛŽ3RÅ§$¤I#‡>¦¤=Ò’d\ó\É8\ë“\íP4…¾lmn\Õ)³†6?gnüT/\ØÙ·$0j¯\Ð\Î{\\ùc\ö‡\ñEÍ¾›€ùS+[>QÀ\é_\Üå™›Ö¿Dþ8|3\Ô<ecþ™…¿µDl\ß,ŠNqžÆ¾\×4=_Cº{=^\ÒKY9¤}Ž0k\÷\ñ8o©ªq’R\êÀ<KÁâ¾¾\ê\Ê7ƒJ\ÍlrÌ¼\Ô%M]aÓŽ´Âœ\ô¯\Ò\ãÞ‡ç±–…uµ&	\íRãš™S#\"º”Bm”¶š‰¸éŠ¾\èQGM4V\àe¤uQøœW6&\\r}\r(\'9(®§\è\Â;Ÿ\ì\ßiV\0}…\È\Î[š\ö+{£tU˜Ž\Ç\æ\Ú\Ú~‘il e1Æ€’;]M½\Æ\ñ˜†V¿s\Z\ÞÖ½J«o\ñ?¯r\ê*•R]=?N·š\æ?.  Q\ëW$³¹·b<À¼q\é\\Ö‹{\n:±9#·C]Œr	I;ÿ\0ýU\ÅÊŽË™C\Íw+\Üu8\Ç>\ÔHf;\æÃŽ¿myD‚\ä\ï€¦\Õ\È1\ô\îz\â¡Àfw¶\÷x¶Iÿ\0&…¹H%\×\'¥t\Æ\0†Ž)<ˆ¡P~\Îf>¡rFk6†™A`L@G$ž+#Pµ\0,˜®~l\×W3@ª#h¶©À•R}>\ÞOÞ‰6¨=”Z\ä\Ä\ÒRƒGE	ZI£{;;Ž\'eº‡Æ²„§Ì³žk`\ç\å\ØÄ®=ƒf½eá±Šb\Ä\àœ\àŠŒIp\È#\Ç@½«\å19M\n¾\íX©z«ž\Õ<\\\ã¬N/]5¹KI{’ƒ5¢[h0\Ëi^B\ì[©\'½zJIf#ý\ãq\Ô\ð:þ•\ÌO¶k——ûÆ¿\'\ñ\'/Á\à0\nZj.£\ÖÝ—üK’W­Z­\æ\ôB \rÁ+[…]Þ´+EWº5\Ø}Š\Ê\ò\Ô=£\r\Ø\èHæ¿š+R“2W>Þ™\ç\Ï\ÝÒ™\åJ\éŸH¼VÁ…¿MþÉ»ÿ\0žùW•\É?\å7·™ÿ\Óú½b”rªÀ\Ò2H\ïÀ¹¥¸–]H,¤u\ã¿\áK)X\Â\ä—5\á;$B#»\Ì~øÀÿ\0\Z°dµ•,3\ê*¢ºÃ¹\Êb8Á\êMG*_\Ê\Ê\ñmùº‚2G\ãš\Z‹“©*Ë†þ\÷ZE€T)\ç¿\õ¬\Óÿ\0Ÿ½\åUŒc\0u\÷\Í%\Ô\É	¦b\Ëü(j…sBH\Î\âU\õ R)\Ë^_\ò\â±âº¹Har\Ö\ÄfT\ÆI\är)-A±\×\r!\0œ…\ï\ÍQµº¶üˆÕˆ\èY‡u\åv\àd\ãš\òÂ€U^´\Ä\õ¢D\n°“»¨À¦\É$\ÃtE9v\Çý!L©œt\à\Ñ#;»pA¤\õF=F\ÞW—\å±\è6ÿ\0Z´n6\0”\õ\Ç5JYT–Y±_AšS\æL¡#R‡±\"ŽT\ÒF2·\î\÷7\éW1*²¡z\ö¬\È-.\àù\ÖR¹ëž•qX°f\Þ!Up{ù*\à…\'Wm\å˜\÷=þ•gr\Æ\Ùý3J¬­&\n\å‡a\éM0hzª–\íAß¡©\öA\ÕF\ì\ò8\ëø\Ô\Ãs\r®»W¿¾¬LªA\Ç4\ÄF\ë67\Åv“\íWK/ÿ\09«\0Œ›\æ \ò:\nfB	$\÷ #ž[Œ\ï%=½ª³\ÚÛ‰¿zKú\ñ[1l\Î\Ù|\ÝMg\\G}°¡;¿!ùÔ°)]\Éoüz¨S\ï\ÍV¶º›l„\ïŽ*+»+Œ€­\èzÔF»¼™Ã‚Ã†£F9\í±½€ \ô\äf¬5\Üsd\ÔúV8\Ð\Õ\äiL\ÅA\ë\Ï\ô­(l s§®zýy©Ô½J\æx3nÄ†þ,`ƒUþ\Îd“„\ÞÀg,2j\ð”&q\Ðú})!\óC´‹++\Üž\õH†P–\Ò\íy$aFsŽ¹ü;SK\ÜÛ¢\É!UC\÷‰\ôúVœ³O<d\ò\÷\íT\ö\ídPpOJ¡ü\ò’\è\Ð\Ô™m\×\Ì[\îŽ\õj¨\à´†	6 \0w=\é\êd7b\á\Î\"a9\é‘\õ©\Ë6®q\Æzý*\ÓÚ·–b?¼\õŽ*5Ó´\÷!$\\²Ž™\è}±@bUÓ¯L\Z{C ]‹\ÊO$ž¿•N©k\Z\â\\ž~µBXo‹mŒGRx¦\ÚjÀ´w3\ïma´3«(<ŒœŠ\óû\Í/JºgƒP³Š\æ\ÔJ ‚;\ç\"½kû*\ádºUù}\óüëŽ¼\Ó4¶ºm\Î\ÅÁ\È8ü««Y\ÆWZ\Õii\Ë\Ðù\ç[ø\à]zW–;!`Å¸[v*1\ë\é\\”Ÿ²Ö#3A­\\Â¤\ð\n¬˜¯¬’\Ã2\î\';¹Á\ô\õ­D\ÓüµR\Ãh†9¯£\Ãq.6’´*´½OÃ˜*¿¿‘\ðž£û1\É\Þ^Ÿ¬I0cÁ6øž\ãM°ý–\õ‹¬‡\×R<tN½ý+\ï?-#O=‡ªŽµš-¥%\ò~\æZ\ô#\Æù’zV‡\ê6\\–?ùr¿\ó>2²Œ\ã\ã\Ä($[ÿ\0/›úV¾•û4ø{G\Ô-µ½R\ê\õ­\Ýd±*)#žy&¾»[­‡\Ê\Ü=\ð3Ÿ\ð©[H»K…g\éÀÉ¬1_˜T‹Œ«6™Ñ‡\á¾›Rš)\ÛxON–\Î9a\\\ñ\È$*Y<+lª²zÜŸÊº{8 X”)\Ë\ñŸZ\Ðh¢Z3!\ãÜù\×\Ã\É-²M\îyûh*\ä,*Ñœÿ\0“[\ðh\×*£Ì²\Ó½¡G\\€§€pqS’Í”;ž++\"ù™—¼h\0\ç>™\Å=Dù\Ø)\ÉµM¼­\ÙO¸\ÅA,a8Ž59û\ÄšN\ë`Lb\Å\æ?˜©\Ûh¨¥RŽI`£Œv?…..B\ç•Q\ïD“Un\É\Û\Æ\Ü\î\ç\éQ&Y¢³±\'p^zu\ôªÒ”\ò\Ê:g>œT³kQ–U°\ÇŒz­{w;‚\ëÊ£©5\ÏWT\ÍineMqsN\îq\éLû;®H(sŒ\ðJ\ÏÀ\Í\å\ï\0±\0\óúU[\ËS3\è\Ë\È\ÚH•|\õW\Õ\Ä6$º†™%‘H$…#\nG¯©üÃšI¢–eF·J½3À#\Ð\Ó!œ3™LR/[·\ã\Ð\×\à,\à\ñsœg·ºt\õ>Ë‡\ëSIÅ»2Ô‘	 e#¨\Åy\Ì\ÚÎ±¢\ÎaŽBT€k\Õ#û ~µ\Í\ëº*_¡dQ¼t¯Á©M\Æ^G\×\ò«\Ü?µ`˜f#¤Ô¿\ð°\õO\ïþ¦¹Y´¹â£F\Ùúf£þÏ—þy·\å^‡·\ò–\'ÿ\Ôú¸À\Ò9‘\Æ]ø\ÎqúTF\Òx\È\ß.\õ \ëø\Õ5Â“)b}ZPˆ\íb\ãŒ\ñ\ë_>\äz7,¤ü\È\Ê\0\0mmþ\ëdùTQ\ê.\ñ“Ü‘\×Ò§³¸¸šB³FH\Æ7c\å4\ã ±c\ì\ä\Â\Í\"d¯FÈª\ì\ê#ü\Ç\Ç=ª\ÔÐ‹\ÇsŠ|:|\Ò\æP»Ct\è\éUryLÀ¥\n\Î`\Ýù­º\ËaG\Þ\îO§lTWZ{\Ä34…\÷ÀAk\æ™>p1œ\â©h&imY†\ç\0íŠ«$Ls»…ÿ\0d\Õka”&2\ÊOR\Ù\ç\éVD2	,\ÇÓš–\ØŠ˜\Ú\Ý}O\ô¨nZu\ržbbs\Ç5\ÒLJ½ª’{ú\Ö|³]C&\ë\÷U\Ï\n Z.\É,\Å\ÊK‡CÔž¿…tLY¢‚@\ê?Æ¹%¾¶ ž^_‘[Vl¬ªÑ³\r¼{\Z 5\÷Ï·\çzS\Ä{fQ\ÛÚŸ’\ñ\á\å\Ú{bš¡9\Ìÿ\0>:š\Z\ZE}\ð8;#*{\æ„i€‹´‘\ÏÔÔ–pLy\ÆOJbL+*7™žÀ\â\Ú/\\I$*\ZIJ\ë»úTI¨Z\Ã22É–\ë\×5\Ð\Ì\Îù~1\É\Î?O†\Ú\Ìp\ð\÷\Ï>¿…4Is\í1q!_EÆœLÛŠ•\ô\ÍH\â`†(±\ìH¬I´»\çm\ÒL\Òý\Å\ÇÒ††lF»Ÿvÿ\0—ú\Ôw1£&•?\Þ³R\Ù\Ú*[\õ~O\ñ}\ì\ÕÆ²(¬C\Ç\0\ÓHG5og=´!˜\Èžp+BT–R\ÒN\0\Å\Åt‹\ò°o9P\rEc;Áp\Æ\à´Û‡^”\Ä\Ñnm.\Ègý£Áª¢\Êkv\Ê\É\æ#c†\í[`[“¼Ÿ-[œjƒ´2\Ê\Ë¥Q¾Z`—BŒ\Ñý„\ÙÛžÀÕ‹[‹]Ÿ¿Xt=þµr\Þ\Ã\ÍPw\î\nq\ót>\õ}­¡@W«œP2’\Æ\Ì@‡;1ŸzWž6Fùu=JŸÊ•\0 Î¢h\ç-”ˆüD\Ð{{&É¤ÝŽø\íV>\Ì\É&M\É\ÜcúT‘uÄ¯…\íVw\ÛÄ§c?ZiD\Å\Zº£“¿Ôž\Õ´´‹\÷±\Âß®*\òD\÷Ct~[a°I\àÔ†\óX3‚N=À¢\àd%I7‘‰þunX&X†\08œ\ô©d•À,O9ü)©#.Q?‹ÚšGe	\'qž•\Ì\ÞB&l®2=º\×O&\Ûvi¦\ÜG\\\õª,moå¼°Œ7\áDw±À^\Ü\Þ\ÙV 8\Æ1ø\Ò\Ú\Ý\\Ý$‰„~¹\é]C$‹\òy•	\Ú=*³\ê\0­š$úúWV¬\ÅØž\Æ	P0™™\×<:\n‘\Ö\Ú9\Äsª\ÑÝ›ˆÌ–\í‘ÐŽ‡\ò©\á\Ü\Ðúþui²\Z5\ÛL\ò˜Æ»sÓœþ5‘$[£\Äj±IÙ8ü+T‡›l“!\ä\âƒoo!Ú¬H\ÏÒ‡!$[Ò“ll1\Ç\0š¿,)4DL@\àµN\Þx\í\åHŒqÿ\0×­t>y¹\Û<WÖºJZv\ö\Ñ\Ã˜‰go\ïJŸË¿!vÂ¬Rx­2cuR\än*6{\ä*-Pœ·A\ô¨h´\ÅHtˆ\n\÷\\\â«Kqm\nüÐ€\éÀ§\Ü\Ít¿)\\ƒø\â¢{{y\×s.H[4›)¼\Åg\"<\Ø}\Ñ\ÍR\ÝI…h±þ,I\íA[K%¢E\å¢e\æ²®–Fbÿ\0)þÒ°’,‰K\òÀ`QÖ¤š\ÜÊœ)\çÛŠ”]\"0\ÜÇ­G6¥À‘ cÓ¯ZÂ£²4…\ï¡\Ïÿ\0`\ØÂ¦TP[$‘¸œ\Õ\ëvµu\Ú\à1NhM\Î,\Ë0u#°üj_%Õ¶•\é\Ï5\åJF2eY\ìl®	“¼`q\ÇZ\Ë}$\ÛH„€\ðwr+t\éW\ØiX\ñ\Ø/Z@·Q\âW“\÷`r§Ú¹\ë\áÔ—¼aU§£1–\Ê\ß%™^ÿ\0d\ä~U™5¦«–†dxú€\êw~u\Ô\Ä\ï/\ï\çú\n¦\ï*²\Ärd\î-ý1_/Žà¬»Û©B-\÷µŸ\àzT³j\ðøf\Î9¢\Ö\ÐB\Þû›ÿ\0‰¤\òuoù\ö‡þúoþ&»˜•\n|\Ù?\îŽ*]‘·ùWÿ\0³(ÿ\0Ÿ?‹ÿ\03­q.\'ùÿ\Õú¢\ãL[Ž!f¡\ÝU\í¼=m\r.\ã\Ï\Ê;U³kw–Ü’Gc\ÅGm%\âI\å\Ý|\Ë\Î\äþ5\à¸\Ñe\Ø--m¾A\÷[š¿”-\å¡Á\í\Ï—r¿2²1B=ø«0Nn\ñ¼v¢64r/,b\à\î‘\Ù\0\\~t\ô¸œG\å\ÄÅ”sOh£‹,²ƒ\Ó#\ßÚ£G*…q…\ô<\æ¨\ÎD34˜Ë®ãŽ‡šr£cs3Û½M ý\Ø\ò€-\ï\ÅR‚+–f,KFi’YR™\ïc­H©&2¿ ný\é%†xAxÂ»Œd\ëVA—jü\Ø\ÇQ\ÇJ«HÀË‡\ËzTm†¸\ÆA\àu«\ávX\çw±ª-§\ÙE9u\Ü\\ú’h¦:22«»®?[I•¤)…n˜þuœú{\Í !ŠŸJÕˆ=¼y‘ÀJ\àV\ò.\çs\Z\"¯¦™«¿až\Ùsq\"‘úÒ¬Œ˜\0)\Ø¢–iÄƒimÞƒ=)t,b\ÏjHB@3V|˜O1¨@ß­QdT8Á\æ¨>«\äLU”²ž\àp?\Z†\ì3¦ŠÉ¶€\Æ{\Ô\æ%\n€Xv¹ø/\å™\ðªÁZ´ ‚d4rQ\÷\Ý\ô5J}Q/HÁy\Ç=3T¤frdfVS\Îü+EŒ\n™f\ã¿Š–\É-fHÛ½©\îfcy©„\Â\Ä\î88\É\ÇÖ¥[´Eo3?»\õ9\ÎkR\â;E\r¬=;þ5NE-ÄU€\êI84\ì$’\ÚdA»`ƒP\æ0yh\õ\ëRCŠ£\í$a\ÜzT£\Ìb\Ë\Â*\÷4˜·šo-\×\Ëp27zTƒ\ìÓ€Ï´€q‘\ëY²\ÚÁq6dn½H\èja	·\Ä6qO®i«Œ¼\Ò\Ç\ò\ã(\èjX–›*ø~‡<Vz\rL¾ÖDx\ëžO\áZ?g’4Y¥Œ*„?\÷Q±\à‘\Øsš¯7\Ì\Ê\ñ\ÊB‘­\Î?\n’[\È\×£\Ç|*)\'\ó\Ó\äU\ä§\á@\Ò,h‘—vÂ¶:?J\ËPû›À¯Ò¡)9\"^2@\àŒzR)•Pù\ÊT\ç…§˜|¤^m\òrÀ‘ƒž½[³:ƒ\Çû\ô¹\éSG\æ>\Ç\ó©ü¶s\ó\åv\÷¡1´c\Ï4vm›‹Œ¸\íŸÒ‹K\Ø\î¤\ÂœzvúÖ™°´fi%@Ys\Éj”\åý\Û1Jm\ã\ó£¨y»\åJ\àn¿Î¨J«g #\Ë>\õ¸&¶\ò\ò\ã;º\0*¥Å¼/¹‚z\óži¢\Í\Åq¹û<s,…\Ï8\çZš\â\"¯’Œ§ÔŽµZ{b³~\é|¦q\'¸aû\Æ\óÁ\ó]1ž–2q3g†\Ý]\×cc#9\æ¨LVtUµm¤ž{V\Ý\Â\ÞLTª¢\Øý\êu¿\ßÄ°m^„Ÿ\r KB”ª\"¬i()žI\Õ\ôDU(x$\ö\ïZrˆ»Q1\íÖª\0\Å*M…‹v\Î\0\nS\æ\ÏjØŽtD!F\çc‚Gj\ÆH\ál—Á{\ÍhG)„‰#¦¹\ä\ÍQy 8\ã\Ôq‰w!\\žA\ÏoqJ“Üº–\n {\Ó-À%¼è•ŽxÁ\ïPZ… \Ê[ û\ó‘DrF~VP\Äþu4’8qµsø\ãÞ©´W;³ÀŸ¼\0©hwq¼heAŒ»Ö³ž\ÚyÌ¨\õ¢\"w8\Èóš™¡¹\Éd#\Ê#½\ê\Z¹W2Hk¨\ö\Ègû˜¹\Ã\á£¬6\çú\×[\'\Ú\ã]ªBøþ4\Ébv\çú\×=XšÓ–¦\Æ,Top£¦I\ìzVM\Ý\ö¯\æ2 ;}zŠ\ìbµ[¦)\")U\ä \ÒÅ¥Å¼´™\êA\çŠ\ó§E\ßCº5Q\Í[jw\Ò\Æ#º_/ùœS\Ð98Ý•n¡‡L\Ö\ôÖÁ\Ç<T›OšF?fnN2[·µg*o¨ù\Ñ\È\Ö\Ñ\ìQ‘ß°\"›\"\Â\êP©ü\Ål[B-£e»\ä8\íY\×\È\íJÎ„zuúSQ*\ä~j\ã‡Š<\Õþù¢M=g\"U_,0c\õ¦dû\Ña\\ÿ\Öú\æGx\n\íf\ô\íU<\öi\\,M\ì}\ê\Äs\Ü} °\éÓ§\ãZ¶\ÞZÊ¹f9\É8¯ï±%´·ŒŽ\à®8À§.8\ÎI+\ô\ï\í[-r¾fØ†\ÜÔ­*\ÉÌ€¹$\nN(.R‰\0L\äŽy\ëS\Í&€sOd·RD\àGž•\Åm³ze\öž¬¥0j\à$f+¸nx\Çj´#˜nT]‹\Ç\Ô\Õ˜DC(\Ú\Ù\ã*\ï\Ú\')\æ	#øqš\ê&º}ˆ	qJ«#C;F„ý\Úz¼\Ò82·\Ê{U\õº…‰X\â]Ç¿¥¸¬U\È\Þd ±\ëŸjŒ–BT“\Ï5h\ÝC>kŒúy¨L\Ë+\ïbF;\Ó„Tu>r\ðjÔ“þ\ìRI\õ8UU\ä“h\äc\'š°\Ð\áX>1Ž™¦E¹- \ô\ÍJ,\ÃHJ‚\ÞÞ•”úu\ÌÎ®&\Ìc¯°­\Ð\ì#_¶H®C®…’P›GBGÁšNù\ÐU\õ±…\Ðù³\Ô\Z¥&›lK\"\r‡\Ô\ÕM\å\ÅhP\íÒ’;’\í\å©\0ž™8¬¸-n,¤(®dSý\îØ©®r²I\èGZ‘\Þ\æ,	\Þ@=~*ÔŽ²\òÀ¡\íYw–¥¿{À\ä\÷­G–\ël\ç¦‡5HMx\ÍUØ°\îi\÷0$T\àI¾b9\'Þ£»·\ó€™7sýi\ê!K|€dþ¦H#’\ì:dp3Iol\n\ìp3Ü‘Lb\ã\ÍFm¸ÁqøPŒ‘F8\0–8\ãµSš\î+\ä9g\è\0\Í\\-7–p\\\óŒ\ã­Jh`\Ê0½;þ´À®\÷\å#VlŽhŽ\à\Ýù\ã \íAU™TÈ¸Q\Ç\ÔT\Ö\öÑœ¼d\08\Å\0R{L¤\ÈX\ä\óZOkc@Â¿6j¬\ñ\Ê+\à¨\ô<­B\Òl\r¸\î\ô5A7wjÿ\0 \n\ó\ÅZYr0;½\ê”DL\nŒƒU/~\Ù\nù‰RC\ã4¯\ÔÑ½N’)-üË´uÕ¹†f\Ú	@	\ä\ñNµ\ÈÁ&£1\nW\r\êzs[‰\n\Ï[¥\r°\ò=qR¦;\Z·&YJnl*u\Ú:\Õt,¥Š\Ät\÷¤“S³€a\Ç\Õ®±h\Ò;`*ž•w\èCL§\"\Þ\ò\Ð®*7\Ëhù;ºã±­[ýI\ÌdG\È#ƒŠ\Ä7’K—¹”\ãµH–G$³6\0`\Üd‘\ëP=¼\â3‰6Á\Î*\õ”Åˆ\Ü|þ\ä\n|\ö¥Q™Hu¦zU\êKEÌª\Ë*ªp¬O&®SJtÀ\ê0$\ÞH$r§mŒ#ˆÀ\Ý!\ãwA\ê4\É*Ä—/#¦\\9\î\n¼\Ö\ÈÛ¥p\Ø\çIlel™P/o§½Y\ò\ÚWØ„\ä\ÓZ5;g\r\"ƒÓµj¬\Ê\È	Œ¢zU²£`°ž\õiTG‚[¨\ä\Íe2\É\0†Cµ8Ï©«{`‰\ÈøÓ½P…Nw;sÚ³%–ýP\É$8_j‰2¢]m¼R`\ç€O¬@’\Ë\é%F=08`\ÛF“)\óF\Öƒž+B&\Äk’=i!¶[––À7Š©myl\Ë#\rÞ™«\ö\äqÓ \" –\Î\Ýe3˜ª±\nZ\êI\ö’e\çÚ£¸··|¾‰\äÆ˜\Ã\0¨\ÂúS#C\'#“€k9\Ä\Ö/±Z\Ø-„–\ò¨…q\ÏqøU¸¯`½P-ŽW®\à9\â³o´»i¥\ófïšž\'û{` ÀÀ\ë\\®6gB’e\É#•°\Ø\Ü\0¬\÷‰£B±\ä3tÁþ/_Â¥¸†\ö\æ(\Ù\Ë9©\é\ôªŸc»tQ$£a9+\ÏQ\Û5…Jw5ƒ-G‘\Û\Ìl\î=OµKJü]œ{cµ|\Ã\ñ\'Oø\ò¾\Õæ¶»¶¸²f;bµB.Q7ü»O\\Ž\æ¼gá–½\ñ\Ìø­#‚A¡ŠB\Ð_HH#,{Ž¢»h\å\\\Ð\çRDOgk¡¿g¶\èÒœz>\Ïiÿ\0=O\çX~»\Õ\î\ô[YüC§¥¶¢\Ê|\è¢mÈ‡\'\0üb¶\÷/üû\Z\ãivF\Çÿ\×ûI\äˆ—*q\ÏÒš—[\èXŸ^xªÖ§P•@–-„œb¯H$\öÌ§+\Ðzý+\ÂZ\ïB\ñk]›¹\ô\Ú*º\ÜFUŒQn<rzþT«\Z\Z\ÄËAÞ¶7úÔ„‘ß¥7`\ÔeÄKµdBvp~´yp$EÀ=3Ö ‘L\Ò	‹×“µyªŒ\÷)ˆ\Ú\"A\ä18œ´)\"üyu\ó‚c‘\éJ\ÒOtZ0‚(ÀÀ+Ôšª§#\ä»p>\íZŽ9P¼\õ8<z‡Ë©J-6\ó.\ZV\n\ÃqýEY²\Óbµ$M)bA\Ü\Õm@v’[\êzU‡…2¬Ý»U­ˆ‘‰w{inß¸ˆ\Ìý:Uhnu†\ÌPmSÁ\ô®‚\ä\ÚZ®WwSš­\n\Ù\Æ\ë<[\È={þ56wMI\Ò96\0\r\ÐÓ\Ê›\òc¿­_#®\ã’\Ã\n1S¬*\ÌÌ‘1Ž3±\óÚ–+¶¸a\Ôú\Õ\Ù#6¬dQU¾\Ì\Ì\á\Ë\ÇC\Å$l\Ïª%†GP95\Ç\"«3d¥WŒJ©\åŽH\ç&‰cºœegù@\åzUÜ”º$k²¨0Or{R‹Yg!\'^¦:Š±Üªˆ¥O`\ç<þu§\ö¼|¸\Ø’*g&\Í\í\Â\ñL‘|ª6\Ó8™\Ü6T\õ\éR+´„ª€>´À†i”¦\âù^\ã\ß\éP	”Œ\õ\çÒ¤’{5—c¦\é};M“(À\Âúb†#Ab’O™\Ï*FWú\Õü\ö9‘¼µ\ç¡þµ©#6b}0OJ`=„r•&ÄŒ=MYÄ!;1\\\Æ9§\Ã%\ÄQ€¾\Ü\ÔM#¼ »6\Ò3\Í+¢U8û§°¡[`V\èÀ\óŠŠKI·E P\ç$žMH±±$o\Æ;š–Æ…¸ž[…\"1·§\0S¢H\Ò=\Ìû€\õ\é\ñÚ«©U~O\ñµTØ² Ebm\Ù\'ù\Ó\ÔEûe³\ÛÉŒX–h\Z!œ»ŽkË˜\È_|D\ö9U“%¬eaw\Æy\ëü\é\\h×‰¡*@U\é\ëT.~Ô³\ïtQO¯5¹yff,`{p\ß\÷ƒ¢r2:QmR9ƒ¦E1\ó•I\ò i0\Û6\è@%9®©¦\ÙÐ£i\ô5FY¿ )\å\Ï\ÐT\òH\Ã,Ë”SŸ^8\Å$\n\'>R|Å½«N{8\'\ï \Ê\ó€q\ÍVB¶»^\Üd\öÖ­\ÙN[-¬üÀq‚9ú\æŸ,NU|–ÝSŠŽûP\ÕetŒ\Ä#QŸC\ÅC¹dSr\à–8 \ñVAW\Òùr¨`28çššMVn\ÌÛ»3rz\×6‘E_\nA\È\éM&\ÔAÁoÎ®\ÖÜ’¸–fa\Z\ã-ÓŒT¢\Òpÿ\0hY6`|ÁO Ÿ%Ù·\Ð\ãštw\ÊJD9¡#!—taÊ±<\ã­Y²h\ävsÐ³\ÞÔ‘/”\Ådx\õ©\÷¹Œ\Ç6\÷¬\ÛArq\Z;‰CÁ¤’i¶4c\çÁ\è}*¤HÑ©\ç\0\õ5r\Þ‰€¾\çAf\\–\ÌÄ\ë@=9¨Z0e\\HF7)\è+J\ä\È\'`\Ð2“\ÛZw•‡\\\ç½CB1\Þ\öû©¼\Ð8Pæ®©Ô¹%6{~”ù®~\ÎlÜ©œŒs\\\ÍÆ»31r™A\Î1\éR\æ‘V:-\å·+;’\\À¬û]6K6g\çŒ(\"™i¨Z\Þm \n\Øû\Ü\ñO&\á$,pc“\éR\Øâ‹Š\ÂU\ØÌ»\Æ	ÿ\0\ëT\Ûv)\0œ^ UxE#9P\ö\õ­(å·¸lË»x\õ©ä¾¥©70:(w/¿Z”\Ý1\rP‚W±\ëƒP-$%N\ì* 2;dn\ÈßžÞ•…H\ô7§-H\í¡Œþ\òH\Ø\È=½*Ù‚\Î5`h\Û\Ør\ÃÞ«\Ç‰C\å¶r\n±â¦™”.\é<`Ÿ­b“µš5o]\nb\æH†ÁÀ\ã…\\Š_¶\Ë\ê\ß\÷\ÅjD\öÊƒl¨À\ó\ÆH©|\Û\ïÖ’§\Ø^ÕŸÿ\Ðû+\ía\Æ\"\Ï9‚*¥Ù»—\æˆ\0\Ä\ày«06Ð£ª¯JŽIv¶V2\Èy<×\'}F:Á¡\Ý\Ü\ó<…G\\ƒœ\Ô\ïi\r—\Ì\Òo#¨5e/§\îwÊ³„¤–\ÎjH•oav‘¢f.˜$m\Æ1\Ô\Ö&Tª™’¹\èØ¨£\Ô!\\ù 1 \äK™u\Z:%¶\ÔO¨«^DP·úÀ;œq\\º\ê14Q¶–\õ\êy#žV\ó\"\Ú\Ócv@¤¦€\è°\åD‘°d\Î>´Ë‰žF¢$C\Ý\éŽØ¦X¥Ôw°:Œ§\ð§Küs\ÅjMŠ\ã\çF€\Ø\ô¥E%\Ìm”;V\ìV\Ö\É\ï\äuArtø\Â\Çrx\Ç\Ñk\Í\Ð\ÈYgPA$žryn;¹\åV?”q“Ry\ðÛ‚Z[\óÖªÛ‹«‡c4qŸ\áâ‹´4’-5\Ë?1\ô\ÍDd¸\Î\ä@[×°©X#Tl\Î_¡\æ‡+n8ù!°^Ì²¤ù‰û\ÛG\ËZ\Å$²\Ø@=3À¨b2ck2®9\éÉ¦+ˆ¼\òy{\0·4{H\õ`©I\ê—\æ^¹Žu„2m$š§½û\É\Ò:\ÔjÖ¨ªZ\ã\'=\Ø`U¯\íKH°\r\Ä`‘\ê\rGÖ©-\ä¾\ôoij þ\æ=\Ö\êo½\ò/·Z…#|²Œy\ëQ6µi»\ËŽH=MC\ö\òü©4n}FLqt¤\ôš2\å–\â ¯*rû™ye±/‘\óÕcRƒ’d“v:c­C6Æ £u\ÇL\Ð\ñ„$_LWIÀÕ‹\"\ÔJ>D\'\ß5am¢Tœ)fB(\ÆÄ”ú*Œ×¢iDÈ¢Sß­\èKÈ¹q	‘Ÿ\Ër»Oy¢\ÕuuUÀA\×q\Éü*ŠÁq\æ‰R«œÓšÐ¶\r\0ue=\r;e­\åJ\È\Ù#85ž\ò\ÜFÁF\É-Òµ\"y\ãq\"sžyý*¶«\Þ\íG®8ùx¦\âO0\Ø#˜džx«\ÑKm#g\Ì\É@\ëøŠÌŽ\ÂXžG rsœ})…\Ý\n»ºžø¡&;›l‘\nª<³\Øp~µ‡,\ÑZ±\í\\‚©\äÕœ2K\ö±o¬å¹›\ÌT`\à\õ\èax_Û¬kÈ \óþ5s\Îi“k\0t \õ\Ír\Ö:m­¡\óe,_\î5Ñ¥\ìN€\ÚÇƒŒ*\É|¹²0»\Ð \â¡eT“s©,:žÕ”šŽ¡tdGŒ\î^Tcj>\í‘fF¶TÁ8o½R\ËCe³,\Þdå•˜üª\0¯zŽ\á.B¬_)\nqœ\ã#\ß\ëR\æ(Pºy›\×#\ëQI$F%—¨\È\È\èZ\Îc]\ñƒ|1x‡Q†Áfb‰\ç7,GP$×‰x\×\ö•øk\à\íB\Ú\ÃOFÖ„\ÊZIm ù\É5\é>5øq\á£b\Â9o„L–\òÍ¸¬lz Ž\õòœŸ±¶°“\Æ$\ñ/a¼ˆ;{\ã\ðâ¾+¥‚q¾&V}º?C\É\Ç<M\Ôh­?\èüi\ðoÄ‹k§±˜\ékn\ê6\ÝÊ‘³“ýÜ‘š\ô¸´ko0\Ý\Å1r\ãx•ç¸¯#\Òÿ\0f_…\ZMíž£¼\ækVV\ÃJY—û\Ã\ë\Î+\Ý~\ÉaC\Â\ãŠ\ó\ó«\óÿ\0³7o3·\í-Ws*(â±ŽY\ãbûA$u\ÍVµ\Ôe‘Ä’FaV ›\õ®³\Ê@>\\3c­\"\ÛF\ÃË¸Q‚x+Ú¼ýM\ÈR\Î\é$,Çžz\Ôw8˜\Ñ\ÌlÇƒ\éS-”0\î\n\í#79c\Ç\áR¬pG\ó°Á©´*\Âma_\"`%‘A;˜\ç>§¡o«cF@ù@\ëŠAghO\ÏS\ëšÏ–\Æ(|¬\Ü\0¹æ¤­Ë²j?mP\ñ\áv\ò?Æˆ\îY“y”\ñžÙª»¢|›>^:š¬Ž·¬\"\"E\'±\È\\Š\0’[)’I.VF“y\Ëc)‰¤\É \Þ\ñ%¹^ú\ñ[N#\0F¬‰\Ïœz<\ð„Æ­·=È¥ÊŠ\æ0\Ú\ÅUÕ‚ž˜\Æx?\\TRþ\ä“(£\ß=kZIÛžAQOÒ¡ŠKIG2’¹\àŸOpzRh¤.ž‰xÊ„v\â¯=©´<)\Ã™\Ï>\ÕR)¡rE¡\è2\âª]}®a\ó\\*\Î\Ây¦–„¢\Õ\ÔbE.¯°\ã#þuR\ËíŠ»NB·BEGk\ZDd2>ì…ÁÁük¢¶\òYlG\0\õ¬9·7R1¡}Ri\Ýn¶s\ò`r\0\õ«\ñDZBdf\0t\Úzýi.5Ko\õ\ÅCgn	\Çù\ÅRŽ\ò”¤l7 \Ô\Ö|©«5¡³´DÚ¤¨\É\ã/Ù­¿¾*Å‘®·’{û\Ów\\ÿ\0“OB¹Yÿ\Ñû2\ò^\"»Xsœ`U%§—\ÜO¥1\÷\ÜJ\äº\ß9\ÍY1\Ån»\Û=\ô5\ó\Ñ=\Ûs9\Þr\Âø>\êý¼NF%uS\ï\×5v\ßì™/k\ç¯\åVüû5_6C0\à2i(\õ7cÿ\0N™Qv\È$À¬Hü=&\ö›f\Öc\Î\Þ3\õ®Áf>pwsÀÁ\Î?\n¹½¶”	=À©i2‘Ì®—\r¸G\ë\È$‘\Ó\ØT\×W\Ð\Ú:¶\Ðs\Ðâ¢’KÈ¤s{:\É\ì*ªtüjy­ª\ZH\Ã)\éÁ\ã\ëY¤3}~\árê­·¡\ï\ÅZÓµ+¹d[•%\ó\ê?Æ´\Æ\ÕzqÓ3L\n¶\êD…\Ûw#n0Z\ÐF»]\Í26XY\ë²I–9\Ó*°B~Y:U]SX²\Ñ,þ\Õu\÷›!S<±ÿ\0\ëTV\ÅBs¨ì‘¾	RµEN”o&j5\Ä6\è\Ò\ÝH`\ç§\ë\\•\ç\Ä;51\Ù\ÄfoRp\à+\Ë\õ]v\÷X”¼\Îv\öQ\Ð¥r\×2œ9¯\Ís®2¬“Ž\Ý\ó\ê\Ï\Ýøc\Â\Ü<–9\óK·C\Ôg\ñÞ©vp$©\ì£I¼Q¨0ÿ\0†\ã\Ü×–ý¸Ž3LmAûÖ¾¯\â\ä\ï*ŒýWÂ˜\ZiF(¤¼‘\é\ï\â’?\ã\á‰\÷5]µ\É?½9ú×™A»ž”Ã©û\×4³Êy3¾5ü0_q\égXl¬\"’=]A\ÎN+ÌŽ¦Ç½95sš\Î9´›\Ü\Õe\Ô\Ö\É\Ûc¬[2\âN}½\êi\îÕ†øx#Ò¼’\ÏU‡\Í\Åv\ÖZ¥«Ç‡#>\õ\î\á±R©\Ï2¾\rE\Þ\ÇGg\â}SL|\Å)*v±È¯B\Ñ|Wa­\ÈmnŸ\ì“0À£ý\Ó\Ó\ó¯º½y(j¾R08#¦8ýk\Û\Ë8…’NWf|‡p>0ƒ|¼³\èÖŸ}·>¼Ò­#@¨»’¥eC\ÄG\ÌK\ç#Œ~µ\Çx;\Åjx\Ñ\ï\å\Ý:Ý¶~\òŽ\Äú× \Ëok$E$:\ÎH\ô¯\×púxªjµ-\æ¼\÷&¯€\ÄK]j¶\ó]\ÆLÓ²Fs\Îyý*+}f\Ò@bva´\à\r¸©aY”y{ˆ^\Ù\à\ÒÉ§\Å!ù»0\Ç\Ýs\Ç5-\åqrx\ã­2\æXN0T\á¹\ç\Ú-œYg‘\ËrX\åJgµ·1¼¸q\Î:úqT™)\Z2HbAsX¶Ú°º˜n€+Œ~^\õ¼\×\"D\ÚøŠ7\0?\Å\éU\Ìv\ö¨JÃ´\÷À\ä\Ð\r„ù+°ƒ»œŽ€U@\ç\Ìmøl·sÂ‹i“db3\õ«n­ùL½Gç¯½+ˆÅ¼3J¡>£5¨ 0þ\î4\0c\ëY!\åú\ö\÷\Å^f•£ro\ÆB\äƒLw4R\ÈWg»ŠÌ‘\'£L€qœ\ði\Æ1\å£K G\á\Ï\ó©\âTR<§.rOBis\r\")-\îf I\ZGŒdŽsYºÝ¶‹o\ö›ù„(Ûœ\ã²û\Öû\Ë$D\Ã«\ã/ŠŸM\çŠ$°f-mgûµ\ç\ß\Ä§\á^.}š¬&\Ô_C\ê¸;‡^e‹Te¤R¼Ÿ—o™\ï\öþ=°½b,¡\ÊOC\Ë^+KN\ñu…\Ô\ßf¿Sk\"œc?(\'Þ¾ƒÆ‹\Ðki1ø\×L|c¾\ô¹#“šü\ÇÆ˜\Îw6\î»t?u\Åøe•N—³„,ú;»Ÿu¤PÍ…ˆ=ÿ\0§­[\â8ÿ\0zvb¼£á—‰\\\ð\ß\Ú._çµ“\Ë\ÜOQŒŒ\×z\÷\ðKÀ0ú\æ¿_Áb\ãZŒj\÷G\ó†m—<&&¦\Z_e\Ú\ä·v\ö\òË…$)xÖ ¶†ü\Ê&\Çý\Òz\éT\ó#C9\Âúv«\Ö\ð´.­\æn‘x\Ãî®´y¬\Ôû)U\ØNsœ`\ä\æ³\çŽ\î 	b<dŽ\õq™\Ë #G`\rZ™ž\â\Ý\Òé³ÃšLZ™\Ð\ÜF‰Žú\ô5f\Ëb\ÛF\í\ê3\Èÿ\0\"³`Ó¬ ,J–q\È\ç85e\÷Æ¦TL1\×…!\éÐ¾\âùŸ×µb\Ïus†+&p8 T±¬l¹A’:w\æªj:twH0m\Ã</Â‡\ä\"F\Ö\í\Z]‰&dn\ë\Í_M\ó¶\÷\å\Ï\ñŽ3øW?e¦[\Ú1—n\âN2O#>Þµ¶º¢»­¼J2¼/=\èC\íd\\™v„cŸ˜\í5RH\ZD6À\"‰7˜ª·CSûa\Ü‘0\Â\àŽ	\ïR-­üW\ÞYŠ3GÆ\Ö\ÚY\0LDcz\òIúÔ±\Äm\å2N7£œú\æ®OžÑ°FJ\ã<Š\Ø1Ž€2i\Ú\Ãe-¾\ÐB\õ\íÞ‘\Þ	\×mºüv\è*·œ\è\0š\ß	\' \ÉúJ\ÖVT„¸\ç\ë\ëR\Çžš\Î\ÆBc–!žz\ëC[Z\r¡\òÀ\'Þ·fš\'VYÀr}:þuTF²Jd1\Ð\×¬¥e#:U¾r\Z\ÙF\Üwëš‹\ËÕ¿º•º\Æ\0~c´\÷\ã½&mÿ\0¿S\ìŠ\ç?ÿ\Òú\ËÈš \ÒK\'\ïÓ\ô¦°“b/˜<\Ï\âlc\ë[o<‰¶<–þ\ñ¥Wž¼¬¡\Þ\àzŠù\ÆzW\"K%p$‘\ó·\ò©\äj\í\è{·8ª\Ò\Ú\Þ4	ûÕ[øzþ5n\Îšv“ýœú{Rb\Ú;‹\ÇO.4\áƒ1\ÏÖ®7Ÿ\ÍÂŒf¡C\î\ÜB©\åx\ä~5[\Î*B)`§<œŒ\ÓkK“sE^\Ö¼ cžœšY/bsŒ‘žF=«5\î_\Ë1œ\î@\ËU)L—f&^“úúÒ½\ö)3QŸÌ—!r@\ãÚ£¸³3)fo/w^eMu2K\å[Fþwr½?V ¼¹º\ÄW\Ì#\Ú	ùŽ3G0³\Ò-d¾™±*X\ä\ö¾¦¾c\ñ/‹d\Ö\õG»€€\átP+\Ò>,kb\ÓFŽ\ÎÝ‡úKs\ò­|³=\ó	2Nk\ó®.\Í%Î¨Ce¹ûw†9\'Œª½\ém\èzl\Z˜o—9¦\ÝÈ¥<\Í\Ýk\Îm\õp˜\ÎjK#–\àW\ÃV­\rO\Ù)\Þ\æ\Ì\÷cy\Úyª¦üƒ\÷¿\n\ä¥\Õrz\õªÍ¨ƒ“žk\äª\â#wcÚ§=\Äß³–\0T-}ŒüÙ®?û@É¨ÿ\0$gŠ\âr¹§´¶§e\ö\ì´\Ï\íœ\\p¿\ôl\nh¿;¹9Y\ô¶¹\è·\ä·S]U\ã\íZ¼Š\ÞüŽs]=ž¬\ñ^\î\\\ôÕœµ§s¿k\Ç{½Jš\ëŠ}U_«SF¤:Á®¬EUngOUc\Ð\ì\õY-î£ž\Û$m‘\õ¯«<5­[\ëºdZ‚ýü\0ÀvaÚ¾¶¿\Ëu\Å{_\Ãoÿ\0e\Þýšb\r½Á\0ƒ\Ð7\ðŸÎ¾Ÿ‚xƒ\Øb=”ß»/ÁŸŸx“\Â\ß]\Â{jkß†\Ýß‘\ô´“E¼œ€qŸ®+]x@¤/2ž¸\ì=1J“Ý’Í©ED\ô\Ø\Ù\à\ô8\ì*),¡’C+Eµ› \äzý\Â\ï[Ë–Ks5\Öy\Ò\"\á\\¶T7R}«ªƒT’\áT”E\ì[¿\Z\Ïm6Vh\Ø	±øS\ò¨ª&Ÿ\æ#nÐ¸\äúb­\\†:\á$|g‘\Û\Ûj=\èHp	\ÎO½CÕ€l†Qœû{fµ\"´\Ä\Ìs\å\ñ\ÏRj’\Z\ÝEjû$V\ØOT­#5©#\êæ³„\r§l…\ÐºG?L\éº1\äm\Ã$ã§·5LFc<°íŠš%•¥l&Ü€2NOÖ°y\Ò]„£*­ƒ\ÓÒ´g¾’\Î\ØÊ±3\ã\0}\êE$i\÷«\Æ\Ð\ì3\ß\ñ§\Ç\Û\Æ#Œ\\\ð½z\õ¬\ÛMB\êú-\×6\ínÝŽj\ì{\å8yA9\É\ïúQnÂ¾‡1\ã?[øw\Ã\÷ú™D\Ð\ÆDký\ç<nµù\â\rI\ïn\åšFË¹$ŸSžµ\õŸ\íâ€¯o\á\ëyDžJ—‘‡st\é_\ÝÍ½=Nk\ñ~=\ÍLB£¢G\ô‡†9*\Ã\à~±%\ïO_—Bs4mÁ®ƒN¹¸‘\Ô\î9=«<\Æ\â½wá·…f\ñ/‰,t\Ä\\¤Ž¥Ï¢\Ï\é_)”\áYªkvÏ¹\ÌqJ•9T“²J\çÚ¿|=&\à\å–ü˜\Åûy¼‚~^‚½j\çJ³0©Œ„,zª\óøâ¦†[[D´¶R‰ªªŽ˜”\ÅVš<D\Ç \ò:šþ‰Á\á£JŒ(­’?‘\ól\ÆX¬MLL·“¿ùqFmN±~@À\Ââ¦‘nSnBF\ï\âüªv†\Ü)Y\äRpvœŸ\ÄU\Ön\ám‹…<\áºbºV‡\'r²k6#\Å:È®¼d¨\Ì\Ö\äjW\ì8\ê*‹Y\Ã7.\ÏQ“U\ÓD²™Œ’«\Ø1\éC‹\ó\Í	•v°=ŽI\Z­r\×\Û\Íqn)\ìqø\ÓZ(m\Ñ`„©¿\âx«‘\êy˜ $ª®@\à\Òlq‰§\ê¾k\ít\ñ’@\Ï\éšÙùŠ\Ç\ÊÃŒŸN(`HÉ‚5 œ3\'\'ŽÆ«E7\ï|ˆ\"eÓ¡\õ¨\ÊhX\ð\çk\0\Ç\0\ôÀ«¶pB\Â\Æ\õ>¦ž\ÐK\n,…2‡®{fª\åÕ°¼©\éÈ«HƒG\ì\ò–+\È\èIskn„2†‘zd\õª;K£)<\ô\ÝLû2›o>\àˆŸ8\ÆH\ïÖ›amG\Ù\Å´\á‘wq\É\Z°šk«†\Þ9=AúSmþÎ¤­«—\ïs\Ïj\Ðw™yRy‘Ò„dm2Ÿ=LŒ3\òž€þ8¼[–#i\Ú::{ZhŠY˜	M¹\'a¿a\Ëc8\'\ëÉ¤\Ð\Ó\'Y­°%Á\Æ1Œb¬\ÛÛ©Mü0<pj´h\Ó)P:ƒ\ÍFeKx\Ù\ä\á\à\÷þT\í`l\Òf³C´¦\ìw\Í7Í³ÿ\0žU„uL\òA?\'\ö§¯\ó¥t\ZŸÿ\Óû-\ç\×aaÇ¡\Íg\ß\\C\ä\óv\Ç\ÏÖ¡l_1@úŽ\õƒs¦%\Ùi•Ì€´ŒW\Î\ÊW;\â$Z¬v.\âiü\Ô(&¶¬µI\î\ÝUa*Ó¿Ÿm¥i\í–HþqÔ“\ß\ØV\íµ\â§üy¢žpq\ÔT\Å\ê[\ò&Š\Ó\ïŽ\ÏJšx\âUar\àdvå«šÔµ;\Ò^tdbA$>‚¡‘uO*#>\à\ìœ~•RŽ‡m²\ñÜ°Vùø­G\n\Ç(lûTŽ0A\Ï\â*x.o¢\ò\õMª\Ú\0¹5£?\Øce¥UW€«Þ¥GA2š˜¼Õµ\ÜÊ§°\'5j\âA½”¶x\éMIcŒ\ï\á	éž¦‰/\Ød2–À\È\ÏO§­5°ZÚ³å¿‹Z¾™}|–ú\\«\"Z†\ötY3’=\ñ_>\Ý]°ü+\éozt\n–zœI\ZJ\\F¡An¹8\ï_(_»q_qU9,T\Ùý+ÀXˆ¼º’]>¢\ËÀ=*³\ê.üf±eŸ«ˆ\ë_8\ÊOS\ï\áT\è~\Ú\ÜsHo;\Í`-Ç¯†\à\õ‹Â›}d\ßûVs’j3v{V\Ú3Þ“\Î\ë“U\õPúÉ·\ö³\Øæµy¬/=½h3ž\õ_W#\ëG\ñ“Š»¦\ã6r\"\ã¬¤\ÄâŸ³kT­\Î\Ú=Tž\óV\Òù˜\òkŠŠC3ZpË´\òy®jü\ÍP©©\ß\ÙÝƒ‚Mw\ZM\ñGR\Z¼z\Ú\ó‘š\ìt\ë\Ü`“Š\ä§QÁ¦zzIXû›\á\î¹m¯\é­i~û\î \0\Äü\É\Ø\ã¾+ÓmDBÚ¤N‚¾\'\ð_ŠfÑµn\â$\Ã)\è\Ë\Ü~5\õÝ–£g©B—¶gÊ žFs\õ\ö\ô¯\è¾\rÏ–/¡7\ï­ü\Ï\åxU\àqn½(þ\îzù\'\Õ\æKf+·?\Ùj	 iþKu#Œu\ÈJ§\ÈF0 #\ïd\î\'ùR¾°-¥\ò¾I\0\í\é\õ\÷¯°ROc\ó>¶Ÿ:“$–^:\Ö\ÜZœ!d%@8 ‘Œ­fC)¹‚K€HNŸB|—f\rnÒ¶0 üjÀeÞ´“<UÀ\ä\â¬\Ú\Ëqw\Z¶À¤\ö\Ïú\ÕXlYH\òm“\æ\ä\åŽ8­YÃ«ÌŠˆ8U?\Zi6Eˆ,£do•O>¹*\×\ÙN9#û\Ç\0*‚\ãP	:®Ãœm9>£Ú¹\éu‹¿´tµbŒq\æy¢VEGTt7&H\nùn…Iÿ\08\õª\×Ú¥®“a>¡tBEn…\ÎQŒ\Õ»¹\óT4;—›Ÿ\ë^9\ñ\ë\Å0\éM*ÿ\0I½??b#^¼qÖ¼ü\Ï°\Ô%Z]\ëdyD\ñ˜ªxx§«\×Ó©\ñ\Ï\Ä\Ï\â\rj\ëP\òfvo =\á^b\ï¹\ðj\åýÉšFaÞ©F	9\õ¯\æ\ê\õ\åV¬ª7»?°!J4©ªqZ-«a	w\0\r}\Åû=øNKKIüMp1\æþ\ê.9\Çr+\ä_\ri3jZ@»žg\n w&¿M¼%¦µ†‹k§XB#Š\Î0›œ€Kw8\çŒ\×\è\Ü	—)Tu¦´G\å^\'\æþ\Ë\n°±z\ÏDomg 	\n‘\Î3Ž=\ê\ÜLmF\öBë­$1\Ço9k¹¼\å=8\áIþt¡9Hü1_«\Åh>_C’K›Idc\Ú\ÎxH\æ¯Å°¸ú\Ó\î%·Ž\à2ý\Ü\ô9?QSY#8\\¨\ç=9£Q¤f\Ë(ˆ1‹\Ía_\ë›TGp£ \õ«—\ßý¸\Æm‚A\õ¡\Æ?j”–“?›\Z$•#”®h’(Xø‹l\ÅY–\ä£\õ\ÇÒºO¶5\Ì{†#\ôÀ9úVLZT\\\"\ç\î\î#\ñ5aGµ\ÄÈ¥r1Œt\ïM^Ú‚\ò±K\ß\0\ö\îOÒ¯¨*Ä±\Ã/NÆ©¤Šû_w^ŒÓ­iE¸TÃœ\÷ª…\Å\"x/\íXùsFþg¹ùi\×FVD;\Ó=jš\Äc—™‹ÛŒ\Ô\ÒÇ»g±ïŽŸ\\\Õ\Ü\Ì|­!Mˆ…ˆ\ç\ï\ÓÚ¦\n\æ33F\á¬\'–\î\Þqæ\ÉÁ\ç¡>¦\ö¶\ït\"g\Ø0s¸ŸÎ¨\ÐÚª;Ij…±’3\Ï\áR\Ì\Ë—fÀS‚Fr?\nÎ³\Ô$¿ŒJ\ðµ»rpzUøŒ\Î\Äù¾X^¹Ò€,ù\öj\ÞT¾ylr¾\õP\Þ[\Ú4m<ž_}\Ø\Üjag(^\"»]²v\ñÖªù1H\â2œ23ŸÆ&ZF71´\ð¹u\ÏS\Ç’M\Ï\")RU\Î	\ì20¿\ä\\ùþ•}]‰U8>†€µ²P0H^2G\'\ô¥û5¯\÷OþµJU[”,1\Ç\"/ý£ú\Ñas3ÿ\Ôú¸\\\Ç4ŽÌªœ¦\òY\Ð\í“9\ÇcM\ò„\÷¬I\Ï\çüŠžS>\æù\Ï\\t\Õ\ó–=\r£Ò ™§\Ókg†*\ô)cÊ‚<ƒ,—‘²G\òƒú\Ó¤m\ñ$Pm\Ï\çø\Ñk™²cg&\õs\Þ8ú\Öd·ŒF\ò\ÍÓŠ´5«—RDg\æ\à\ädb¬\Û%º\á„h¿<\Ó~Ci\õ*[\\Z‚\Ë4l\Ù85\Ä\òœü¥ê­‘\ÈV\ó5¹$.\Ô\ÇR³ï®­!SXý\÷\ï\ô›Z\rnV\ò¥Y0 |ÄŽ?µ \ßfd¹”JW€\0\0j\ËunYg|?¦1ùS­\í²&‘¤n½vøR€v9¯ˆþOøf\â\Þ\Í3< \É®W°¯\Î\íj\ÚH%x\Ý0TA1_§žL¨ÿ\0+±ÁÁ\ó\Æ?…\Ò?›\â]\n\"\ñ·3Ä£•?\Þ\Ð\÷¯”\â\\™Öµ†\ç\è\Ü	Ä±Ã¿«Vz=‹.2:U”þ5\Ðj6o‘ŒW7*°\É¿.\Äe­=O\ÛicyµLg›\é\Å(”ýj®	cšr’1\År\Ë\ö:¾±rÇ˜GJO5ªpG4Ó’A¤¨w·\'2œ\æ3Þ¡Á\Æ\ãL\Îüj\Ö^Ø¶¯ƒ\É\Í\\ŠBqŸz\Ç/ƒ\× SÁ^½+9\á\Í![±\Ò\Ç(\Ç­¤\ç¥riw\é\Í_K¼\ô5\ÅS\n\Î\Êxƒ©Š\àž\õ\Ñ\Ø]G\Í\\3d\õ\ÅlZ\\\í#&¼\ÜF\ô°ø‹j\Ïb\Ò\ï²¶zW¾ø?\Åúh\Û$\ñ¹•?\à~•\ò\öx•s^Ñ¡Þ¬J2y8\ÅueXš\ØzŠt¥f1ø>.“¥ˆ\âÏ¥,üsk\"q	†Q×€\Ã\ð«	\â›Xcf•¹v(¹5\å‘Hl\íF¢\Ä2\õ¬\æ\ñ}\ÄM˜\è+\ôº|a‹QJ¤ÿ\0\óLG…ùco\ÙÁÿ\0\àL\ös\â\î¾\Íg;8\È\ö\ÇJØ°\ÖuHbXSKšaŽ\ó\õ¯\n‹Çº\ç\ð\\„\Î@ýie\ñ\æ·(\Ã_\È@9Àl\0j*qµTþ7\÷!\Ò\ð·º§\÷¶}/¼G!\ÄZA@?¼\Çúb™=\÷Š—!\ìáŒ\Æ_ÿ\0\×_;·‹µ9N\é/¥c\î\ç­W}~\âgK‡cÜ–5\Ë.6ª\öœ¿úÔ¼4À\Æ\ÍÓ\âÿ\06{³\ÞkÊ®\Å\àV \ÆNz\ÖeÖ¥« Iu±ŒŠ\ñ\ß\í”<<¬}9¥\Z¤yVfÝƒ\ë\\U8-\ç/¿þ\õ=Š<‡üº\Ýÿ\0ž›.¹©Ck$\ë~\Ôp1ý+ä¯Šwº–§9½½•¦f\È$ž˜\è+\ÞÎ©gqoå‡\ï\Îs^C\ã--®‘ü³k\Ë\Ç\ã\ëÔ¥7$ú\\\õ0y.‹r§IF[]$˜g|6­\ØFdq[š‡‡®mÙ˜¯Ú.ÅŒŠ¸æ¼Œ4}ä™¥x;\è}7û>øY¯5\Æ\×%@b°ù\É\ã\ò\ö,\×{.V(£%þ\Ç¼\ñ\\Á\Í&\rÀ\Öx\Â\ËxL®~‡\0~U\ëF(\äI\îMA\ð\öP\ÂEuzŸÊ¼oš<VcV_f>\ê\ô_\ðnc\Ë97,›\ñ\÷G8>ù\íP­\Õ\Õ\Ó(ˆ\áW†?j<c™rlÂž*¤M#\'›n_<?QŸj\ö¥\ä\ïgbviDc?Nxš\×v‘\ì\È%ü\ár@ü=*½Ö¢!Ž<\ì¿xþqR\Ù\Ên˜:\Äad\åIÀ¤e\éš7‹\Ë`S\ÝaÀýi\Ö\ÖVq¹•s¸\Ã§\Ëu4\àÛ‘\æ2Œœ\äj»Ê¨TÙ‘\ëTÑÉ¥··\Þp«\ÓqU<¸\ÄlŒ\å¸\Ç\È\Ó%Xþ\ìl@`I\'¨>Ã½RHeX€dÉ‘‚Glg4ŠZIiw#n\å‹\Ð\õ«b\Ë6MºbzG@\rU}R+\ÝL€n\Æ\n¶\ÔûQÿ\0j…±&@=¹¤¤;2\ö¥ªY¤  \ß\ÝÀ\Ö4z¡2y<n\ï»&£’”uw”\ó\ò\ôÇ¹©`‰!t1Z´…FA\'§\ëT\Û%[©¡²\É)™\áFfœ\ñ\õ5¢–AW\Ëo•{(\çN\ÖFR\Ò\\E•s¤\ô\Õ5Ö ˆ‚EùUŽ\Ð0w~5b,I\"(H\è	\ëPÁ#«¨ÃÖ°_[‹¿!blŒ“\÷±éš±o}\É\övŒ¦\ã×¨?S\ë@mv\å\\z\ñÖ’6\Üw\ÈrN03T\Ì\n¹v\ð>nÿ\0[’\æ€E»\÷ªsÁ\Éü)\\+/”wF uü\ÅT+3\Ê%S³®\ïLS¢.ù\ó0AÁ\êj;»\Ø\ì\ÓÌœ0Lc’qE\Çbq\Ç€=O&—\'\Ô~u5·\ö”\Ð$°Ú¬3\Ë\0*Ÿ\Ê\Õÿ\0\ç\Üÿ\0\ßkþ\\,ÿ\Õú¹\ã’VÁ9\Îjm‘\ÄD²9Â¼þBš&\ë\ÂJ\ÊyÜ múzÔ,\ÓH\Ò\Úv\ðz\â¾|\ï\æD—DeŒ—0Âpy\'\è*)µ;&7,‰\Ð2O\ãSC#\Í~¼0‘Þž–þqY%‡\'<\ó\íSb‘oy>Y;Q1Ú¤`B€„\ÝH?•T–Q“)¤\ãž*\ÜpB®5Â€\Ã;W\Õ$!1K3K\Æœ\ô\é\ëJÁ6*£ùž¹\\`ûT’\\\ÆU\ÑÆŠ>fnÿ\0U†\â\Òlywvÿ\02O\çE„–¤«\Æ7+\Û5ft`œ† ¸\äcù\Ód\óa\Ûy\î\öWy¼Œ1ùœú|Æ„’`X`¨\ÛŽ;\çŠÅ¸Ô¥\Ã!µr¤`œd[p\Û\Ã \Ýy\"£7E\Î=\ÍX¸‚\Þ† \ö\ï\ëO\ÙÜ•+3\åÿ\0ü \Ó<F\Í \"\Ø\\¹\ÉF#\Ëlþªk\å¿ü8\ñ‡\Ù\×Q±’4S\÷À,‡\èÃƒ_£¯if’±p\Ò\Ç\Ø.FM\\Ž\Þ9cB‚&\à+ŒÆ¼^CNµ\ÚÑŸg•qž\'\re+J?‰ù-&•/\'nG­VþÎ”œ_§\Ú\ï€<!v\Æ\óRÑ£;¬J#,}r+\Ç\á\Ç\Ã)q»Ã¿6y+\\)¯\n|#&\ôg\×\Ò\ñ&…µƒ¿mù›\ë¦JA\ÈÉ©K˜\à„\'\é_©–_\r~[®c\Ð\íŠgŒ©b> š\ê \Ð|)§¶\Úe¤\0ŒD¹þFµ‡[y\Õ\ñ2š\ÖŸ\à~M\Ã\á­Fqû›i$ú)?Ò¶-þx²\ï\r\"\é\÷tý\Ó…~­\Ú\ÇÇ¶\ÙTŒ\ô¨? ªzÄ—–pùQ¹\Îz`WT8BŠø¦pU\ñ.®Ð§øÿ\0\Ãš6Ÿþ$_|°\èS®z0£\õ<WKiû-|O»¤µ·¶Sÿ\0=\'P!šû\ö\Æ\ê\êL	X¼k\É\È\Üx\ô®”‘P\Â\r\É;¿•o\Â\õ»8*ø‹zF)œþ\Êÿ\0¢8I,\äs¨³\òqþ\ðZ\óO|&\ñ\çƒÁ“Z\Ó%Š Ö®$ŒÀ”ŸÖ¿Y\'\Û+	#\Þ\Ûx¯­$\ö\é=«\Û\ÞF&‚@C#\0C\ç¶=\ë<G\ád½\Í®ÄŒleûÄš?\ÖI m²­j\Ã8#=\Íz‡\Æÿ\0\ni~\ñu\õ¦Ž\0¶-½Ts°ž«Ÿc^5lç§¥~SœåŠ„\ÜWC\÷—2\ö\ô£U+]^\Ç}£^˜¥\ÃW¶hú±ƒq`\nù\ÞÅœ89®¶\ÛQ–5\ÚO\ë^<Li\Þ\èúª2m#\Ú\î|O/”-„Ÿ\"\Ö_\ö\Ã?^•\çj\ì2kIoÀ×¥qV\ÆJN\÷=\ZJ}¢ÇœÔ‡R\Ï|\×\nš†y\Ï+j¹\Ípº²os±T‰\Ùÿ\0im=qJš¡9ù«Œþ\ÐsMË”\â­I\õdº‹c¸:‰\ÎS“QcOJ\â>ÝžI\âš5	\çŠ\è„ü\ÌÜ¯©\éº\Ü9ú\Õû‰M\ÌX#p¯2ƒS*wv­\ë=ar\ÜÆ½L%tÝ®s\Ön\Ä\×6\É*˜¤^+)4h¢I\Ç5\Ömq1z‚³Ì»FÞ†½E­&pBwºg\Ò?üG\Zi\ö\Ú-\ç\Ì~ä“Œ\Ô…{¬+k–\0\ØW\Ã6:£\Ãm\È\Å^	pG¥}Q\áI\âKÏ”^T›\æ\æ\õ\æ¿Q\àü\÷\Ú\Ã\êµ©h=øÂž\Æ^¤½\Öý\å\Û\Ì\ô¸¢RAf=ÝŸÆ2þ\ì`‚^9?ZÄ·dÀ\ïu^›ü§ßŠœ]LŒÀFH\Îc_x¶?!·BI\ÜXfx-Ã³ g®£\Ò„«(Á­H\óJc\ÉÁ`P“\\4\÷ú”\ÎþL>Q\'À{\çš\ÎNÚš$w¦\áUˆ‰\Æ\ñ\ÔŽ~´\Âþq2O5½G\Êizm\é>e\ÎAlm9\õ5Ú´pª’\Ø>cŽ¾¸«Ž«Rd¬gº\Ü+}\ß7\Ù[ŸÊ£h\Ö6\áps»¯øÔ—\Z\Ä1¸µ…Lný9oÆªÇ©B\é\"\Ë9WPG\ïT\ò}\ê[E!>Ê—\ê\â\Øyh€¤\à\ãÖ¦Š9\n€y\n\n§B=)úzjS\Û9bC¬`€G\ãÖž‘?œ²oØÖŽPg\æ[;›—\ó\ô]¼¨\÷#ü+e^Ø…h\É\ç\ô^h­¥Áù‹3ÿ\0\ê¦%´-˜Œ¿7\ð€3\ÍT]‰q4>\Ñj\è‘[Œš\Ë‹H\Ûs\ØþUj$M>¯cÿ\0Ö«r9G–ê¤žÃZ•Œ\åŠH$ŽœZG@T’\Ù€\ÝùT\çO\Ø\ÄF¤§\÷sÿ\0\ê¨-\ÆT\Î\î1Ž€ýk6‹R2uŸ¶\Éqp\Å\æFË•À\éÿ\0×«–2\Ï«iqQ·9~>Ç“[©{pX\\\ÓR4™vJI9}©(1\'\Úc’03ÿ\0\×\ëPI ùU€px \ò=\éRÁad23ž\ìN>™¥Š8Iù®Î™\ïO”\Ôt®Š\ØV\Ø;\rÆ™\æ/ü\õÿ\0Çš¯F\Â=\ñK\öSÿ\0§\Ê\Çÿ\Öú\Ò9j8`Gù\' «q]ZN¡U\Ã?B…r\÷ºLÚƒ|\écOx\r\õ5~\ÃFµ\Ó\×\÷=\ÎkÀK±Ü¬jy\Ò+:°ÀP\Z\Zy‚ùT_F\Û\Ïÿ\0Z–8\ÃI½\ÆBÿ\0t>\õ£\Ä\Èê¬¨#\éÀ<Sµ\Æ\ô2/l\à½_º`b2\çø˜F©\Õ6Dªœ\0	q#\ßÖ¬\Ív\ÆBDù:!¯5Z\É\æ«ez°\ö¡À9Š\Ò\Å\ð4L\ÎU9r\Z}…¬a%P¦_À\ã\ñV˜µK Dˆª§³Œ{\ÕY\Z\Þ\ÒAm¸\à.\åIDf£§Éû½9\Í8Û²(‘˜Ltª41å¶œ§µ*\\FD²°G\äg$…Z\ÛR>Y\É9\Ô[©\æ;@Cd\ã\ß5~\Ò\Ý\ÌE\ß \õU.D»\Â|NG\é@ùCû6Ycù\îA\'“\ó\0VtP]X\ÊF\ò\êN0N\ìÂ®GkkŒc€!<\äg’}\êÁµXN\è@ú\ñøš.£´\ÙI¿N*Ÿ\öR¹\ßo\",‡«\ó\Ó\éZ\ê@Á\Ü\î i²\\Z\Ûü\Ñ\ó\'Bü\èm™ÿ\0\ä9S4²\ÃúV„q¥ª%º‚\0þ.§ù\æt.\ä	Š«H# \ÕË.„D×¥T¼£\æühLh¶³¬(!\0sÑ»C2$Œ\õ<ÓŽrx?L\Öfû{8„PŒ•’Iü\êK[¹<©Ož½\Øý\êw\ZZ\'–\Ê8\ÌJ\Ë\Ý=¾•%´À\í0° | m\à\ç\ÐU?&;­´0¸\õ­\ëb\ëm\0b:\ô\0~&›wd$V\â\'\ÊOsÛ¥s.×£\ð\æ‰w«\Ê<¿!NÀx\ÜÇ…»\ížf\Ý&\Å>€Ÿ\ç_ |{\ñ\\“_E\á{ie¿\Í.\ÓÁr;ýyù¦+\ØÑ”º½s‡²×Š\ÅF¯\ÐùG\Çú´ú•ÏŸpûä–r}X\ä×œÛ£\ã×Š\Ú\×&7w´\ñœ\Û¤±²¡š¿\r\Ïq·ž§\ô\îKƒ\åŠH³j…zÖˆ}£š`M½*d\Ç#µ|”½\æ}FÈº.vãšoˆ^¼š\ç\Úf\ÇZ\Î=\éýZ\ã{@¾$\0i~\ÜqÁ®`M\Îi\Þq\ê\rCÂš,A\Ó}»Þ·7­sbnÙ§	Á\ï\Å/«Û­Îƒ\í¯\ëH/\\`ƒü<\ÓLý5†`ë£¦\ï\ÎM\\‹PaŒ5q\ÉqŠ½ý³S*N.\è¨\Öl\ô\ÛY\ð¾A­µŸ\ÌÁ\"¼\Ò\ÆfR5\Û\ÚL\0š\õp¸‡8\ò\È\Îq³¹\Õ\é\î=³$~ß­wž\ñd\Ú£¤ü¹\Û*“€\ËÞ¼\æÑˆ`\Ë\ÔU«²mo\å>\å\Ç>ÀŽµÝ—\â§Fª”š\Ø\à\Ì\ðT\ëR”*+Å«4}\ó\ÄW\öQ\Þ\ÛL\Z)(\Ë\×Ÿ…Iˆ\Ã1±|}M|\÷\ð\ï\Ç2XBt\Ùþxß”\çc^\ëi¬¬\ò,h¥]»uýk\÷œ£5†.Š©úúŸÉ¼M\Ã\õ2üK£-·Oº5V\ÞRÂ°\ã#ž\n¥$^c“<`¡\ç\ïƒW\ÞGR7%Ž8o\ä;\ÕVE#bPŽ¬\Ù û\n\õd|\ê \ó*\Ì\ÛG\çÒ¡µ’k¹T˜\ñ<ÿ\0LV\èKFG?\äU\ëUW‹+aØƒŒ}(WG?¢4³y\êÍ¸í¥:]Å•d˜3¹°$}qÖ·V)Y\ñ\ÎOr\0ü+Dé±®\Ø\÷\çŒ\ó\Å\n=A6r­¸X­\ÇA…\çEy\ö±†u\åŽ6ƒSQ<:¸1ª\Ç•jK=J\\Gp\çh\ç$Œþt	”„\Í/–‘2ªƒ¸|\çü)^\Û\Étû<\ãy\êq–«\Ël#‘ \õ99\Ç\ÔS ž\ÖÃˆ6«Ñ‰%³\ïŠ\î-Kÿ\0½\Ø>\Ö0q‚øüª¬2\ón¹ÛN?^j/\í14¡PùŠN	8«Q\Þ\Û0+=1ø\n|\Ã\å#\ò\åbÁ¸9<Õ˜\×ÉŒ7\ÝV;\ç\õ¥F¸ùü¿Q\ëZ\n\r¶\Ôm\õ\ÆMQ-W3]\Ä\Ìlˆ3‡9\íÒ‘551y\÷q\ç=YO\Ó\"¯\Ü\Ü%Á\Â†>w†úfªNÝ²³Ÿ,ã’¤~´¶‡‹…™ÿ\0p7DGN\áŸJyf\rƒ»\ÏZ±f\Úa„\"n\Ø\ðrÒ¥h\í\æ+pºb¨FC\Ü\Ø\î*gee\á€¹úMûM‡üü?ý\ðÂ¶[DRÄ™\n{\éúRa¯ü\÷oû\ê€?ÿ\×ú\æ\ê4D*nbzg\Óê¸¸Ž2fpÄž§ŒýVµš+\ÅF7Ð‘‘Š³<@\Â,1N\Ä\ã\ò¯\rH\í¹;\ß\Æ7\"‘\È\à\àœR––B²D\Ì\"\ï\ë\õ¨--\É ].\Ìz\äU«›¨Q…¤L\Ê\Ý8\Ï\áš]\nD¨\Ä\ê	\'€\Ä\n“.¿\"¾	=*²	\á\ÉN\ã5\÷°@—pKµ.hj%‡\È6œlÿ\0:J[\Í 3(\êG…W†ù.\ßm²´\Ê9ÊŒƒ\ì\rZ–=H´B6[N\í.r(BÔ•pÜ±úÿ\0v®Cl\áBÀK\0ZV\ö¶\ñ.\åPûº“\Ó\ò­\r\â4\'vÀ?Z\Ò\ÌH\ã\ßQ½ü³´Š\Ù\É\Î1\ô©\í\Û\ísF\à’?Jµ<¡\ç\Äl¡3\×9&§FŽ ;\Ïn+;–AŽƒk\'CŒ±æ¢’\í]\ö>r:€;U}_UL®Í³K¸…\'Þ¨\Û^‹¸…\Ó\Ä\ð†\ìÀdþU*\ÅWÈžEB\âL\ð>b1\íÚ°n\ï®v\ï#+œ\ãÿ\0­]\ÖÖ·Ê¬\Ê©\Ç\ô>\õ,z`$<lG\è3ú\ÒH9ý2\áo#$,‡8\Ã\r¸?S]¹e+¼36\ã€>µZ[\ÓrD,‚5q“Ÿrx3\Ã,Cw°<\ä\ô\÷\àÖ¨‡¨ù¢@qœry«0Áµ71\0\ó€cPFù†A\éÈ­`\á@þ#T\Ö\ÄhAƒh\Âú½ý*[i®\ãfV\Ý7P\çLž\Æ#µá™£\öy\Í_C¡ ]£‚\ÝI\ö\í­…n\Û \ñ^\Ñ\î5;„fHTF\0\Üz\Zü\Ø\ñF³qª\ê7š\Ãn’fv\'=Þ¾¨ø\ñ\â©5\Ð`\ï%ûÝ‡\å_]F^%Ü–ÿ\0\nü\÷‰s5*œ©\é\ö®\È\Ý,:­%\ïO\ò[™\Ì\Û\Úy’­k$;01\ÅZŠƒ¦1H\í“_\æX‡9\ê~\ã‚Ã¨FÈ¬\ñ\õ\ÇjÉ› \à\Ö\Ù8\é\Íe\\\Æ-\\\ôŠ­\ädJûOZ«\æ\ó\ÍO:\ãšÇ’B3\Û\ìP¡Ì&­v!7#šwœ22k\ÎaÈ¥Š\êŽ\Ëë†·\éÒ“\Ï#©\Åeˆ\éA•˜:U,¾\ÂúÞ—¹«\ç\ã‚zSZ\çÞ²LŒyÁ\æ£.ýoÆµŽ]}‘Ÿ\×4½Í±pON¦´\í¥\É\Årˆ\Ì“[¶Ž\ÊÀ5pcpŽ\Z¸<G3¹\×\ÚÉƒŠ\ítÉºsŠ\ó\ÛgŒ\×W§\ÌT\ë^*8L\÷­us\Ñ-˜n\ñ[E\ö\Í>HPü\è7¡\ï‘\Û\ñ®n\ÊL€\æºk9p\êA\ÅvÔ©ª‘\n*I¦R\Ð\õ6”A\õ¯­~j¶ºÝ±Id?j·_º2S_j‘;TÜ¿\ê\çù\×³\ÔW\áO¦\ÞEwm&ÖŒúþ`\×\Úp\ön\ð\ÕT\×\Â\÷>‹¸z9†\ÓzJ;?\ÓÑŸj\Û)…J6\÷xÀúú\Ô\Û\ÈÏ·xnr\Ùü\ë\Ò\ï¤Õ ‚úƒ\åL \í\Æ0}3]œp@!\"Iw\õ\í_¶Sš”T£³?—kÑ•9¸Ot\ìýJn¢8—\î°oCN†\õ“\01\ÛÓŒ`TUT¡•z6i-\äl;\óZ£\Ë\ÝJU\Ù\\©_l\ï\ÍC#\\È¹‚@ø\ó>†¦.‘¢˜\Ôù¼7°\õü)C‹kO³@žcn\Ï\0Î†Ž¼\Û\ö‚FÎúÖšJËŸ—ÛžMaNV–;+ˆš4<n_»ž\ÜV\Äe;ø\å¿úÔ“·%–\ì¤P\ÄaŽ[úVp\ó¶ˆ€ƒÉ»<û\n™\âÞ &N~`y\Ç\ò§´IJLc2g\æ\Î\nþOP¹]‘”Bžø\ã?…L\ï‘\åŽ\\\ã tˆc2°U\Æ¯ÿ\0®¦DKl‰Y]»H v\ÏcBHdŽ\Äm\ì*F€Y™»\òzR\ÌU“\ÌDAÉ¬[¸oeŸ\÷WûªËŒz\ã­\r\ØKR\Ì\î|²‘°œ<þuž-$‘\ÖO8\ä`£®=*½\Ô7ˆ‚)\äl6NWŽ}=ª\ær¬¢Ð³\Íþ\ðÝ\ÄsY\ójR–†µ±ž\òÀ@^…1œTå˜’ÍŒžƒƒ\ì9ªŽ	\ß*¤Žœ^•b;›{ˆÁ•99(zŸJ\Ò\æveø¥º7³±\õÛž?*—ÎŸý¿û\ä\ÕšH¾B\Ï\íŒÓ¾\Ôþ²~µ§0Xÿ\ÐúYµ\r0ˆa›,{p\0>\õ^\ÛQ»šti6˜œ\à¿\È\Õh\ô#W-r\ÒKÔ€þ9©\í\Ñ ‘§¿”g ,q\Ó_<zz °C&\ß5\äW‚p1\é\ÇøÕ¡0 \ð(>•‹\ö\Ù™0 s€}h7q–A-\èh\æ\è	\Z\Ísƒ»#i\ç­Q½Ó •\Ò\îV!LúqLH¥s\çJ‡‡j\Ìg\Ô.¤(Ê¶\á˜\á\É#\éI­S°·\Ô[˜\×lA\0ùT`\îsŠ®\÷\Ýþ\òG!GF$g\ð\â°\'\ë<BÆƒi\Ï\0ŸSŽ´Ûˆ®\Îr„d’x\Ð…Te`j\çV5˜\í‘-P‡oQýi\ÂýçŒ—l\ö>€W7Š¾&c¹‰ü;U¹\É\å6p!üÏ­\ÌV/mG&EM\ÏÐ’¥m,þHL€£©5\ÍA\"\Ælm­<†”aK‘’Bkf\Ò\Öþ;_2\á$N…I\É\Ò\Ö\ãhÑ™6B$9c\Î1\Üû\Z\Ê\óI\ÈJ\â.z{\Õ4R’\\°ƒÚ´R\ê1—}\Üzš–“†M§\ð¯#á—¯š‚Qp[\ÍbONx«2_@ø‘Ñ˜vçš®\×À˜Ð¦~i¤µfŒ´\Ö\Û\ÇPQˆ9\÷œ%¶µ”¬1\îi;º\æ·4»p\ÛPŽ{fœl\í\åB\ï\ïÞ®\Ä–QK)\Ø\ïœ\ã<Wmk\ØDnz\à\Ö„B¥¢!\n…\ó¬\éµù@)\'Ôž\çU{W:±i\"%$œ¥b\êZÅž“¦\ÜjW» N\0\î{Vœ^	&˜“\î\å\òš\ñ¿Š\Ú\Ó\Ø[E£Fv\îý\äƒ\ðùk\ÌÍ±\ßW \ê3\Û\áÜ¡\â\ñ”\è-ºú-\Ù\á~.\Õnu½JY§m\Ò\Ü9f?Z\á\ï	v/!¥lF\æi\'»<¬\\©ÿ\0\ëV\Ã\å‹\Zü74\Å5\ÛÕŸ\Ô\Ù~<Ë•h•Š¸mS\'\'54\Äg9\ÍS\ÜG\á_ \ß3¹\ï^\È|Œ@\æªHF2jG99¦.\Ø\÷®ŠT\ÛvDNHÉ–\Î\æ\æqol$²*¨$’}\0®\ßNø\ñ+W,:\è¬3™\0L¡Áý+\ì_‚?tý@‹\Å×°«jwª^6qþ¦<\ñ·=\È\ç5\ïK2®\\³c$v#\ë_¶d¼J2®ý\ç\Ðü‰<Aš¯*xh\Ý.½ù\Õiû1üG¹#}¬0§Ì™r\àH®¦\Ï\öQ\ñ<þ›¨\Ú[\ã)g9\ô¯»Ã«°\Éù[œ\ÍI\æ\"€’?_E\Â.Ÿ%WŽ\ñ\òûK\î>=²ý‘\á;~Û¯ª\ò2±Å“úŸ\é]M·\ì›\à\È_7Ú¥Ô¨AEE\çß©¯¦š\â(<¿:@®\Ç 6AÀúÕ‹w¸›WI\ÉaÀ®¸\äxX\í†|W˜Oþ^¿À\ð;\öcøSn\ë\ö\è\în~²\ã\ôº(ÿ\0gß„pË¶-H£¡y]¹\÷½vh\ZH\ÙKÇ¦sk$[£K‡M\Çû\Ç9=ke ´\äGL\ó7yU—\Þy®½û<ü.\Ö\í\r­¶›ý—pA	,À«v$A…|\ñÀº—\Ã\ïM¡ß‘/–G*Œ	#oº\Ã\ëÐŽ\Õú›å¼€\Â\ò0Ú£žk\æŸ\Ú/Á¯¬øq<IkntÃ‰»Ÿ)¸\äû\Zù\Î\'É©\Õ\ÃIÓ¼®\àž%­K\Zu\æ\Üe¦½ú|ˆ­¥,­tv³\0úW¤\ÛÞ·-\å ŠüF\Ìþ”\Ã\Ö\ÓSÓ´Ë\ê=+®´qÁ¯2\Ò\îpGlø\×yg6p}iÓ’q\Ô\íL\Ó\Ö\í\ö–Ì™2\Û|\ë\î;Ê¹\r/Q(Ë“Œ‘\õ®ú\ÚPw\ê}ëŸG¸‡\ÄcK´B\ßim\Ñ\ÎCvü\rz\ÙKs½5¹\ä\æª4—´{u>\ÙøQu\öŸ	\Æ\ÓH>Yh=H¯N¶\Ô\ôÁ&\'Ã±û½H\ÍyÏ…´¯øG\ô-5FeF\ð;±\ä\ó[\Ëw³yW’C\Ð Æ¿¡r\ØJF[¤¿#ù<¯\nøÊµa³z‚.•þeE\Æ:\0\Ågy`6\Þ{‘ƒŒ\Ö&\ï“k\È@žHªcPŠå£’}\\ß®+¹\Î\ç‘\Éc ’YK\'—\ÄVÀ!ƒ~&­“<Py\ê>m\Ý\óŠÃ´\ÔD\ÌH|ø\n\Ø]B\ÝA\ó\ÈT\çÚ„\î&‰ÿ\0Ò—… ŽI8aþ52«&\0!‹uŠ \×\"E\ó­›zgû\Ã z\Ôr]1\n\Â1#)\èÄ\åE\Ñ)=ËMd\×f)\æù\×$c¡\ö\ÍKwsk0C“À\É$n>\Ù\ëøVeÍ¬wÈždAF\È\ò\Ï\÷\â­8\Ã6\ö\é\Ç\n¤\Åa&¾°¶¹r²·oA\õ\æ¬Û¼wˆ\ík†¡\'³\'´·•³,NN>V$u\÷\Å>\ÚhbU¶.« 9eR	5\Ã/É¾8\ö§\Í\"\öíš–\É\Öc\æ£<®N\â@i]£ yo†\ã\Æ\0©Y‹1·ûš¨“\"[…·š\Ê\Æ]rsž:V9Šx\ã6\ä\÷À \ZŸy*Ê‰8$tª‚%&œƒ\Óq§k‚•‡\Å\å•\ò¤pùÁ9#\ðª\×vú…¥¼cKdŒEÀO/w^þØ©¦´\Ò\Û\÷p\\\Æ.Wœ†•67c!‹\Ì8\ç=>´š\Ì\÷\Öuv´\î¤\00¨¤~\ß\í­_þ~eÿ\0¾l\í\Ë\ÅpqÖ—Ë‹û\ç\ó¥©W?ÿ\ÑúÀ\í¹€©b©\Ôq\Ï\âk\ôûB\Û\ï&d\åO\\T‹tmùOQ\êj%Sr¶“\Æ\r|û=`\ÂGP#À=\Í^\\º%³@2C˜\ßh\êGøT*\×M)ûˆ\Ü`œŠ•o\Ç\ÖVbrzŽ\Õ¶•\ÔýI¥E\\ª\á¤À=©H\í†ˆ\è)µ ŠSeQ$\ì$s€»¹?…A\"\Ål\Ã@\ë\óŒý+Q¬\ì\Ù\Í\Ì\à	‡B }i·ý¦<G!„\Ã/LûšV\ê2¡¿Ž\Ú7k‡\Êþ‡¦=ª¾¯	\Ä,\'Q‘\ÔU\è\ì,¾\Î\æä›‰ÿ\0O¶Ž$%PœU-@½°¢¤\ÓP¿6\æ\ê?\Zºu±b›Ìºz\Õ«€\Åwga\ït©âº‹\Êxcº—iÿ\0*9DK\ö¶EPcRˆú~T\÷ºµ’&Þ¥Ÿ(\ê	\÷¬FÜ¤H\ì¬@\çúÓ·y\ä*\ÇO\\ÐŸAØº\î²[…•c\ÕWÖ¡‚ú[±$r\Æ\ÖÊ§\09\å±\ÜU=³ž\\Ž€\Zå·…J´§\Í<*§\'>¦…¸\Ò7WZ–É‚H¡\Ô\÷«z·’ùŠv(\ç\n3Š\ã’\Ê\Þ%\Ý{xL\÷Wþu~§±‘’\Ú0Á×«*Qz‡)\ÑIsd»¿\áŒ\æ™&¥o2ojr=@°´Ù¤¼šAwfc\nÀnf§z\èZ\ÝQ·*\ä{\Z\Ö7bes}v‡1[\0ƒœœW\È\ßµ©<Urn\Æ\ÒUq\Ç\Çjû»Žx \×Î¿ü0Ú™±\Öl°\n\âÀ<\í\ÎsøŠù\î\'ÁJ®\Ý{j}§f\èf\Ú}¥o½£\çuC™<4¹‘¿•\ÏL\ØR=k¤Ô˜(¸\Â\ð>‚¹k†\"¿Ÿ³j\í»\Ô8\n6Ž¥7;½ª³`ž\Õ3\0ª\îü\àw¯6šgMQ§\ïZþ\ÓN³­Y\éÃ¤Ò¢“þ\É<þ•Š\Ç½Ÿ\à’Ÿ¶°\ñ\ï[TÚ¹ŸŒþ@\×\Ó\ð¶_\õŒd \ö\ß\î>o‰³Oª\à§W­´\õ\è}­­v–úm \Â[Ä‰”\n;Ê®\Û\Ý\Âû™ˆ8*:W2·‘)!\Î±ŸJ–[µbÇ¸¯\è»\ée\ä\'\Î-·s ºÔ„Q+”‡“š£¦\ß\Ý\ê_p­¼1\õ,rIŽ“–˜FF\àO>˜Ë‰-\á\Æ–FsÂž\á\Êv\Çb#aq(¹|“\óÿ\0\ì¾Õ§gªÁ7\îAAŽ?È®\nI\Ù\Ê\'+( \áj1|¿v¶\÷<}\Å;‰\Âûž—.¥À\"¹›@›7\È2I\Ñ@\í\îk’‚ú\âY2\Ù$5ry\æ‹C4’q´r:™J\â\ä:5º\ó˜\í\Â\×qùŽ+ž\ñ\rª\ëZuÍ‰›p¥m=G\ãLž‹tŽW\Üq×}ù¨\åso–›\äýÿ\0*\ÊJþ\ë:i·)Gt~rx\Ç\Ã\÷\ñÞ—p?Ô¿\ÊÀ2žT¨¬¨%Êƒžµ\ô?\Ç!\õLk\ð|\ßf\ÄrûOÊ¾i·vC°ÿ\0ú\ë\ð®*Ê•\n\ò²\Ñ\ê\é^\ÎV\'		·ª\Ñú…\É¹9\ÅzpG5\åV²…l\æ»M.\ä\äf¾2>\ì¬}\å)\Ýhzm¼£µ·nYeƒR„¥Ùœ\ÆG\\¢¹+†9®–\Æs\ë!ÿ\0\ëW§”\ã~­‰…e\Ós—;À,^­Û™~\'\ÕºžûOŽy@²A\çÒ·&i\ÕU™\nƒ\ÇJ\ä</¨Yµœ3D\äq\Îz\ë5=b·37¶O\Ó5ý%…­\ÓS]Qüs˜a§J³¥=[L–9¤\ò\Ú\0€«\å¿>\Õ^\ð[\Åm¹Õ¤u\É~fúµý²\ë(U€\ÆŽ§8\Íh –m¡S#9ã¨­®ŽD­jT”’8\æD—¡8\ãþŒ\æ§\Ö4©o-\Ò\Ü\\2Œü\Øý+awŒn\\®2¸«h€Çµ2\ïÖ­D\Ì\ÉÒ´±c,NÌ¸\Ç=?*Û…\ÄW›\æ\Çc\ÐTsEr°\ï,@xü\ê¤\\\Çû™\ÕZQ\÷¶\ô\ç¥&Nš„\Þfv¦\ÏÇŠ‚\ævu“.¡d9\ãÒ²¤¹T;6\í9•0\Ê\ó9F`Ñž­4\ÉhÑ‚f0f.0§\å\Í:\"i|Ý$n	À\r®*¢\Ê\0§\îg3A$œ’>h±\"Op–\ò˜\çq\Âû\Ôÿ\0j‡\Ì,|£¨\Éü=\ë8Ú™ø“¹\ç=¾•m#ÀUAµãŽ´!Ž\Ä\Î9v\äg•\È5£$5›J£-\Ôv<tÏµUŽ@Dd\"†\É‰úT²Ü¼>\âx*=ûQ\Ì+\æGÐ\Éüjh\í\â,K¯–x\Æ\'´\Õ-o¿\É\ØNF\ô>\Ø\ïDo¾iivž}\áÿ\0\ë¡6+\"e+Œ4™#û½)ùû\æœÓ´XU\\ƒ\Ï\çI\ö\Çþ\å;2ÿ\Òúu\ã‹\ïe?•bKw*\Ä\ÂLG+Ž\àu\í¦Ç¸} \õ¹®c]¹²³m‹’ƒ»ŒŸj\ðZ²=\È ³º<™”ŒœaG\åZ\Ð\È zKu\Åq\ë¬À¬Lˆ\î8«v\Þ\å.\"\è\è{nŸ1¡µo=¥\È)\ì:\Ä+K\íL»}+“[+9\æ\óg$…ì¥¿\â¬-\ìk;<H\á0\0\Îrq\íT˜\ÄH+`s\ÅS»È‹&8\Ï=3T¢¹º›|~ZŽ™9È¬mKY{$xÑ„Œq…ži»[P+˜\ïm\'7wY›#Œ{Ö¬ºÅ­¸%‰2w¸Y/\õ¥;údU­3H¸¸‘&¼\È¢úš\Ï^ƒh\î-µµ|¡2\0\æ¬FŒº5	¸d\àTš~¶L¤o“¢)\á}	¤’T²i\ZV\Î\ß\á\Ç£j5w8\ò\÷!$œU^\ÃO\Ç3.þ¸Bz\Öa\Ö~\Ûm‘cpŒc\0ýj+K½9\äf–V‡#«µ6\×A¤]–\"’,\Ñ\ä“\Æ©cµ¶X\îv\È20s‘\ïš\ÏW\×\÷ê–·.F\0\ç\ñ\æ®In\ð\\mb\ì\Ý\óÒ‹1¤\"<>pW\Ü\ç03W&Ufnp>\éÿ\0\Z –\Ð-\Ç\Ú$s¸zV“Î¤(U\àûÔ§¡v(ˆ\Øn{\ã\õ«\æü®\Ø\ò[¥Ug¶VC#“\Ï+ž*[¸¢”¡‰v!\ä\òqB‹P]N{U×¯\ì‹C	.\íÀÁ\Î+\É<kªÝ­€[™K\É?©\Î\0\ë^‡¯ùp\ÌÞ¼­|ý\ã]I\îo<°r±p+\æø¯1tp²³\Õ\è}\Ç\å‹ŽŒ¤´Ž¿\äp7r\ä–\'šÀ¸a\Ó<šÐ¹q\Ð\õ5!8¯\çŒDù§súŠK‘1\ÍTpwqV$8=\ó×µU4aQ\îF\Ã#M}c\ð¿J\Z7†¢»‘X\Éu™J¨\ç€?*ù‹A\Ó%\Ö\õ«M2!“q*/\Ð\Ï\é_ °\è\ö\ö0[F6ˆT·ýž:W\ë\Þ`\ç¯%\äÆ¼O\Í-a¢\÷\Õú-Œ[™.Ì‘º\ä\ãÁ\Å_\\\à0_”v«’À\á7Gœu\Î;{T1#F?xw\Îq_¦\É_c\ñ’Å±x\Æ\æ›ü\ñPKd\Í!šF2FH!Kw>•b\'„å™ºu«ŽY€…?\Âj\â‰l¥u»:\ÈX\Ä\Ã\0€O?Z†±·ù\Ä‚qü_Z>`$8S’O?—­g\Ãrn\Ñ\âh°H€\É\÷§bQ®¦-¨˜a•§[€\"\Æv0ORO\ô®]\ï\ÓOv–lQ–\Ëý+Ž\Õ|Oq¬\Ñ\r„\÷þ´l_&§¡\Þ\ß\ã)qp\×(HÜ¹\0.}g\ßKeyna·¹.S£3doa^Lu‹\Û\Æu¸˜t\ê;ýi–ú¤¦Cn\é\ò\ã\ïƒ\Ç\Ó“wf¶:K\í%/¬§°”oŽe(q\Ï\ßÛ­|M¬\ésèšµÆp¥d·¡\Ïp:\ÄWÙ_4j\ÂbÁú\ò±¯ø¹¦[\Ê\ö\Þ ´†TÞ§u«\ãø¿-U¨{H­Q\÷üšº—FOI~}\"†E\ÎsŠ\é¬.\n=k…‡\0Vå¼„_†b©´\Ï\è<•RÓ®9®ª\Ö}ÀWš\é·?uX\×ki.Få¬’º=8³\Û|¨´\ö,s\ÊsŸC^šún£#`»?w\ØW\Î:& \ÖW°\\!\åÊ¾›´šûS´Š\ç\Î>K¨ *Œ\0}\ë\öŽ\0\Í=®\á\ç\ñC\ò?üV\É=Ž*8¸i­}Wù„\ZeÃ²4\ÅUºœ\Öøs\r\ÊÀŒ1\Ü\ç\0\n 4³3†’i:c®*\êi­n¦O¼G®O\ò¯Ð¢¬~K-\ñA˜\Ê\n?\ñg5R;\ïœyN¤\ñÿ\0]g£´.9ùûŒ;û+žº¶\Ôu\äD‘C;\Ý\Â\Õ\ÎV2\åGLo|\í\ï\æx°Ç½Gn\ÑGŸ-Ì‡<œ\ä\×\'¦\é\×v\ë2\Ý2ËŽ‡{žkF\ÓOž)\Öh[+\ÝA\0~•	\Ü9M\é\á‘?z\ã#Ó©\ÅliI­…;I\ÆA:Í’Wµe‘H~@U\äµú”· ,Y“\æÎ©K¡67X˜¦uˆ¨\rœ/sŽ´\ô\Î\ç±H\è}«K\È‹N\Ë#Ž«ÿ\0­\Û)`¹„=\Í\ÈL>¸\ô\Î(\æ\Ô\\¤’Ogc¶Ü½Ø\çD7\r<\ì¢\óq¸\ð?SQL,\âý\å¢W9c»§^µ\ÞC•ˆY¹%O?¯j‰J\ÌVpº“8Á3\×·´ûuBªžI\ë¸úŠ\ÌiU\ÙX\áÿ\0V„RIª†\Ãg‚O­i·$–Ý ”‰²9-:T$2|\ñ¨\0Žù\õ­ƒm®\'2¹\Ï\0\à~•B\æ’H\Ë<6y\Ó|¤^\Ä!U\0DÜžir\Îju7F\ÙQ°<Ó³sÿ\0?Ò°sÿ\Óú¢9\çH\Ý\î%@\é\Ü\ÖÅ•µ\Û\"´ÿ\0\ZÖž]Àù±²\Ó©\÷ªQ	\Øù‡Až‚¾}³Ò°ÿ\0²[[[¢Ahù\ä\ã\'\óª\ò8u \çvzƒ\éVcœ¾{gÆ¤ºŽM…­#Rþ‡ŒŠOBŒè§‘¹)´\õ`ý\Ï0)%3\Îp?*ž+Y¤¼e>„\Zº¶p©\Ì\Ç\'\Ó?Ê”\É¥EÂ˜v\Ï$ÿ\0…W¹†\Ú\î\ê5—1\0x\÷­Û›Xp¨€\Î3UÍ¶\ÆW	´\ôù†O\çVÀÇ†\Ì\Û\\\÷oA\Ø\ôúzÖ–\ó`\Äa½;\n|\Þj\ò\ÙE<U#\Òä•žK’p\ÃŸj\Í_ \Ò\'žqº\óO;{V~©\ñ\ÄQ©T¼zž}uv\ö¶\Ö\Ñ* #q\Üû\Ñ*\ÆWwÝ³N\×†™¦]˜¥ŒaQ†\Ò\ÙÉ§§†§\ó6½Ê” $ŒWZ[dk·\0Àj™||\ÆN¼sMh4‹Ö¢$Bp6Žƒ‚k>ú\ö)rÁO€NM_¶{R³Hwg?™=+*\îkW‘­Ù²W\îýi«Ø¢ƒ7”²’Pq\ÍV\ruu\ò#d\'“ž¸«2G5¼¤  9\0š¯k5\Í\Ë/’<•c\Él\çÂ±±¤L\ó\ç+«Ä›³\Ã\Ô}+¡YŒ¶\áF\ì\àP\"†\Û\"S¼“\ÍQ½9]±Ÿ-[¡\Æi\èjŽ\Ä3ùQ\Íq0\0D	R\óN±t\Ó\Î\ÎÇ©&½¿\â\ð\ÙY%º6d›’I\ä_;\ßM\óšü“\Ä\Å:ªœ^‘ýO\Þ<2Ê¹0Î»_\Ó\ÑW/“Ö¨1 qÈ©\æm\Ç5Y\ñÒ¿.ZŸ­·¡¶z\Õr\ÜÓ˜’p)Œ3Òº\è\Â\í#†¼\ì_ø7¤%Þ».¥s‘ªaH\ì\ìqü«\ëý5…\ÔEaBp	\à_2ü>\Ò\î´\Ý:£¹<ï€\èÀý\Ü×·iz³«yR¦\Å\àú\Zþ‡\á¼\"¡…„ý}O\æž/\Æ<N2s\è´_#´1\ãG \ó\ÅUcl\ØYa\Ç5F\î\æi¶\Éo&BŒ€{Š\æ\å·in~Hc\È$\ñŸ¥}•\Ô\Þý\Ö\â\Âb\äœeOA\ïO{ˆ-\îpI\ÎI5‚±˜xIC3{b«\Ë3D\à¸/lÿ\0:4\èk6«&?rwZÎ¹\×]bÀO›\'-\ÔÐ­ir[k‚\Ãøs\ÓF\æ\ÃÍŒ‚w˜ª\å‘‹ªG8i&LŸQ\ÔW1s\Ü^Lrd\È9\ä\ó[3Y:+G¸ŸÃ­r\÷šQ‰™€\Ú\Ø\'ž\æ²O¹¢\"Hd‡\Ìm\ã\æ{\Ó~dù\Èùz\ñ\×\ð¨$»\ÖþTº@?*¡\Û\È\ê œqÒ¥Å”¤ƒ\ö¤\Ø\á\ÔE\Ó?.~µ\Ék¯>¡–@f7\\\ä\ã\ÜgÒºø\ôù&\åˆÁ\îkj\ËÃ„Ê¸\"¡\É$u\Ïj\å¯(¸Kc³S’J}O’\æ†[I\Þ	Ö°A\ö«pÊ¹\â½;\âÆmeu§§\ò’þ\îC\Ûx\è\Åy$.¼\nü3ˆr\ÇF¬£Ó¡ýÃ¹²\Ä\á\ãT\ë\ìg\ØÃžµ\Ý\é\× ¨Á¯0·›gºKMQm\Ôc’k\äV\Üû\nU—=F	@ä‘\ë_J|*\×#»\Óe\Ó.Xþä‚œ\ô­|_©$\î@Nk\éO„9K«¬~\ìm_©¯»\à)N8\õË³\Üø?\Õ9\år\çZ¦šûÏ¤\ÜÂ¬Î¥V‡n#”*r3žs\ÒM\'\ÞpV#\ØgšlVFF61Çœü\Þþ™¯\ÝUD/J\rnË³‘,\Ûw-\Û\ï\ïJV3€\ïg#\n»\öx\n„U2’1‘\ÍWE¹ˆµÄ±\0û½MK“%‹6\ïB†9\ç—Ò¤Š\ÞÑ¦\ßM¸z\Ä\Õ\ë(Z;Ažÿ\0…l´v\Û7©*Tr­D¤\ö)s7™<¥}\Õ_jÊ¹–A\åªçžs\ô®’ú\óNŽdŒÌ«.2p~µud·j²d#\ål\ó\Í`\Ë9\'¸_\Ì)½1\É \äý\\\ÒuxoAû.L¨\Çx\ÚAS\ïž+I4\é6\í¬GxÏ§Ö­¥¼–\ð4† H*O\áU\ÜR6¡”\"43™00=\é\òÛÀ‘··ZÌ†k»‘”1\÷1Œ|Uµ>C“À\Ü_·\á\ïZI]h\ÃD‡²03\Å=\Ý\æ21\òH\òúUX”G|g¯<V‚Z¬\È`Á\nG\'\ñ­\ÐL¯h\×1°Y%iP\ô\'\è*\ô·žL{–+\Ô\æ«C\å»:M\"\É>\\Æ¯²\Ê-šdP}\Ó\éŽØ¦®f\Údjœ>ž”\ï\Ýz­cÈ—d‚€H\ÎCmý*?.\÷þyÿ\0\ã\õWSÿ\Ôú¢\ò\éQ\ãŠI™›¢e·Gfø‡q\Ï\çUV\ð\\\\°‘³×±«\Ñ\Ù\Ï)iJ*ª^k\çú¡•}\r·7\Ý^\0Ï±ª¶\Ú\Ô2Ž\åLL\Ã#ž2}\ëY\ß-ß–Aa\Ý\éëšš\ÇN˜(šh‡–ƒp,zúVZ\Ügalnd‹r\ÊOSÁ\ÅI¾Q&\ÇùTÿ\0\\\Öm¤\íq!NÜŽ{/¯Ö¬m\âÚ¨¹$\òiˆ‚k}\óF\â\Z3’\ìOAV£vgfÁ!‡Ps\Ç\ôª\íŽ\ÎI‡¯½X\ÈM\Û’>€P“ch”\Ìldt­8ä¹†\'\ò€\ç¯8¬\ËF\Èv¨rÜ–=*½%\ðG>Õ¦ƒl€‚\\6	=\ÍlEcq‰f;œŽJ\çÿ\0µ¤BbE\0\õ\ã“ø\Õjm\Ãq\'\êqŠ\\\É´:\rB*\×Ì·\å\Ø\ãŠ\ç\á\Ó\î\î\\1R{T\r«;H;\õ\Ç V¯\Û7\í>f\ÌúSM64¬HüŽTçŠ´ T\\aXžrŸ¦i^\ö\ßh\Ø‚MA&±Al~cÔŽ¢“vØ»·r˜Y\Ù\ßíž•s©Ä»]f`G]Ã§Ò®K¨\Ø5É¤2\Î\ÝF9STo\'@Hl0>\Ù\Åd\ÙpZ‘©\ïF\è\íS’\Ûz\ÒO¨ùh~F\ï’Â–\rE‘„(J|¹\ã\î\Ö»|a²’må¶«Ò±«5¹3¯EÎ¢Š\êxwŽ\õ\íR\\¶V/‘}8¯(¼˜œt­½Rý%•\Ý\Ï$“ù\×1<\Ê\Ù \ó_Î™þ)\Ö\ÄN]\Ùýg’`£C\nQ\Ù\"³·9ª\Ò9\êzÔŒ\Þ\õY˜Ö¼˜E¬¤5~lœÕ›+f»¼Š\ÝFw°úû\ÕP\Ó\ÅoxufŽ\é®\â\\ù@\àû\×\Ñ\ð\î\Ûb¡¶\ç\Ë\ña\õ|%J‹{i\ë\Ðú:\Æ\ò\æ\Þ\ÍB•QB\äp00*V\ñB\Å\"Ÿw(\ô¯0Z\Õ$‡\É2‚‘ŽÂ™\Ür\Û\ò\Ìyž\õû\Ü=\ßtþsŸ¼\Û\î}1¥\ê0\\[£(,Xdc\íYšµ\Ë$(\\\\\'…f˜\Í`\Êy\ö\èwNÁWr\ðy\é^9hy5£fa%ü\Ì6\Ãr=+N&¸‘Ï\Ë\ÏNyÇ­n\ÚÂ–\ð°c\Æ\0\æ—\È,FO_ÿ\0]jµ1lÉ†\Ñ!G\ò“\'Ÿl“UR\Õ]»FsÞ·Dw\ÂmÚ½*\ÂZ\\H\nª\ô\îGzd]u9’…£\Ùsƒ!\ô\æ¸\Ý^\Öù\æE\Â\à|Ã¯k\× \ÒF/?z\ô\é\ãy\È$*@\È\àú\Òe)#\çi<#©]>\ìc\'§·½i\ÛørKe0+û\Çùâ½¶K;x\ä\ó`]„Œ“\õ\ö¬‹¯³$8\Ú[³qš\Í\Ø\Ò<\ÇQ#·l¡*>•\æZ\ïŽu;5¹\È\Æx¯I\Ö\ì\á\Ô%’;&*\È	9û¸\ÏA^\â_\r\ê‰(•\ÆTv^\õÁU\êz4¬WÖ¼Q¨imÀ ¸\Ç^8¯=\ó\ð~R3\í\ÏJ\Û]*V\Öv,¨Üƒ\Øúd\õ®j\óNû!co»ŽÆ¾_>É¾´¹\×Ä·\áŒýa$þiEv Ö­½\Ê\ÈG5\ä·^(´\Ó\ç6\÷\ë$g\×i cVl|emq(Š\Æ	g“8\0)\ð\ß\ê\Í^€ý<W‡P\æ\öˆ\÷\Í(Iss|\Î\ä(¹¯¼<\r§Zøo\Ã\ðY\ÊU¦“\äs’}>•\ðÇ€4­NIU\Ô#1`ec\éÏ©¯µ<¨yºiK•,©¯\Ü}\ç\r\äq\Â^R\ÖG\æ<e\ÅJ—ÀýOVŽi®m\Õ$(\ô\Ç\áQH\ÑDF\×.ˆ>\é\çú\Öl2,Sf\Ü`¿\n1\ÏZµ‘,\ç,\Â8þ\÷?\Å\éŠú\÷¦\ç\ç‘\Õ\Ø\ÜE<!l=\ÇJµ$\ë*˜¡<½þ\Ëý©c†A\n\ã?\Äj{—erº\ç½Z\ô2h×ŽK\Â\å\×o”«žµa^%œ\ÈInH¬¹\çD1\Â\à¾\â~^\ÕvH\r±Š\Ò\ä\àv¬\í©&f£¡iÚ¬°\Ï,gtX\ÆÓƒŒæ ¸d¿{Ž\Ý8bO9\í\ë\Åu¼jz\n\Æ\çM4\ëI&˜\Èw$„1\Ï9\Ïz\nnHÉŽ\Ò?\"1†Ýœ\ä\÷\ë\íWÄ¨\"&\Ûßž†·-–ª£Ž=*¹û\ìÌ›€\ãMBÁs!\Z\íT­œ±r@\×\ñ5U~\Ô\Ï!½*!f\Â1‘Žÿ\0j,1dù±‡\ÉÀ*…\äá¢µV,\ç\Ç Rm\ß@#I\ÙXÇ¹wº@û¿Z\é\ì•fÀl7=+‘¶±¸\\;(\ß\Ç~¿t\ÖSCy3J’¹\ïW\÷\"L³-”\è¾i\Ãž\àUeØ¢¾ƒ\Ð{Š·w{l\Ð:©\ÇrsÀ\õ\Éÿ\0k\Ý2	`„P[’@\ç\ò5lž]¶¢E)\÷Jœ­M\öˆ½kš¶½–h„~\÷\'\Ø\Ôÿ\0h›û´”ÿ\Õú®\Ó\ìÖ±–“<\õ5\ÚYÝ‹E\'Œ\ñš\Îo>}²Î¡s\Ï?\ÈU«[«k\äa—1œs\Øý+\ç.z„¶\ñXu–-Ïž9\Èüi“\'6\0©\ç¦=+>\è¼nA|\ÓÒ°$K‹‰Â›’T`Sh—q”Bª«\È©&˜¸>>Q\ÔqŠ£ka\Z9Ÿ\å\î3ýiº™\Û\Ô LúQ% \Ñv;Ø‘¡\n³g¾Eg\Éx\æE(1\Ø\æ²>\Ü\ê¦)0U3¹›r6W±Á©¸ú›Ÿke¸ \äg\Ç\çR‰£‰\î\Û$\ãqÊ°þ\Ð`C“ƒü\"‘o\'¹´\Ý\Èy\ô\éM2´5l.§ºV“\ÉTL\ä±<þt\æt’PP\íL\ò\Ì3Xw:\ÊB-mGÈ½\ñ\\\é\ÕutµpeFnI\ëŠÍ–‘\è“]Ú¬¢\Þ%£¿z\íKµœ(PN+\àa\â wþ´Ö¸Y\Æ\à\î\'’8\éUq4^7¹Áa\Ð\â«Gsz\î|À­“À@sŠª\Ñ$\ë\Ã§@N2j\Ì\æKXc\ò\Øc\É\Î1T\Ó\'–x\óŸ/\É~ù#\'\ëX—7xWwÀQ\é\íV´¤¹ù‰\ã§_zŠ\ê\Ò\Ö+f–]\Ùq’S\õ¨jÆ°1\îy¶\É%9æ³µ5–\â\Êx”ý\ôa\ÍDdŽR\Ó![¢\ç§Ö£œ†™I|p3Þ±©Oš.=Îº\ä”fº;Ÿ,k2<\ðCŠ\æž\õ³Œ\ã5\ìž8\ð¬\÷aµ+.ƒ¯Ö¼\Z\ñd‰\ÙJA<t\é_Œ\æü;:ud\í¡ý\r‘\ñ5<E(¸½{\ZB\ñ\ó€jdŸ\'\'š\ç\Æ\ÜnSV‚\ÝYÂ~\Õ\â\Ç+“vŠ¹\î\Ë4KY3¨i•rv\Z\Äp\ÛJþ\òV$“ÀQ\î•y\æˆR?n<D9\\ÿ\0+µµŸÎ›\ì\ÈŒ¸Ý£f¿K\ál\á¯Z¦\ïD~W\ÆH±+\ê\ô\ã»\õ\ìv›\ãŠ2\ó™GZ·m{š€@\\0OO­R±·k¸©\Æ1\Ó\éZP\Û\Ë\×Ì›}W®M}“>Ë«;­ÿ\0Ë\ì·!‰\ã<}+\Ól\î¦x†øÊ¹\ïž\á^Y§\Ùj&A,k\åþ\×uo\æ\ÛB\÷«H\ê7Ÿ\å]4\ê\ÛC‚ºL\íap©µŠuÏ­j\Úù\É\ò8Qžk˜¶\ÕPSh(ž¤æ ¸\Õ\î^y	\Ù\ÝøVþ\Õ-Ž7‡s$(¯æ»©S\Ô1\ëS\Çyn#\0wÉ¯µ\ñ\ô\Ñïºr\çžFOWC`—W‘o‰\Î\Ðx-KÛ¡*]\Î\â]N\Þ<‡ ƒ\Æ\áYjV,Z8]À\É\ò}\ë\Û]<û]\Ã)…9 ý*´ºUÉ™eŠ8\Ç\'3zR¬Z§b\ìÚ‹2¶ÓŸ›¹þU\Ë_\Ì\÷R˜\Ãm+\É\'‘[É§¹b6‚H\íø\ÒI§‡;•úœ`z\ç”\Û5‰É´¾cyEQ°C¿ZÏŸ\ì\ì~`»Tc=k²:>£w¸\Þ1\ë–\'ü*\ä¶el\ä’G\'¦{\Ön-›)£Æ®\ô+\ò<%ù\È*1\\\Å\×\Ã\Ë°\Çt‘\ÈÞƒ ~=\ë\éøE­cŒª¥x\ç¿zž\Ï\Ã\0«´Ž\n9\ÏZžMG\íì‘—\ávƒNuf\ñ¼Š\é\ô?‡¾²	qcnª­\ÑÀ\Ü	ú\×\Ò\òü6µ#3¬Ñ±\Ë)šÞ¶ð¾‘§\Çi!O\n:Â¯•\õ2\ö\é9¤x^[¶PŠ\é\Ç$W½\èú\é\öKx^9\õ\Í]±Ž=¥U<µ\Ú1ŽkÆ›ˆ\à€x\Íiks*µ®Œ»=*q0š\ñ¼Á sŠ×š\Ê\â+¯6\Ö}Š\Ø\Ü	\ëù\Ö\Ôq!„e\÷\ÕD\Ö\ðÜœÎ»3\èJ\é\ä8\\Œ·±o´þ\êP\ò\Ü\ô\õ\ÅkCn…P¨(|§\×Þ«I€‘b\'\÷˜8\óŠ‰da,1K\"¦\Ï\à\Ï_LÒµµBr\Ð\Õ`RF0`\ÈA\Ë0\É\É\ô\ô¬«¡¨Oú|¡\â<…PI\ã¹#\Û\ÍF8\îÃ§=°:T¶º”s\àD\Ê\Í\Ç­.eq-®•º\Ók\Ü5\Ã0Êž˜tÿ\0\õ\Õ(\ãž\'0\ó„\îzÓ‰[1û\Æh±ŽI\ê{\n[˜\åV†2•{‰\ÅÄ‰\Æ¦jš\ßK\"³\Æ\Ø\É\ãŒf—\í|\Í)R=@\íP\ÝL’4fQG\Þ\Ïq\íCaq©+\\g\æ\ÙÁ \ç\Ð\ÔÖ \Ì\í(\íÁ=\ë*\åÍ½¼\ßÙ±nf\ä\Æ\æ§[\î#\ñ\Ìe\ô5šzƒ7g*\ÆÌ‡\å\Ï\'U¥–$\ç‚çªŒ‘Y-«\Ý&\Ë)\Ø6\àKq\È\ô«6­\ÈI”gœ\÷\Õq˜š3®\Ò\ê\áü¥C\äF2\Ú>•V8\ï_tsD\ád\Æ\Ñ\Øý+xÞ­€*ù¬HÂ“Á¨Rk\éÝˆS=³œPÐµ$²Ó®D°“œ«Ÿ\Ù\óz¯ý\õY\ñZj»y‘zš—ìš§ü\ôZ¡\\ÿ\Öú\ïRÀhþ\òŽúV|s¢¯ú+y[°Hýyª’†äº1ÞšWj¬Â0zs_2®zº\Z_4²\'\åQ\Æz\æ¢G*ÁÓ·A\Û5N\'@N\èÌ\Ô15‰s}qb8ü\ñ“\ÅSac³\\\Í\óI(…Oa\Ô\ÔrCl\Ò\Å\É8\ÜOJÇ†\ò\æx”È€\ÐÞ¬ù\èw\Ê\îqT\ØX©s¼C’u\ê3O‰.’]c®O&š\É²C•\ëŒw5Y¬­nyŸ!\ÈÁ\êi)2…žXÌ‚7Ã€G9æ¬³Illt\Õht¿/p\'pc’{\ÕÛ›X®#H”lXù\Îy\â•\Æ4ßˆb+8G~œ}j5³+@œ7 \õ«LaYU“®?>IÅ¼YL/e\0Qn¥9$£ž½M1 ¹»\Ê\Ä\nª\÷\íU\î%¸\ò•\í­¼\Ý\ßy˜\à-b\é:¥\çÚ®-\"™ƒº’—\ð¡0»;Am´k™9\0;š\ËgŽl\Êäº©éš¨\î\áI)ƒ\ó< ª7\ó”·\ÙhK\â+O›Q›žEµ\Æ\çÚ \ä n¿ZY\"·fa–!F}«‰´·¾•Õ£bqÓ§Ö»»S$X‰faŒ“\Èú\Ô4i{½Æ—$¥¦ˆW/vn<Æ¶\"S\ß\Åz«[ù›·q“\ÐY³Û¬\Ò4x\ÏŠ—\r\ç³<§P–\Þ\Õ\r²\ÈZ@>s\îkÁ<\á›Ë«C>’JÜ“•Ú¿{\×5\õ\rÝ¬ŒX bOP3š¥wF0i\æ ùWÛ½sÖ¤¦­%s\Ð\Ã\ã\'OX;œ\÷ø‡q7”7F\ÉJ\Ø\Ñ>\Ý\Ï2Ë­K$\ç?t\ð¤\×\Ü\í¢^j”´\ÓÁ\î{\0>¦¬\Ûø\ñX\ÝJ±¨\çX\ÒÀR†±‰\Õ[6­5iÍ³\Â\ô?\n¾Õ…#*£…\ã§Òº\É<)¬[Z™¬@ŠB\Ãs•å€¯y\Ò\í–\Ú5I¡ú+``\×Lm’_‘\Ô2Ž§µ\Õ%}\Î[±\óf™ kD¯\îLLNT Á\ê\Z^‰džRÎ¥\Ù0wÿ\0\ïWa>‰\ìwÅ’§!‡\\Ž•BM&\òþrŸ2Û¡\Ú\0\ÉK\ZJ&n«,\Ã*N\öM½ƒV¢Vý\ê¬\"L“š§„m\â\'\÷²:\îÝŒ\õ®¨”Â…\"!œzœU\ò‘\ÌR·³’\æ\ÝB V\Çq\Æ3Ò¬\êzg¹WX=+¢³’{m\Ã\0p}sT\r\ÜR¼‘Ì¤ÿ\0tg<U+X\Î[žym¤\Ê\Ó\ã\ã\å\ÍuO\Óü…”«ÀEþ&=I\ö®’\0^\Ñ\Ù D”žx\ô”,f¹U•Ü±\ä`Ž¶bqp»<ï•‡Qü…gIeb®p¤ýî¦º¨<¹”Q€Žÿ\0…f\ÇCE\ï\\d\ó\ÓÞšWÊ‘\é\ñZ>\ã\÷¤x=\ñV>\Ô*;Tÿ\0dc¹\Ï<c\ÙE-¼F=¸†qŸ_z¦6T¶±i\Û2eóžŸ…kA!V\Ý*?\Zµ$k–n»zz\Õ+»O´ p\Ì0Jœ`zT´+–œo –|, pzœŽµ!·‘\\<K¹T.:û\×-\Z…˜-¥\Ã,ý\Ö<q[‘\ëmo8‚f\ØXŸ±¤\Ü\Ó—@»v±\à\ãµ:(\ÕT¬À\î\Ï\'©>•_uÔ·BWo\Ý2\ã\n1Ÿz\Ð\ò—cº9À\õ<\ñZ(\ßb°Í°•ŠŸÆŸ\r\Ë\Ç0EV\'vª\Ít–ˆ.^B¼Œw\ÉúU\ë{\ß9\Ã$,w<ÊœbL\Ù\Ð\Û\Þ\ÊÁQ#\Æ:–Ô&]Y†0r)\"`‘€[y“ŽjH\â’Sº` :\çšè¹ƒ+&—oqz\×q\Þ\ã–>ŸJš\êd\r¡×¹M^ÇŠy=\ÅU“‰0\Ù98\ÇlP\Ñ1­´W¼/\ã`:ƒV\íâ·±)äŸ•[©\Òj\×SZFZ\Þù±T-µqp\á&O,·£5\Ò,\éo]fÀ$Hƒƒ\Ï5f\ÞHd\\J \08=k%eM¾c€1\Ç¨\æ„I-¼\æ\\1\nz\ÕlgqXJdg\ò\ð‘\Ëc#\éM‘\á}¡W$t>•0•Xl“%u5\Ö\ß!1Ë±\Ôd\ÔY\Þè«‘K­\" Rq\Üt©­\ížg\nX)\ä\ô¨£ƒRM\Üù‘\â\ÇL\÷¨K]lh‚’N\÷\Ãs>\r.{›É‚N­\î\\ž\õ©\n¶ºH¹+Á\0p}O\áRZÙ½µ©•F\è\É\Îh±µ1€\ò\Ù=séš•²…Î©ki2=Ý»°€\n¯›¥u±Û‰#\ó\Û\×<V)…£S#‚\0\õ\È2]ÎŒ&»q\É\íŽ*\âû“3`D\Äd3Kä¿½Dn%›$gµ\'/\÷\å[\ÝYŸÿ\×\ö?:-ød\Þ=1Ö›-Á–0\Å6Œ\Ïl\ÔDm\r½˜œdctÛ«6ùw\÷E|\âG¨aÈ¶I6Ê¼N8\õ«B\Ù&R†\ã·Zm\î›aq.Ngš¿ioa\Z(\ê}ª\\]\ËD+\Ø\É\Î\Å^ƒ=~µBXlRq?\ß`8\È´.cÍ¼C\ÎF\êOJÄ¾°•d\"\rÁqÊ‚1T\Ð\Ó-ù\Ê\äœ\ò:J½m\ã—\îO¥sq\Ý-Á\ß…#95ª—˜@\Ò+ª/?7¤ßŽry\ÈSÁ=…Y‘\à•q\äžwW\Ü\êºÎ«u\äX«C\ãÊž¸\÷®\ÓIût1´\ä`c‹s\ë@\Z\"f‹‚œ\àdS¥¹»B‚\ÕÜ·CMm\ï B>Cü~þÕ«\Ó\íU|\Ò]\Ï9\Çz¤®&P[»¦GK\ØÄŠü|½¿\nŠ;hbÇ–p¯­t~e©®£\"Eƒ\ô¬m\ñ4n\ÞQHx\ï\Å[V\Ô\"Eä€¿,h\òzb\ï7nŒDlp)\ö‰,su‚Ÿ¼\Ä\Ö\ô–±¢€\Ãd\õ/˜\ÂÓ’\ØF\ñ	yI9\Û\×\Ó\Ú[\ÛF>u)‘\Ð{\Ôvš]½œf[xR\'n§¹­H#\Üp\Äozq‹\ê\'2Hm¡wŒÞ•.¡¦B\Ðo»=j\âÂŒ†Á0zCˆ|…lªp9­t#™\Üá¿±¬Y\ð#Á\õ\ÍSÃºdwO!Œ}{\×\\¶\×0N\É$c\ËnWxŸz†\÷Ê‚Ù”\Þ\Ü\ä\ñ\Å`\ât©t2RM?MS5\â‘n8\È\ë\ô\â´PÑ¯­\Î\Ûxc\ô¨\í\ægˆ[”¢Ž¤sN,UrÀc§z•+cù6weº•œ.\á\Íh‹Ll(§Œ“ŽŒjì¶Ž¨’.=}\ÅBq¶G\Ë\×\'ž£\æ+I\ÄGw)8äŠ»e\ãS7\Ê\0û â¥Š)\Î8·‚~\óp¦«\ê\ÖWP\"\r\ß\ëy!\ñ©HmŒ¸{[|oeF05š\án\Ý\n\ìU;¤?‡©§\ÚiwRÍº8\ò\ÉqÛš\ÔMåŠ‰À$‚:{S#\Ìûfm[r\í;@U U\ä\Ó\Ú\Æ*FÓ¸\è¯5\Ðym\Zy&E\n¼ü«†\ÏÖ«o’\'g—##qâˆ¹Z\Ò\Ê\â\ïg\ÛY V†?Z\ßÅ­žcA\ÇQ\×\Ïÿ\0hÚ¼j\Ñ\Ü:\Ì\Ù\Ï ŒÛ½R’ý/\Ù\íÝ‰~7(\ç?_Zndµsv\ê4¹Çš¤¡8\×52ˆ¢‰!º`+\"I`p\Í ¨<U¤¼–h\÷\ÆÝˆ\÷JjCz\çsx\r’pZ\Ê\ì7.\Øø\ÆJe¬Š\â6,	Nz±&·\'¶AûÍ»\Ó5i]Ü–D ²™\ò\ÄNk;TŽ¼|ªyQ\ÎE:{¯-Z?»»Žê¹‘ gxzýM96{kim\Ä\ñ\Ä\"—\0\í\èr{\ZÍ´\Ò\ï\ï\È±|£ =\n\ØIm\å>[I—\óz’\Òý^v\î\ÌTN8$zRŒu-\É\ØØ‹M¸ŠX—\äŒ\Ç\ëPÊ±yFO^E\\}F\ì0R\ÛCcMGgq\Õ\Ë\Û\ÌIÀ$`V¼«¡ƒ‘ˆl]\÷_uy\íùÖ¸´P¯)m\Ý\Ít\ím:¤`§\ñ¯?¿»š\Þ@¸Á\ë\ê(”yu\'š\ì\ê–U#rƒ\è\ëP¶¡%ªºM\ñz($š\çmu\rZiËˆ8\ö\é]\Ù_\áq\ÉÁ8\ÔFM‰—£¾¤rx‘¸†ú\Õ\×bb\Ü\ì	\éš\Íyd{SK†=\Z®E\ëF \åq€À\òq×Š\Ð\ÌÔ’E¨—\ês\×\ë\\\Ý\ìÄ§›!\Ð\ç\ä\è\Ã\éZžR<E\Î\ç\õ®#RŠú]A¸`Ýƒ0:sYL¨–µkv ˆAùâ´´›™K‡ÿ\0TÀ\ï\î¥sh·.2\Û\\\õ\àW YX\Ç\ZÆ“°\ÄA8\î]\Ç\'¡}£H\öù ®F5¡6ñ±¹Ÿi\ÆB\óü\'§\çQKw\r\Ø- Âœ‘\Çq\\\æ­y8ƒÏŒ)	€sÓŽ\õ£\Ð\Î:š·\Z­\ÓJˆÁÁ\ãª·-±{ V5<°¥s\ñ\ß^\\Ù›Å—\r;ÐƒŽ„T\Ë\â+²‹Y£Y‘J‡e\ã;ºd\Z‡\"™±i¬Csf¢»\Ä\ÇŸl\Ò^nÚ²F76p{þ•{F·‹\Ê+!Û¸¤‘ùqO1I¸w.¹\ãÓ¶‚{Ø±l\Z\â\Û-•·½R“NX\É3’Û†9\ÆO¥Z[‰	\Æ	À\ÇZ<Ý»Ÿ8’Oj.‡a#·¹‘Cm\'·\\cÚ¤û\×\÷?\ñ\êÏ›U;²Š\Ì\ê½\rEý«/ü\ózWB?ÿ\Ð\÷;#&enOOZI,§,Î‹±GNzV\ê[]¨\àVF©|\Ö\Êa2ª\î\ËqùW\Î\Å#\Ô1rGúÁƒœ\óN”y%-€GsUŸQ±;p\Å\Êúw50¸Þª‰Âž€\óŸ­Csr‰z“\Æq\Å`5Û›ù„\å\Ð)#g_ÿ\0]lC\Úb£ÀŒž¾\õ£\0p(û£¡W\Ü{Þg{³\Íq\æF\ñVÂ´°›eŒ\0y\É\ï[‘X)>c0\ö)\r¾ùq[‰\õ4\ÔA³\ÞÁ\âpã¢€1V•)\0ÿ\0*šú\Ú\õ|1y²(\È\\\÷\÷¨l¾\Ð\"&\à\r\ç\ï*ƒÁ\ô£@°±Û¼d\É.[wLÕµ´	pNzc¦=*\ð’$[\r\ÏPy\"‹†gÁ(\Î2}\êP\î	m$pm\ÆS°â¢„I>c*>\ö:š[x&v\"f?\Ð\nÖŽ„lSœu5Q$Š\ÚØ²32…$`ü\Õv\Ú\Í#$\ç\ñ\'šz[°ƒ‚ZFWQµOÖš²bkˆ¦\r\ÐÁGN§>\õ‘a\ö—l\É\÷\ô­„d\á=qÁ©Dd¡ z\Z9„‡²Ž¨H“ž{þ4\Æe·A4­ \à¨Ï½Z@Ú¹\Ãw\ç5`En•\ß\î\÷41\ÜH\Êpne\ó\èOaT\õT:¸\\\ó‘ž;\â$‘’¿\Î\Í\Õzþ´‘[\êb6’}‘ŽÀr}¾•\öµ\Ö\ìÇ˜*‘&\Âœz~t\Ô{yŽ\Ë|–\Î8}sR\ÏnL\í\ö‚]±Á>¿Jl30”£\Æ\n\ö zV¦É“˜¾\0ëŽ¿MÅ”@µ¼J]O\Ì\Í\ó{\óUC—–Ps·H\àŸAL…\"viP\ÌN\Ã\éB\ÐkR\äú\ÉbŒ:\àqÞ«ÍªN\Ø\Ê\Ù#ƒ\ÆT¹±P<\É\Í\ÜrN•\\\Z4B(ç”X|€\ó;Ò¹r±¨%‘²°b<Œzþµ}˜2eŸ\æ\éY1\Å$[c2p\'Þž\å¹ù°G\×5­\ô3{š;¢²ˆ\ÜÈ¹lqŸZÂ¹Š[Û¦º—O\ÊH\ãMº–\ÑfŽ\Ú\âv\ó]r \ç-ŽøZ\ïKMN$”\È\Â$\Ï¶‡>\â“d\êI%½±	YsØ§\Ú±V6øˆ9\ä\ñŒ~4Á\åŽ\"6\òŒ\õ\Å=¢Œ\ÄQ\ãÊ·8úRE6hJ.&!\ð3·#Ž?\ZÌŽc§ŽW\Üýj\ôR´‘\áW\å\ãž)C\Æ\ÇcUq(\È%:Oz°U¶™%s+\ôÁ=*D\Ï\Ë\Æyâ«—Ë‰]ƒ9\ç\ðªZ¶&\Ä\Þ~o\×5…%ýÌ“`C¹‡^¾Õ©(Q™ 8\ê9\ä\æ›j\Z\éÀŠ»zo\õ¢\ãŠ\ês\é\rÙº\÷{|3\ç•t\ñK4Yˆex :WºÉ^D\åø\Èü+@yMnX½°x\ëM&K–…‰¯šuÉˆe»Ž¢‘\ÞT‰\0ãƒŠ­vËžþµ¥»4›\ZUQŽý«U\æg&iY5Ì…c‘þF5W¹µ·‘\ð\ë¸!\éV­R8¼\Æi¹\ÆR=…W‘\ö)–\"6“\Ð\õ5L\ÏcF¶\ÏËV<w\ÕV )Y8\Ï?/_Î«,\Ï4h¥\ñV\í\ã·uÿ\0Hr\Òƒ§\éU\è)›™¼\á\Z&Gs\×mXc`w¯LTR­¶©“\Ô\ã\ëDy¸M\Ñ–89À¨\ê s&\Öv\òS.\Ù^#%\îT¡\ÎT\õµ_†\Éxb\ç\ßÒ ’È¬…\Ý\Ë!\ÈÀM	\\ÎŠ\Ò5‘/,\ñ¼\ð98\æ´c%<Ï›-\È<z\Zj(ˆ.ÑƒéŠ£1–EesÞ³¸\Ù$·PyŠŒvHH\n;d\Óu->\â\æØªŒ`OCÏ¸ª¶Zw™¶y†\ß-‡,3‘ž¢º¥Š5GB\å€qN.ú‰œ%­¥\ÂLx‰eù6Ÿ˜“\ßµ\ßÃ–…\ÚIÔœ.\Õ\à=kxÆ‘2K\n\r\Ê\Ù£4Ù‘Á\nO$š|‰…\Ç\Ú\ía…Œes\Î9\ïR]jHHE\Ér\n3\ëU\nI\÷	\à\ñ‘ZCl\ð\ïy|·\r€œdš`vµ\ÌxŠ‹…’Eù $\ôùû\ÒI%\Í\Ä\Ò\ÄcU„t\ÇROµ%\Ô‰$N#—9\çø½*H\Þr\÷*Ž§¶?\n–¬2\É\Òo\n\Ð\Òfj_\ÝDk;†-•¤U\ã*\ØÔ¿\Ú\Óÿ\0\Ï)?\ïºb¹ÿ\Ñ\ö[­g`(™–A\Øp\Ô\Öùwr}ª\áü×‹\î€8\ÐV‹i7A6Ç¶(\Ç@NNjå®ƒ+B¶\òÊŠÀž@¯žQ=C¹š5•\Ç\ÌMu\Ö\Ö1\ñ»\îŽzU\Ãgm§B971=z\æµt{••®\äS1\ì£\0¥5\àf\Û\ÛÁ\öb’\n‚\ß\Â:\ô\÷­#\n\î(ªžÕ«9µ\Ó\å!—v\á\ÈQœV+^D\îP\r¹\è\æœÄ‰£Ž\'\Ì‡¢\óŠ`º‰\\­¼%=IFk›8\å\ò!¸\0°ûÀ\àÿ\0Öª\ßl¶H<©/›\'ƒ\Ô\ÐU‡\Éupdh\í£È— ±ŠrªÛ¦7­éš–VU*‡nqƒ\Û\ó«l›Uwe\ñ\Ð´\Åý\ì\í\Â<t\0U\È-¤gŸŒ\Ôe½Ž\ç›pQ{\Ít\ö>R\'›pKv¦¤•® Š(w\Ø\Z#û)ƒ\Ée%ûŸZ­s{m4þD„nû\Ã<ª\ñ§\Å›Ÿ%|³\Ð\÷\"³\æ³„å£‘N\ã…ŸJ´¡R%Þ¼wªf\æ\Ú\Ô8üO\ä+=\î\î\áf•WpÁ+¿\å¤\ÑV7|\ÖN\Ãú\ÒKsakˆ$\å\÷y\ÇÖ±\ô»‘©\Ã\çO3ü \à\n³qV\à«&\óÁ\ëOŸ°r•ŸZŠ9YQB©éž¿•Y‰á¸Z`Ï“ŒŸ—¥e[Z\Ú=Ç˜‘X\ã,{{\n\ì¬E¬„98\ä\â¡;°kB)\ãŽr=¤Œ\08üj5·9\04\íB{-¬(.\ÝÁ\ä~Š%Hs#8\Æ;ƒŸ¥7+\r\"Y\Z7;ˆf#¿¥@°‰dY<\Æ_—Y\ã?\íf¥ùgÁ	µ€\Ç\'“øQ#½º‘n?\Z†Ë\Ñt\ÛD–RÀžw˜¬\ÝO´5\ì»J®vƒ\×\ó\ëPY‡qƒ.þG|T²	\î¢QgŒ0\ÃúŠF…\ß2\îtªd\\£·§–\â\âk´þ3\í\\•\í…\Ä(\É(Ç—©úžµ½¤¨t\è\âº\ä©8\'“ø\ÔGr›²7c‡2yÁ\ÖŸn¸ª|;3;‘Ž¿Z‘<\Øe\ó ¤<noJpžg²2»1\ç¢\"R¶¥ku¤7.=³V^\Ò\Ñ!%´\ãŒ…JÒ·X\Ä\í6[`\Ç\ò\÷\ô¬gUk‰U¦b\Ù€\ÏcZ{;\Î\Û\"wd\nÁ<\Î@\0c4H\Ò	!‘T\É\á€ZÙ³N¦LãŽ¿•_š[¥o.\ÕF\Ö\ê\0Á\"ŽA_Ì‚(­6)ˆ“\ê:b«\Ü4|©ùz³/Z±\rÜ’ª!+\ðŒsŸzÔ“E»¸PˆH	\×9\äŠ\Ò\Ü\âµv¾\Ë·#\æ\Ç\\W<nµ7`eL(\õ8¯Km\öa”\å\Ø·\÷}\0\íZ‡@m‡• «\ãG±`ª¥£<šx¦»‰LUT\àÒ´´­>}:_\ô[Ÿ0>+þ¸\ÍiË¡K˜E\Üw`\rlC\á\æ€Gqr\ØÀÏ§\çJi\êT¦Š’+\Ã1(\n3\0p9\ë\ê)±\Û$Sù\Ò=3À\0\òx­R–†3!f$\ð?j\ç\ä7\í¨Eco\0P\êX»ý\Þ;q[HÉ³r\à‰aT‡\÷hNXz\ÕdŽ5‘U¸\0‚=*\Ô0\\3ù2G±s&3þ\ë\ë3\Æ\ó<áŒ€z-7¡%Áo;¥8\Ý\É$K=½—\Ü@\ÌO9^‡ñª°£NCÍ‚?º@p»F\n«`8§{ˆ«\ZÊŒ%R|µ\àŒp¹©Ü“™|\ßÎ©B\÷\Ë,¾Z\ó&Þ§\Ø\öâ¬³9vm§ }\î\Ô	“¬¬\ÜH\Ü\ã!A\Î\n˜\\)\×\æ9À\ë\\&¯,‡TRXˆ\Ñ\0f\èI>•§§\Þ^I,q\æ£`n[”¯f4Ž¸\ÍŒ–\Æ9ÂŸN\ÕJ\ç\ír¨[yV£p\Ý\è=jy¢\ÆøŒÉ·¨L\ôŠ©-¦\æÈˆŒ\0O\Ì¦hzˆdW	:#!B;\Øz\÷©\Úf…£`±$ø\öª@[[h\0N\îzcÞ¯ 3ÿ\0g\Ï\Ó4XE«e¶e\éKD:\ñ\ëŠI\Ø>\ájj<{g¥&\\+J\ßw8b®Ol§cœc¯Á¾¥D…¦a\Z\÷ÿ\0\õš\Ð{Œ«!\á»u¨­\âK}²´s\ÔMM.¡¸1±\È\Æ8«Ø‹\Ü\å¯\ÞHfhT\Û\Æ?\ä\ÕxB™Ac\Î\Ü\÷$uúV\Õû\Ù\ÜJgbcp q\õ«\ñkH\ö„RO9Qœ\ç©Ï­BWe^\Ê\Æ6irD—¨\Óm\æS‚sZBV8ÀQÀÒµ\Ø\áÀŸ)\éŽ9¦Áj’+=\Ó|©“Šm˜Î‹\ì\ÈH€\É\ÉÇ­Iº/ù\æ+:K¹c–DN1\Ú6×½7\í\Ózÿ\0ã‚¦\ÌvGÿ\Ò\÷A6¢¨\í—\ç¨\Ä\Z·rl\ÞùÁúWR±\Î\æbTž\Õl[\Ã#,Š\Ã+\Ï5\ó\ê™\è¹\Ä›e3|\Ã\ñ\Ï\ÓÒ´_Ï³™&Š Áø.§‘ŸZÐž\Ù\ärò¬¼°r7\ì2Â©+{\Õ\õ4³h\ÖvžIx-Ÿ»\îkˆ\×5{–Cod­\Ç_s\ï]•±¼\Éz\à\çÂ  \â„(n£\ã½D•\Æqš,W‡¹™ˆ‘‚O%»šÔº·is$h8\à0­Á\Z¡X\âN#`Î®ÀV|\ï·Á\õ\Ïz\ZH«³?GE·…c˜;\É9\é[W\Û2³Ê±¦8g5OP\Õ-\ì\ãe·Œ4«\ë\ÐJ\æ¦-v\âU{rù}K¹N±\õ\ÝŒ\Ï\Ó\n2jº\Ý_\\\Â<¨ü†\ÎI—ž+&\Ú\õ´¸Š‚\"\ß\É\Ï5›>§{xX«ü¾§úRu\âu\Í*H¢	e\è\Ò-‹<>mäª¸À\Ú>Qøš\ò\Ëk‹\è\å|¨û\Ù\ï\ô®Š+\ß:!\ænf\ë\×úP¤‡$Î†\é4˜Â¬V<œ“úšÁŸPg2Bq\"ƒ\éS]lr®£t‡\ã€+*e`Á#<p+)1\ÓE\È\Ý&\Â\Æ\Æ1ý\Ñ\Âþ•q®L«Œ…\çù\ÖtQ€þx=ª\ä\rn_ý!™²p¡G4F}\nh¹\Z\Þn\ÐXw#5­=\àpþ\\~\Ç®Z\êþ\Ò)x+\ë“ú\Õ\ë-p\Ý\Ã\äy2.?‰ºcÚ©;jMŽ‘¡³¶\\G\Z¹\÷\ç\õ¬E-Ï•\äD<\Ì\ä	?…O²H¹B¹Z\ì	n8=ˆ\Ï\ôªsLoA©ov_\ä5<\îb~TÛ¢–\ð•²9\êX\ä\éM–\r\Å!v.¤}ü\ã¼Vy\Ñ\ÕLk—ˆ\ß1\ä‘Ú ¥w©v7-¤8Ü½»p{Õµ¸’\'/·’= ¥´´·‰šb1ž˜\êMU¶±\\I;!ŽTg§\å\Í½‹Bþ	¥0ž~3\×\'žø©•ZH\Ë\àrx¥Ž\Ú\ØK\ç\×\Í?ÅŽOµY‘\Éh\í\ä^	\ëýh\å\êO1	i6\æ#mXx~{‚³\È\nO_þ½c\\LwKigF\È>i\Ø|«\ô\Ív½½¸±X¡a+DÀ\î\×ßšÞ;»“RF¤\Þ‰!\ÙúÀ¡Ž•Gm¤@Šg\Úp?P=Mt\ö\î\Æ1m1\ÜIÉ‘¾nOo¥X¡·Ú¤©\Ì@\éøWW³9\åQŽ\Ó<\'§Nÿ\0hH\Ä\Ìã’¼\ôþUsþ\Û(\Ñ\Ùb\Ú{g¯ÿ\0Z¤³\Ô\rŒ«™aù\×@\÷vÑ¿ï”³0w\"µ\öq3\æfŽD2±Úƒº\õ¬û›+U&\Ô\\Ç¦\rtw#¾-†\Å¦¥fù6»·8\Ë\õ8¦ º\ä\ÊÛ¬lTF\0-Œ\õÉªw”\ò\08\Ç§Þ¬]F“6$€\âŸ\æ\Ã\öa\0Œ*sßŠvœ}ü\íqm(A\É\0\äœ{\Ö5\ÃO)\òj\õ$\Ö\íÞ¡D›H=þ••s5\ÓC›XX3u\Ý\Ç\åX8š)VŒ\ï#Ÿz©qk$±º\Ã.À\êF{¡§-\Ý\ÌS»A³\Î:UÇ¸I#>V\ÖOn1QcD\Ù\ä¿g\Ô-¯=\ä“E\Ã+1\çÛŠ\Ù\ÓBd1—q\',¤\ç9\é×¥tw6\Ñ<{™>VûÁzŸsX\æ\Ò;–\âüÀ®s\Ïÿ\0Z±~eß¹²—\"VEˆŸ\à\'®*I\õt,¥—\ï\É\É\é\\H\Ð\îu\ß-Á\ó\Ø\è3\È·\ô\Í!t\×y¦™¦.0r1Š‰±«\ö›\Óp®øP\ØúšÙ·µ\ó$\ó&••H\áOL\ÖJ«<\à±ù \ë]\Í\n\Ûžj\ã\ÜR9]wN1\Ýy®\âüzþU‘gr\ò´\Ûü¿+†\È={V\äf\Ú\éD\Å7º\ô\ÜHÁ­f4[h¶?|ž	£•^\â\æ{\ö;b»\ZzfD\åÝ±Œ±\íZÒ¡¸‹n2ž;}j»yÛŽi_A\Éÿ\0\Zš7ºCò»¾ÿ\0E8 \í8,\ôÉ©¶\"«¨\\Œ±\õ\Å0-K4{\È‡8\éN’\æ)\"C°†\'>\ô\Ð\r\áT\Æ\æ5\êlU‡ºmª\Û\÷&q\òŠ\É]\Ì\åJŸ,\óÖŸyr5¬jáŠƒŸ\áÁ\ë\Í\0Mq+\0&,pN¨\ë\õ¨§K»ƒ\0On\ã\ð«-©e¾.c\n\ÇúšnŸ%Æ \äÊ¨\Û:Œœ_jº\ÓS2&º(À)$t\'ü+f\ÚIP¸0˜\Í,	\Þ	“\Ç\×\Õv\âtûQ”“!~”%a^\ã…\Ë<|§§§\áMk¹Zc\É’N3Q€\îH¸\ØqÁ\ãÒ«´ŽÅ€Bxæ©0+HHX61\ÇN)|¡ý\çª\Ãt‰‰n\ÞS“\É\0q\éj›Ë—þ{µ\"¹ÿ\Óú™!%?|‡\óýi\ël\Ø-ª;ú\n\äb\Õ\Z/šV1;t\çŠÑ·3Ü\õ®\ë\×*¿…xwGs‹$–V‘žÈOÔµ9-\ÔŽV\òŽ3\ê~ž\ÕR\â`D›XzsY\ÐM$\ÌCt“œ’jdËŠ6v.\Ü\îÛ“\Ç\ÓÞ§•Y\"PS\È\ä\Õ5¶¸¸\Ú\ÑG\ô\'·\áÞ´m\ôÙ®2n\Ê)úz–\ÊH ú¼Œaa#\ã¨Aœžü\Ó]¥ *\Ç\äG\ê\ÝqïŠ¾ˆ\ÊbE\nGR*† ¡\ÐÆ§\æ?xûW;‘¢FgØ´\ïžwo1Ûœž•‹.£P´AÂ°\É\ÇSùV\Þb\r‹´¨Àl\ñø\×qo7®\ìŠ\Ò7\ñc$ÔŒ‚i\r\ÈfŒ37\÷Ÿ ú\n\ç®u¨´™bûI’U˜\í.;WZ!C—˜ÔŽ	9ý*\Ü\Ze”\ê³‘\È\îy\ã\éT±©–p¾B–V\Æ\ðÒº;q\öt@y3\ÐŠlMeZd2l.Ÿz>\×$\Ã1-\Ï\Ý_\ð “fÉ’\í\ÓÌ•\Õ\ì:c\éTHrüJr}F@¦²Í°+º“Q,jŠ¡¥c…\ÛÞ‹¥\ä\Åo	ŒK¼žK\ÍC;;${\\Ž~c\Î)È±FL\òm\ã\Î\n¯qow³\íV \í\ïÞ‹;È·\n@\Æ\å¤‚9mÝ›;½|ÿ\0J­§^\\L\Æ)b\Ø\òÀ\õ?N¢µÝ‘$Ë—g<\â§r\ï¡^\à^I\ÝV@0ž¿½E\0š\Ö .f3?¨ c\ÛÞwyr‡\ä‰Y0rÇµs²j:X»œp)%¨_CÌ¸Ê…\É-Ô±±	\æû\ßOo­r\öw\"Q\æ³a@\çŠ\Û\ó”\Æ(\ò\0\Ébp\0\öêž»\rP´¡F\ñ\ÏZ‚\í\Zå³CÞ¹kŸ\Ø\é\ó­¶\çœeTn\'5»\Ö\×pI\ÂK}\à\ÃŸ_J´L‘e&wGR\ô?\áVÞ—ÀK¨‹1Á\È\ä\n¡¨…T©ÚŠ@\ç\'®ƒO°iœ<q…\Ü2N1M\'}lß¶’VÉ¢‰¶)#(T>•½¥ZC§\çd 4‡“\ô\é\Åf\ÛiÊ¬ª\ÅA^\ê0jú5\Ìsa\åŒ› ¾kº*Ú˜I\Ü\éž\êÈ’·\ËFO|\ÓT\Û0+Žsÿ\0\ë¬uyX—R@\èOz•exXIoœu\Æp_1ž†\ö—ºÉWx\'<ûWMi¦³\é/ü`×ž¦¡¬=Úƒ0¼A\ä\n\Ú:“ù~B6Cr­kº’\×S£\Ô;o\Ý4Á›¡ \ô¨{X\ð3¹{û\Ö,Wq¯A\ÎrI\âxc\Ê\"V¹§\ÌCE\ë«\ë93º-Üž•}²\óJª\ã;z\ÔSÛ©,[=x^o5\ãÛŽ¸<\Z‰2”E•\Ò\òB¶x\éÉ¦­±º\"\âV\Ú=°\0\ãYWO5Cÿ\0ëžƒÞ³\î\ô©\äºY…\Ó$L>\à\Î7v\ö¬›*Å»\Í4$¾tsùˆ?„\ö¬4‰’S–;‰9\Ç\Ê?\Z½=µÄ°yBm\Ê\ñ\Ü\Ôp¯\ÙÑ¡f8AŽ{\ÔI#H¾ƒBfFÜ˜T8\ïP\È\ÖRŽ£\0\á\Õ\õk`ÁŠ\î=y\éš%¶†á„žV\ÖnNjÍ•q†F\ÄX£`wÿ\0\Z§,h2§,¯ \æeRª}¥c\Þ\ÉIŠ(ˆq\÷s\êEKcOS>\àEÁ\å–P ·\\zœsøU\Ù\î-\ç;!r\n\0Oü\ÅD\Ñ\ê1\Â!xÏ›\Ý\ö\õ>\ßJ\ÍÒ´y´ùfº\Ô]\äi›ž0¼\Ô\ÚE6Ž¦Ü‹ˆ†@^\ä`Ÿ­G3´R\äŒ\ç¶k?S\0³8d ®8üýª\ÂjhUb»À”\àƒqÏµjˆh¥yy~£1£g¹&­i\â\ô\Þun\Ù\à{š|¢q˜\âr§\Ð\öúZ»§\È\èû\n\Ø\å›½‡J9u%³TÙ°¶»f\\;\Öz:\Ä\íªr£\ë\Åh6¤!+Š]Û°T?\é·\0»Bs\Ðü\Ì~*š‘M\ã~]2Q0p:œ\Ó\âÜ«\å·ŽoJŠC:K²Uh—v\ÈEYYaE¸\ë\÷T\çZV\ËOä”´h<\Å~„3O²Y,Œ›€`\Ù\ê>\íeL²–I@ù[\É\ç> {U©C<¥<Â¹_Ÿ\'úz\Ó\åÜ¤uYa”\íŒ,Á$|\ÇÔŒu©4»\ëmLK´‘\"¶v·\ãi-,f‹j}\âF\öª\Ñi\Égq\ö©FŸ_Z›;ŒÖ—\ÌXpw¿±ªî‘ƒ\"G:°\Ça\Î(¬¥zg®j¶26(\àŸQUc1!´¸HÀ|Šy‘R}š\ïûùŠeµÊ˜†\Õe\ä\ñ’;Õ´û7\æj€ÿ\Ôú:\Ú\Î\ÍYf¸`XtS[hdp>Ê›— \ã\õ¥²²¶(³m\Ý!\êÇ“Z‘”qÚ¾|\õ3\ßJ\ó\Ïú[ÀSük:q´¢\Ú\Ê-§8\Î3Æ´®\ï\ÄGËˆ‚þ\õÎ¶¬|\ï²F3#Ÿ†H\Ü\Ô1#z7\Ñíˆ´\Ò\â<R\ÃtFSf@\ç“Ðš§\Í{Ž!°§8ü½©\Æ5LHB\÷¿\ãJ\ã1\õ_E¥£_>\ã \ë\è+œ³\ñ-ž²\Ãd2!bA$eG\×Ò´5\í\ÏW€[IºG9¿lŠÌ·‡KÐ­­™\'\Ø\ä–\÷\ì+.¥¦i³\Ú`G(,8<\ç€Uã±œ\ÈÊ…|¼e\ñš\Ùm¯-€‘\ä.GÌª\Ü}=h\ò’DŠ\ÔG± 9 œ–¦h°\\Cekp±\ïqŒ\ñŸ®(¹\Ó\ã–	RÚ¶0zÖ“\\\éê¡£Fxn?•%Õ»Ü¨m9O\Ë\É.\Ü~U\\ fi\Z\Zr\"/¸\ò\ÎÇ©Z¹5´©Fþ¼~EA<\Ú\ìN­(P\ær=\0\ëU\ôÑ¨\\%\ô\ÅC„\ã })\\J%»}–\ä[ˆÜ®Ü–\ä\ó\î}\ê\ÜXF$D>\é\ïY\ì\÷PÎ >#\'•?¥^†&y\Ë•a\÷{zcB\Ò%„ø9\ç\×\õ«/4iu±\Æ\ëZce´\"žý+&\â\Â[xü\Â~`zz»\Êl\î\ÊJ.\Æ=sZ\\Z¥žÈ¢+w<Y©‡ÜŒ$sžù§¬q\ÛÆ¡\Ûj¯\õ©@Ð‘\Â\Ì\ZF“ \ð~^·5ƒw§’¹Y„[‰p\n¸?J\èç¸„Ž6\Ø[!I\çœwúW/e¡_¶6­vnQŽP\à¾µN ‡\Ú\Ø]ÁŠ—	!\ê¤d¯×š}\ìZ­”’»\Ê6«*\õ\Ýý\ÑÚ®iZX²YXK\òžH\à\ô\ëZWq:ùNB‚ÿ\0AK•‘\æzg…o\å¸_\ÈS=ùÁ\õ\ÍzF™b\ö\íGgf\á\Ù\ÎI\ôJÐ‚É”\ï\Ý\Ï#§{†Ï˜c’z\n¥sG} Nü`pƒùš\ê\õ\Ö(\Ò×¦z\Ö=µ¢‡i\Ö<drz“ú\ô«\ðp\ê\ÅA\Çj\Ö*\Ä3¥²½i¢;£\ÚP\õúSVI\Â\É\".ýy\È\çÚ¨CüET\ÇCÀæž·\×0\Ê\Â00\Ì\ñ®„\ÌZŠs¢9L€V\ÂÜ€‰	\Ú\ö\ÍU\Íæ¤ýx\Î*RŠdvƒ½T’ !ùˆ,8\È\Ý\ÍR\ßnü\Ö(GQ\éHne\Ã(\'©\ÇOzÄ¿‘\åŽ	wo\\\ä\ö\Ý\è~•B:o¶Y,{\ö\çœ\óK\ö\Û|\r€3·\Ý\r\×\ð…\0–HƒÎ€c8ª\÷‘\Ü\\bk<™#\ç=3\ÏAšN}‚\Æû¤·\Ù\æ”n \ä‚A\íI\0o\õV\ì\Ã\Ðœ­c\ì¤!Ê\Ï\÷‡|Ö…½\äØT’	\äæ§˜}\nz‹\\V4Q´ý\ó\í\è*w@A\áªK™Ì·+0\Ê(\'\å\çŒT\ÎÑ•,°9Ï·½EÆÿ\01¦UYN£Û·ÒrMµP‘“\ó{S¢h\îy\È\çœw\ÅLÍ¼G­&]Ê‘}l\ä€\ïI\Ä~fb]È£vsl\â¡gwK…	\Ô?9ü+&Ëµˆ\É?”Ò¾pÁ~UÀ\Öm\"MBú[·\ßnøT9\í\ñ¬Ö¼….•¤›\÷ƒ’A5—wv£|ü\Ä\õ*q­fG\öy>e“\Ì+\× \ZÏœ«Ÿ§nS\÷\í\ó\ÐdþµV\ãP[‘&0‹’Oµq\ÖlmYLl\Ì3“žy®Ž\È\Ë$\Ãf\\À\Ç\õ­T®Œ\í©B}\í&\åR£¾Ozd29\á¾e\ã‘\ÆkJkF\í&zgúU(`p¸\'\Ý\Æ:\Öo{šP¸ž%zZ½	P?xB‚;þ¢ª,Av3 m§Œ\ñZ-=\Ì\Ð\Õ2ý\Õ\Ç\êEjµ#”\Ø\ÒÅ Ì\\gOÎ¬M9˜þ\ë!G\\\ðx®)\î5¨§_)VŒ7q\ï[±y²ª\î9\Ý\ÆzU\óhE»/³*\Ç+\ð\Ô\ç\è*¢}J\Î\Å\åc\Æ1ù‚§y­#mžf\Ï_oQU\ãx\ð\ì\n§\':\óüè¸¬Pº\Õ-&F\Ù/’qŽF2}M[·M(ŠT#i\àž§5;,R\Ä\"™2F\îO­X‚\"®®+\Ó4À\Í\ó£n ¬¼$\ÝqRÆ·f\á­\ÌYˆ\0\ÂB\Ù9úcúÖƒ®ù\Ì\î6\È8\Ð{R‡B	V\éù“@D å·œ\àzÏ™Aa,„\Ç\ZO`:þufgý\Ã2–H\'¦T¾¶¿Ô¡Šd6‘w\ïþ0iI:&\Ñg¶Žt:\È2	\êj\Ö\Í#û\Ë^E\Ô’Ák\å\Æv¯\ï\äcƒU1ý\Äÿ\0¿\ßýzžcNCÿ\Õúz\Ö\ò8-QH`{gÖ¡7SM#>Zu\'¾+‘ŸQ—*·?>\ÑÂþµkÀ>b\Êp9\ë_9\Îz–4¤a\"ˆ\Ô`?1\ëZc\Ï\Z\r¶\ö\æm£%ú/¿¾k>\ò\î(	]™ß ¿W,Ûµ\ÛnX\ÕrwpO\áP®\Û\Ü\È7ù&\óŸ|Tª+#7˜¥VŠ\ê$Ä†tlwæ¯«E¹VF*:Ž•i^þX\ì!y\ît\Ç\0rO\Ðz\×):I-ú$&\'¸\ê¬9\ç¹\ô®\Æ\ê$¹—\ËGØª2I§©¶BF?xz“\É>\õœž£N\Æ.£\Ý\ÚÄq0/Œ_ÿ\0]^¹°ƒw˜eÛžÂµÕ£H°\ß{\×Ö³w1gB}­\îgM•gF{\ÕH\ín\Ü¶,¤Œ\á{V¬\è\Òm\ó\Ð3\×\ÓÒ–® \\¤¡v\0i ¹“\ö\ë\Ý\é\Ä{ü¾7¬‹»—K¶\ò¹}0kv\ök«\ò\Ê#\Æ\ß\à6=±YPi;$\ódúc°§\ÊÊ¹.\ì\Ì\ØS\Ï5\Ø\é\ÖM&.>‹Ò³\Î\\9¼¬x\Ð=FkV\ßPE\\\ã-\ë\ß\ð¢Â¹\Ñ\í¸Œdœþµ,ØFp~f\Ç\ñª\ó\ë-m0mˆ\Þo\é\\M\Ü\×\Z­Ï˜\Çl œgn\ã\ëU&	\÷6qÍ½\ç\\ýÐ¹\Éý*_µ$ &C*Ž˜þµÁý•„‘€ù’k®‚\×r*Œ\ä\÷©E£Cw†‰Œ\à\÷­8f!Y@Rr§\×\Üw¦\Åd\ÐÌ\å\Ù\å€š\ÑK{xÁš%\ê	­\Ò\ä2¤6FF\ó°c\Ï;G_Ë°©¤T³“ÔžsSÄ™m‰!%¹,:~5w\ìF³8Ç¿z‘)v‹p¨9\Çv\õ¨t«Û›™\Ý\Þ\ÔÆŸuU\Øeÿ\0\Ú9ý+n\êx\É‘¶%ý?\n “E{rf¶#\Ë^œ`‘\×$\Õ@‚\ÎH1/\ó«R\Ï \ÙÃ±\í\ÔVM\r¼c\Ëfn\à/¯­VŠ\êl\á#Àû\Ç\ïsÛŠ\Ö\æm\r\Ö\ä*±91ž®G\Õz\Õ-\Ë	ƒ*`€OR}»\Ö¼²\Ýd:ý\Þ3Ú­´R\Æ\É\0\÷ù\Õ\'©,\ßi\ámÀ\È\éPy’–ù\0w¥D±$3,¢M\à\ô\÷”¿\Ì\ß*¯\\ûúU\\D\ßhŽ\\\Â|¼L{\Ñ$k4d \ã\×Ú¢)\à#Ts“ÜŸZ‰\î%c\å\Æ~Q\íNú\Ñ\â\0ƒ„·\'§½]Œ8À\È;}Ef‘\'’ÉŒ{Tq¶%t\Ýû\Ü¯>\Ô\'a\Zf\Ô)i˜\äúŽ¦²®7©Y2\á²\Ç\×5µi`y7o‘œ\àu­	­ {b¸€À˜¶­~wù¶À8Á9\È\ö5¡m¨\És\æ¢	À09\î*ì–±$–0.=\Í-µ»\Ç(E\ç-\óÆ¡\"¯¡Y%heH\ãV}ýH\éO\"eL\ÎG^™\íWž[rT\á\ñ‘ÿ\0\ê¨Å¤\Ë9\0qI”¶3š\âvBžœ\n\å¯\ï ±&)r\Û	€NIúv®‘$Žƒnþ6Ÿ\ð5›}Ë†gE\ÜV-Ü´r3)¸F‹`Š6\àžø¬k\÷½³‰_MŒ8B2˜û\àzzWU’F1\í\èy,?•ZI-c”&\ÞO¯?µ$ƒ˜Î±[‹\Ût¹•~Ì§ªs}Ç­u\"9#‹d\r\ÆM@³\ÅBYv¯sÀ>\Õ3\\\Íq*•TX±“·ükX¢-¤*l\Ë9\ç=M[kg6€\äŽ\ç¢’\Â\æB\ÛUŽ\0n2}ªSo±—\Ìs¹³\ÅUƒ˜µ4¶\ÌœºµUIyM#F\Ü‰\÷55¼HÊ®Wj\ÜsS}Œ]H\Â@UOs\ëT\Ñ7*ùr\È[\ÍM\Ø=IÁ>\Õi ’%$„=O@+9\ì\õ[9Sl›\á,3»ž=8\äV\Èy@\Üp\0\óJ\Â*\\\é\ðO°J­¶3¸\÷X\÷\ÍA4*\ðƒœ´n\ì\Åû·0·M\Ý+º0I\å·\ç«\ö?ˆª°\\\ÑF\ß6\ìœl\n\ÑYN\Å\')ŸnŸs\×R	ü©FPI\é[\ëu#\ÆbS\å¨n½IÔ®;\Z\ö\÷0\Ê7Js\ÇSéŽµ•vì±´±†\Ú\è¹>\ç°®o]\×L\n…’A\Ñz`\æ§Òµç»†$—\ËG\òªyS\êj®#r;ˆ\Ã ‰‹ƒŒ\à`\æ©h\ëYeÀ œ‚\Ã­X—\Ë\0´‡\îƒÓ*å•´—d3|€O~\Üc\ëE˜\\EpD³\Ø.\ò98Q»ßšg\Ù\í?\ç\Å$­‡°·Œ…1Ÿ™¹\Í3\ìqÿ\0qïª¯d.cÿ\Ö\õ}>\\\Ê\ÊQr\ÎA<\çŠ\ì7l¶i”\0C\àÃƒþ\Åi¿\ëÿ\0\àm]›Çƒÿ\0\×O\è\Õ\ó1=V7G´Šyš\òbd~¸=*Ç‰\ïfµ\Ò>\ÓR\ïr2?*v…þ­¾†©x\Ãþ@)\õj\ÒBB\èw“^i5Á\à`cŸ¸\ï\æ©øgþ@b­\Zýk1³J5\å¹?\áWaJ¼§’*¤]¿\Z½ú™*D:`6¨¤g1 U³t_Â£›\î¯Ò›\âV•w>\Ì6TVƒn0	\íM“\îÀ\ÅI\'ú‘\õªˆÆ£(˜\Ó\Ä\Ëp¾\ï \â›ß\è*\Ä_\ñ\ö>´ž\àK²=\å\ÙC\èO8®~,\Í$›\Ï\nx¥t]\ß\ñ®v\×\ï\Í\õ4=À\æ\'š[\éd{–/\å\çjÿ\0ÇµU†ydl‚\0©£\ëq\õ5R\Ûøÿ\0\n$\\Mm6\Òž&+\Ðnük­µF\á\ÕI\Åsz_ú\èÿ\0Ý®’¸\ßSI\n[:ùŒZB[0¥j»“,Q6žÕ˜z7\ÐVÿ\0ˆ~•¿BK¿zPd­Vž2T\ìrJœ¯ü#ÿ\0®\éYŸq\Z»•$\ã§Z¿	+\Z’C\ðs\ÉÀªrÿ\0¬?Z\Ò_¹\Ô\Õ\ÄL©<H\n1´qRY\È\Ò!-\Ôqž\ô\\}\æÿ\0v™a\÷Öµ2f\í¬¨\ÊI\ÏzÐžVI#Aÿ\0-&³!ÿ\0]û§ùU\ëŸ\õ\öÿ\0\õÎ›Ø•¹³3¹?\Âx¥I¤0Œœ\åˆ\çž)‰\÷¥ú\ÒGþ©ßª@]°\\ƒŽ	ü©\ñ¨b»¹\ïL“\îÀMIQ\ôÀ\ÍÖ®§‚þ¢r¨¬ü‡h\ã5«\á\ËÇ½µ7“Æ†M\Ûzv‡¯ÿ\0\ÈN/¬¿Ê´|%ÿ\0 ³ÿ\0]\rOQ#´\ò\Õ\Û\Îy¦\0 w\ÅL>\ðü*þ*¨fª\ìŸt\ã4øÇ‘d6\órsQkªgÿ\0$úT­\ÇÐŽ\Ú\êX\ãR¸\ÉÏ½S¹»¸·‘78—\ï{\Ó\áÿ\0T¿T\Ô?\ÖÁþ{VRÜ¸Á)»\Ú@·\çR|±8c·5[Oÿ\0S/Ö¬\Éþ¼}\rBÜ¢3o® \0r8¨\öD\Ì(bpN:Õ¸þ\÷\áU½>¿ÖšKP\Óm/DFUÇ–üm\ãC\íV´)™\Z\ì)\Ó?*–_º?ß§¿ü{7Öµ3eGp!y€r‚j\ìLX;0Ç€?\Z¤Ÿr/\÷ª\Ü?roª\ÓB\÷2=¨\'q[\Ð9\òA<“ß¿J\æOüz\÷«¤ƒýJý¥X\ÜJ\Ñ\"„šŽ	]®RS\×rjKß¸ŸJe¿ú\Äÿ\0}hþ¢MÄŠ_½1\Çz£um\Ù2rry\ä\ö«·_|~Î¢ºÿ\0?\Äÿ\01@‘\ÍI¤\Ú\È\î\ãt{#i\ã\õ\ÍO\ödgYK7\É g\å\ÈqWüµÿ\0súS\îŸú\ä\ßÊ¦#8_\Û\Çqs\É\÷™\'¹\Ï5\Ò\é\Ú}­²\Æ\ñ\'Ì€Œž§Ž\õƒ­\Ç\Ä\õ\Í?•uv\ß\ê\Ç\ãüª€¸\ñ«Æ‘?Ì’}\ê\ÌN\ÑH\ðFv¦vþÒ¢?\ò\Ç\ê´\ñÿ\0Oþù¦€¯\Å\ÇÏ™XüÇ­M\ö‰¿¾j¤_\Çþ\ñ©j\Â\Çÿ\Ù')\G
+
+# Query 17: 3.42 QPS, 0.02x concurrency, ID 0x7F9C0C0BA9473953B723EE16C08655F1 at byte 110718058
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     202
+# Exec time      0      1s     2ms    33ms     7ms    18ms     5ms     5ms
+# Lock time      0   169us       0    16us       0     1us     1us     1us
+# Rows sent      0   2.06k       1      21   10.47   18.53    5.26    9.83
+# Rows examine   7   1.69M   8.55k   8.55k   8.55k   8.55k       0   8.55k
+# Query size     0  18.94k      96      96      96      96       0      96
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  ################################################################
+#  10ms  #################
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'reservation_slots'\G
+#    SHOW CREATE TABLE `isupipe`.`reservation_slots`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM reservation_slots WHERE start_at >= 1701687600 AND end_at <= 1701756000 FOR UPDATE\G
+
+# Query 18: 103.83 QPS, 0.02x concurrency, ID 0x3F155F5E71EFF856F0CF7B8430DE8C23 at byte 10408555
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    6126
+# Exec time      0      1s    10us    24ms   203us   725us   697us    60us
+# Lock time      1    11ms       0     2ms     1us     1us    33us     1us
+# Rows sent      1   5.98k       1       1       1       1       0       1
+# Rows examine   0   5.98k       1       1       1       1       0       1
+# Query size     0 274.88k      40      53   45.95   49.17    3.04   44.60
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us  ################################################################
+# 100us  ###########################
+#   1ms  ###
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isupipe` LIKE 'users'\G
+#    SHOW CREATE TABLE `isupipe`.`users`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM users WHERE name = 'shoheitakahashi1'\G
+
+# Query 19: 182.20 QPS, 0.02x concurrency, ID 0x9E2DA589A20EC24C34E11DDE0FBF5564 at byte 89693458
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:10 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          1   10932
+# Exec time      0      1s     3us    15ms    96us   332us   375us    25us
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     0 181.49k      17      17      17      17       0      17
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  #################
+#  10us  ################################################################
+# 100us  ###########
+#   1ms  #
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+START TRANSACTION\G
+
+# Query 20: 97.07 QPS, 0.02x concurrency, ID 0xFFF66E9B3D962FA319C8068B5C1997CD at byte 65072189
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2026-10-08T16:00:11 to 2026-10-08T16:01:10
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    5727
+# Exec time      0   922ms     4us    10ms   160us   657us   493us    36us
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size     0  44.74k       8       8       8       8       0       8
+# String:
+# Databases    isupipe
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us  ########
+#  10us  ################################################################
+# 100us  ###################
+#   1ms  ###
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+ROLLBACK\G

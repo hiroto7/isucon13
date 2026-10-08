@@ -1,0 +1,4 @@
+log_output	FILE
+long_query_time	10.000000
+slow_query_log	OFF
+slow_query_log_file	/var/lib/mysql/isucon13-app-slow.log

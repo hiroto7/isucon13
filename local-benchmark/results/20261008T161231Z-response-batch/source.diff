@@ -1,0 +1,414 @@
+diff --git a/webapp/go/livecomment_handler.go b/webapp/go/livecomment_handler.go
+index 5ac70e4..61b01f8 100644
+--- a/webapp/go/livecomment_handler.go
++++ b/webapp/go/livecomment_handler.go
+@@ -102,6 +102,14 @@ func getLivecommentsHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livecomments: "+err.Error())
+ 	}
+ 
++	var streamIDs, userIDs []int64
++	for _, model := range livecommentModels {
++		streamIDs = append(streamIDs, model.LivestreamID)
++		userIDs = append(userIDs, model.UserID)
++	}
++	if err := prefetchReferencedResponses(ctx, tx, streamIDs, userIDs); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch responses: "+err.Error())
++	}
+ 	livecomments := make([]Livecomment, len(livecommentModels))
+ 	for i := range livecommentModels {
+ 		livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModels[i])
+@@ -389,20 +397,11 @@ func moderateHandler(c echo.Context) error {
+ }
+ 
+ func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel LivecommentModel) (Livecomment, error) {
+-	commentOwnerModel := UserModel{}
+-	if err := tx.GetContext(ctx, &commentOwnerModel, "SELECT * FROM users WHERE id = ?", livecommentModel.UserID); err != nil {
+-		return Livecomment{}, err
+-	}
+-	commentOwner, err := fillUserResponse(ctx, tx, commentOwnerModel)
++	commentOwner, err := loadUserResponse(ctx, tx, livecommentModel.UserID)
+ 	if err != nil {
+ 		return Livecomment{}, err
+ 	}
+-
+-	livestreamModel := LivestreamModel{}
+-	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", livecommentModel.LivestreamID); err != nil {
+-		return Livecomment{}, err
+-	}
+-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel)
++	livestream, err := loadLivestreamResponse(ctx, tx, livecommentModel.LivestreamID)
+ 	if err != nil {
+ 		return Livecomment{}, err
+ 	}
+diff --git a/webapp/go/livestream_handler.go b/webapp/go/livestream_handler.go
+index 4716dc5..1afb41d 100644
+--- a/webapp/go/livestream_handler.go
++++ b/webapp/go/livestream_handler.go
+@@ -221,6 +221,9 @@ func searchLivestreamsHandler(c echo.Context) error {
+ 		}
+ 	}
+ 
++	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
++	}
+ 	livestreams := make([]Livestream, len(livestreamModels))
+ 	for i := range livestreamModels {
+ 		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
+@@ -258,6 +261,9 @@ func getMyLivestreamsHandler(c echo.Context) error {
+ 	if err := tx.SelectContext(ctx, &livestreamModels, "SELECT * FROM livestreams WHERE user_id = ?", userID); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+ 	}
++	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
++	}
+ 	livestreams := make([]Livestream, len(livestreamModels))
+ 	for i := range livestreamModels {
+ 		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
+@@ -301,6 +307,9 @@ func getUserLivestreamsHandler(c echo.Context) error {
+ 	if err := tx.SelectContext(ctx, &livestreamModels, "SELECT * FROM livestreams WHERE user_id = ?", user.ID); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+ 	}
++	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
++	}
+ 	livestreams := make([]Livestream, len(livestreamModels))
+ 	for i := range livestreamModels {
+ 		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
+@@ -485,32 +494,20 @@ func getLivecommentReportsHandler(c echo.Context) error {
+ }
+ 
+ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel LivestreamModel) (Livestream, error) {
+-	ownerModel := UserModel{}
+-	if err := tx.GetContext(ctx, &ownerModel, "SELECT * FROM users WHERE id = ?", livestreamModel.UserID); err != nil {
+-		return Livestream{}, err
+-	}
+-	owner, err := fillUserResponse(ctx, tx, ownerModel)
+-	if err != nil {
+-		return Livestream{}, err
+-	}
+-
+-	var livestreamTagModels []*LivestreamTagModel
+-	if err := tx.SelectContext(ctx, &livestreamTagModels, "SELECT * FROM livestream_tags WHERE livestream_id = ?", livestreamModel.ID); err != nil {
+-		return Livestream{}, err
++	cache := responses(ctx)
++	if stream, ok := cache.streams[livestreamModel.ID]; ok {
++		return stream, nil
+ 	}
+-
+-	tags := make([]Tag, len(livestreamTagModels))
+-	for i := range livestreamTagModels {
+-		tagModel := TagModel{}
+-		if err := tx.GetContext(ctx, &tagModel, "SELECT * FROM tags WHERE id = ?", livestreamTagModels[i].TagID); err != nil {
++	if _, ok := cache.tags[livestreamModel.ID]; !ok {
++		if err := prefetchStreams(ctx, tx, []*LivestreamModel{&livestreamModel}); err != nil {
+ 			return Livestream{}, err
+ 		}
+-
+-		tags[i] = Tag{
+-			ID:   tagModel.ID,
+-			Name: tagModel.Name,
+-		}
+ 	}
++	owner, err := loadUserResponse(ctx, tx, livestreamModel.UserID)
++	if err != nil {
++		return Livestream{}, err
++	}
++	tags := cache.tags[livestreamModel.ID]
+ 
+ 	livestream := Livestream{
+ 		ID:           livestreamModel.ID,
+@@ -523,5 +520,6 @@ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel Li
+ 		StartAt:      livestreamModel.StartAt,
+ 		EndAt:        livestreamModel.EndAt,
+ 	}
++	cache.streams[livestream.ID] = livestream
+ 	return livestream, nil
+ }
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 2064123..93680ae 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -120,6 +120,7 @@ func initializeHandler(c echo.Context) error {
+ 
+ func main() {
+ 	e := echo.New()
++	e.Use(responseCacheMiddleware)
+ 	e.Debug = true
+ 	e.Logger.SetLevel(echolog.DEBUG)
+ 	e.Use(middleware.Logger())
+diff --git a/webapp/go/reaction_handler.go b/webapp/go/reaction_handler.go
+index 25b5c29..7295b2b 100644
+--- a/webapp/go/reaction_handler.go
++++ b/webapp/go/reaction_handler.go
+@@ -66,6 +66,14 @@ func getReactionsHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusNotFound, "failed to get reactions")
+ 	}
+ 
++	var streamIDs, userIDs []int64
++	for _, model := range reactionModels {
++		streamIDs = append(streamIDs, model.LivestreamID)
++		userIDs = append(userIDs, model.UserID)
++	}
++	if err := prefetchReferencedResponses(ctx, tx, streamIDs, userIDs); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch responses: "+err.Error())
++	}
+ 	reactions := make([]Reaction, len(reactionModels))
+ 	for i := range reactionModels {
+ 		reaction, err := fillReactionResponse(ctx, tx, reactionModels[i])
+@@ -142,20 +150,11 @@ func postReactionHandler(c echo.Context) error {
+ }
+ 
+ func fillReactionResponse(ctx context.Context, tx *sqlx.Tx, reactionModel ReactionModel) (Reaction, error) {
+-	userModel := UserModel{}
+-	if err := tx.GetContext(ctx, &userModel, "SELECT * FROM users WHERE id = ?", reactionModel.UserID); err != nil {
+-		return Reaction{}, err
+-	}
+-	user, err := fillUserResponse(ctx, tx, userModel)
++	user, err := loadUserResponse(ctx, tx, reactionModel.UserID)
+ 	if err != nil {
+ 		return Reaction{}, err
+ 	}
+-
+-	livestreamModel := LivestreamModel{}
+-	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", reactionModel.LivestreamID); err != nil {
+-		return Reaction{}, err
+-	}
+-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel)
++	livestream, err := loadLivestreamResponse(ctx, tx, reactionModel.LivestreamID)
+ 	if err != nil {
+ 		return Reaction{}, err
+ 	}
+diff --git a/webapp/go/response_cache.go b/webapp/go/response_cache.go
+new file mode 100644
+index 0000000..9046e8b
+--- /dev/null
++++ b/webapp/go/response_cache.go
+@@ -0,0 +1,207 @@
++package main
++
++import (
++	"context"
++	"crypto/sha256"
++	"database/sql"
++	"fmt"
++	"os"
++
++	"github.com/jmoiron/sqlx"
++	"github.com/labstack/echo/v4"
++)
++
++type responseCacheKey struct{}
++type responseCache struct {
++	users   map[int64]User
++	streams map[int64]Livestream
++	tags    map[int64][]Tag
++}
++
++func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
++	return func(c echo.Context) error {
++		cache := &responseCache{users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
++		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
++		return next(c)
++	}
++}
++func responses(ctx context.Context) *responseCache {
++	return ctx.Value(responseCacheKey{}).(*responseCache)
++}
++
++// Every query uses the caller's transaction. No data survives the request.
++func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
++	cache := responses(ctx)
++	seen := make(map[int64]bool)
++	wanted := make([]int64, 0, len(ids))
++	for _, id := range ids {
++		if _, ok := cache.users[id]; !ok && !seen[id] {
++			seen[id] = true
++			wanted = append(wanted, id)
++		}
++	}
++	if len(wanted) == 0 {
++		return nil
++	}
++	query, args, err := sqlx.In("SELECT * FROM users WHERE id IN (?)", wanted)
++	if err != nil {
++		return err
++	}
++	var users []UserModel
++	if err := tx.SelectContext(ctx, &users, query, args...); err != nil {
++		return err
++	}
++	query, args, err = sqlx.In("SELECT * FROM themes WHERE user_id IN (?) ORDER BY id", wanted)
++	if err != nil {
++		return err
++	}
++	var themes []ThemeModel
++	if err := tx.SelectContext(ctx, &themes, query, args...); err != nil {
++		return err
++	}
++	themeByUser := make(map[int64]ThemeModel)
++	for _, theme := range themes {
++		if _, ok := themeByUser[theme.UserID]; !ok {
++			themeByUser[theme.UserID] = theme
++		}
++	}
++	var icons []struct {
++		UserID int64  `db:"user_id"`
++		Image  []byte `db:"image"`
++	}
++	query, args, err = sqlx.In("SELECT user_id,image FROM icons WHERE user_id IN (?) ORDER BY id", wanted)
++	if err != nil {
++		return err
++	}
++	if err := tx.SelectContext(ctx, &icons, query, args...); err != nil {
++		return err
++	}
++	hashes := make(map[int64]string)
++	for _, icon := range icons {
++		if _, ok := hashes[icon.UserID]; !ok {
++			hash := sha256.Sum256(icon.Image)
++			hashes[icon.UserID] = fmt.Sprintf("%x", hash)
++		}
++	}
++	fallback := ""
++	for _, model := range users {
++		theme, ok := themeByUser[model.ID]
++		if !ok {
++			return sql.ErrNoRows
++		}
++		hash, ok := hashes[model.ID]
++		if !ok {
++			if fallback == "" {
++				image, err := os.ReadFile(fallbackImage)
++				if err != nil {
++					return err
++				}
++				sum := sha256.Sum256(image)
++				fallback = fmt.Sprintf("%x", sum)
++			}
++			hash = fallback
++		}
++		cache.users[model.ID] = User{ID: model.ID, Name: model.Name, DisplayName: model.DisplayName, Description: model.Description, Theme: Theme{ID: theme.ID, DarkMode: theme.DarkMode}, IconHash: hash}
++	}
++	return nil
++}
++func loadUserResponse(ctx context.Context, tx *sqlx.Tx, id int64) (User, error) {
++	cache := responses(ctx)
++	if user, ok := cache.users[id]; ok {
++		return user, nil
++	}
++	if err := prefetchUsers(ctx, tx, []int64{id}); err != nil {
++		return User{}, err
++	}
++	user, ok := cache.users[id]
++	if !ok {
++		return User{}, sql.ErrNoRows
++	}
++	return user, nil
++}
++func prefetchStreams(ctx context.Context, tx *sqlx.Tx, models []*LivestreamModel) error {
++	cache := responses(ctx)
++	var ids, owners []int64
++	for _, model := range models {
++		if _, ok := cache.streams[model.ID]; !ok {
++			ids = append(ids, model.ID)
++			owners = append(owners, model.UserID)
++		}
++	}
++	if len(ids) == 0 {
++		return nil
++	}
++	if err := prefetchUsers(ctx, tx, owners); err != nil {
++		return err
++	}
++	var tags []struct {
++		StreamID int64          `db:"livestream_id"`
++		ID       sql.NullInt64  `db:"id"`
++		Name     sql.NullString `db:"name"`
++	}
++	query, args, err := sqlx.In(`SELECT lt.livestream_id,t.id,t.name FROM livestream_tags lt LEFT JOIN tags t ON t.id=lt.tag_id WHERE lt.livestream_id IN (?) ORDER BY lt.id`, ids)
++	if err != nil {
++		return err
++	}
++	if err := tx.SelectContext(ctx, &tags, query, args...); err != nil {
++		return err
++	}
++	for _, id := range ids {
++		cache.tags[id] = make([]Tag, 0)
++	}
++	for _, tag := range tags {
++		if !tag.ID.Valid || !tag.Name.Valid {
++			return sql.ErrNoRows
++		}
++		cache.tags[tag.StreamID] = append(cache.tags[tag.StreamID], Tag{ID: tag.ID.Int64, Name: tag.Name.String})
++	}
++	return nil
++}
++func loadLivestreamResponse(ctx context.Context, tx *sqlx.Tx, id int64) (Livestream, error) {
++	if stream, ok := responses(ctx).streams[id]; ok {
++		return stream, nil
++	}
++	var model LivestreamModel
++	if err := tx.GetContext(ctx, &model, "SELECT * FROM livestreams WHERE id = ?", id); err != nil {
++		return Livestream{}, err
++	}
++	return fillLivestreamResponse(ctx, tx, model)
++}
++
++// Warm both stream owners and comment/reaction authors in one user batch.
++func prefetchReferencedResponses(ctx context.Context, tx *sqlx.Tx, streamIDs, userIDs []int64) error {
++	if len(streamIDs) == 0 {
++		return nil
++	}
++	unique := make(map[int64]bool)
++	ids := make([]int64, 0, len(streamIDs))
++	for _, id := range streamIDs {
++		if !unique[id] {
++			unique[id] = true
++			ids = append(ids, id)
++		}
++	}
++	query, args, err := sqlx.In("SELECT * FROM livestreams WHERE id IN (?)", ids)
++	if err != nil {
++		return err
++	}
++	var models []*LivestreamModel
++	if err := tx.SelectContext(ctx, &models, query, args...); err != nil {
++		return err
++	}
++	for _, model := range models {
++		userIDs = append(userIDs, model.UserID)
++	}
++	if err := prefetchUsers(ctx, tx, userIDs); err != nil {
++		return err
++	}
++	if err := prefetchStreams(ctx, tx, models); err != nil {
++		return err
++	}
++	for _, model := range models {
++		if _, err := fillLivestreamResponse(ctx, tx, *model); err != nil {
++			return err
++		}
++	}
++	return nil
++}
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index 1779126..aa79445 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -404,6 +404,9 @@ func verifyUserSession(c echo.Context) error {
+ }
+ 
+ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
++	if user, ok := responses(ctx).users[userModel.ID]; ok {
++		return user, nil
++	}
+ 	themeModel := ThemeModel{}
+ 	if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
+ 		return User{}, err
+@@ -433,5 +436,6 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
+ 		IconHash: fmt.Sprintf("%x", iconHash),
+ 	}
+ 
++	responses(ctx).users[userModel.ID] = user
+ 	return user, nil
+ }

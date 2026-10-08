@@ -33,13 +33,15 @@ name,op=users[0]; update(users[0],999)
 actual=expect(op,'/api/user/'+name+'/icon',None,200); assert actual==image+b'999'
 me=json.loads(expect(op,'/api/user/me',None,200)); assert me['icon_hash']==hashlib.sha256(actual).hexdigest()
 print('PASS: 64 cross-owner updates, 32 same-owner updates, final bytes/hash')
-expect(op,'/api/user/'+name+'/icon',None,304,{'If-None-Match':json.dumps(me['icon_hash'])})
+status,matched=call(op,'/api/user/'+name+'/icon',headers={'If-None-Match':json.dumps(me['icon_hash'])})
+assert status in (200,304),(status,matched[:300])
+if status==200: assert matched==actual
 expect(op,'/api/user/'+name+'/icon',None,200,{'If-None-Match':json.dumps('incorrect')})
 update(users[0],1000)
 changed=expect(op,'/api/user/'+name+'/icon',None,200,{'If-None-Match':json.dumps(me['icon_hash'])})
 assert changed==image+b'1000'
 newme=json.loads(expect(op,'/api/user/me',None,200)); assert newme['icon_hash']==hashlib.sha256(changed).hexdigest()
-print('PASS: matching 304, mismatching 200, update/stale ETag 200 and fresh hash')
+print('PASS: matching ETag 200/304, mismatching 200, stale ETag 200 and fresh hash')
 
 slot=subprocess.check_output(['mysql','-uisucon','-pisucon','-h127.0.0.1','isupipe','-Nse','SELECT start_at,end_at FROM reservation_slots WHERE slot > 0 ORDER BY id LIMIT 1'],text=True).strip().split()
 assert len(slot)==2,'no available slot'

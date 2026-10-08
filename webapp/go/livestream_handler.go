@@ -221,6 +221,9 @@ func searchLivestreamsHandler(c echo.Context) error {
 		}
 	}
 
+	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
+	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
 		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i])
@@ -257,6 +260,9 @@ func getMyLivestreamsHandler(c echo.Context) error {
 	var livestreamModels []*LivestreamModel
 	if err := tx.SelectContext(ctx, &livestreamModels, "SELECT * FROM livestreams WHERE user_id = ?", userID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+	}
+	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
 	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
@@ -300,6 +306,9 @@ func getUserLivestreamsHandler(c echo.Context) error {
 	var livestreamModels []*LivestreamModel
 	if err := tx.SelectContext(ctx, &livestreamModels, "SELECT * FROM livestreams WHERE user_id = ?", user.ID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+	}
+	if err := prefetchStreams(ctx, tx, livestreamModels); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prefetch streams: "+err.Error())
 	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
@@ -485,32 +494,20 @@ func getLivecommentReportsHandler(c echo.Context) error {
 }
 
 func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel LivestreamModel) (Livestream, error) {
-	ownerModel := UserModel{}
-	if err := tx.GetContext(ctx, &ownerModel, "SELECT * FROM users WHERE id = ?", livestreamModel.UserID); err != nil {
-		return Livestream{}, err
+	cache := responses(ctx)
+	if stream, ok := cache.streams[livestreamModel.ID]; ok {
+		return stream, nil
 	}
-	owner, err := fillUserResponse(ctx, tx, ownerModel)
+	if _, ok := cache.tags[livestreamModel.ID]; !ok {
+		if err := prefetchStreams(ctx, tx, []*LivestreamModel{&livestreamModel}); err != nil {
+			return Livestream{}, err
+		}
+	}
+	owner, err := loadUserResponse(ctx, tx, livestreamModel.UserID)
 	if err != nil {
 		return Livestream{}, err
 	}
-
-	var livestreamTagModels []*LivestreamTagModel
-	if err := tx.SelectContext(ctx, &livestreamTagModels, "SELECT * FROM livestream_tags WHERE livestream_id = ?", livestreamModel.ID); err != nil {
-		return Livestream{}, err
-	}
-
-	tags := make([]Tag, len(livestreamTagModels))
-	for i := range livestreamTagModels {
-		tagModel := TagModel{}
-		if err := tx.GetContext(ctx, &tagModel, "SELECT * FROM tags WHERE id = ?", livestreamTagModels[i].TagID); err != nil {
-			return Livestream{}, err
-		}
-
-		tags[i] = Tag{
-			ID:   tagModel.ID,
-			Name: tagModel.Name,
-		}
-	}
+	tags := cache.tags[livestreamModel.ID]
 
 	livestream := Livestream{
 		ID:           livestreamModel.ID,
@@ -523,5 +520,6 @@ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel Li
 		StartAt:      livestreamModel.StartAt,
 		EndAt:        livestreamModel.EndAt,
 	}
+	cache.streams[livestream.ID] = livestream
 	return livestream, nil
 }

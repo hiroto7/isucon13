@@ -1,13 +1,11 @@
 # ISUCON13 current state
 
-Accepted score 15589 (initial median 7595: 2.05x; initial best observed 9479: 1.64x). Goal remains 100x.
-Accepted bundle: grouped snapshot stats, DNS name/type index, bulk SQL LIKE moderation, relation lookup indexes, icon write-only READ COMMITTED plus owner lock, stream row locking for moderation/posting.
-Official full benchmark passed; targeted 64 cross-owner and 32 same-owner icon updates and 10 moderation races/160 posts passed. Existing nonfatal report/delete races still occur.
-VM resources fixed: app 4vCPU/8GiB, bench 4vCPU/4GiB; app IP 192.168.2.7. Only two VM processes. No more macOS administrator dialogs expected.
-Go pprof 50s CPU and heap captured; 62.54% allocation under fillUserResponse, mostly SQL icon blob copying. Next large hypothesis: persist icon SHA256 metadata and use conditional GET to eliminate blob transfers.
-Initial post-recovery scores 9415,7595,6696; third overlapped host Archive Utility 438% CPU. Exploratory 9479 excluded from median due extra old VM process. All attempts including setup failures retained.
-Fork hiroto7/isucon13 branch codex/local-benchmark; push authorized, no PR. Benchmark official code unchanged, TLS verification enabled.
-At genuine structural-gain stall: reread spec and fresh profile, then public solution comparison before ending. Final persistence/reboot and full benchmark still outstanding.
-
-Icon metadata/conditional candidate score 11501: not adopted; candidate saved in e26ffb6 and result diff. Accepted Go/schema restored (binary SHA256 349f08d2e1c423a84a3f45c114aafd8d2d9240fc84d4e1e3cb8059849b658369).
-Next: detailed DB profile (--db-profile) of accepted state before further implementation. perf cpu-clock tested, MySQL has 44173 dynamic symbols; pt-query-digest installed.
+Accepted score 32448 (initial median 7595: 4.27x; initial exploratory best 9479: 3.42x). Goal: 759500, 100x median.
+Accepted: grouped snapshot statistics; DNS name/type index; bulk SQL LIKE moderation with original general_ci semantics; relation lookup indexes; icon write READ COMMITTED + owner lock; stream row lock for posting/moderation; request-local response batching.
+Response batching: user/theme/icon reads deduplicated and batched; stream tags joined in one batch; comment/reaction lists reuse stream/user DTOs. All use the caller's transaction snapshot and no cache crosses requests.
+Official full benchmark passed 32448; 64 cross-owner and 32 same-owner icon updates and 10 moderation races/160 posts passed. Nonfatal report/deletion errors and benchmark moderated-spam 400/201 discrepancies remain and require investigation.
+Fixed environment: app 4vCPU/8GiB; bench 4vCPU/4GiB; IP 192.168.2.7. Official benchmark unchanged, TLS verification on. Baseline canonical runs 9415,7595,6696 (third overlapped host archive CPU); exploratory 9479 excluded because old orphan VM.
+Go CPU/heap + full MySQL slow log and CPU perf captured. DB profile: 869260 commands, 236797 Prepare; tags 90467; icons 35831; COMMIT44 aggregate seconds. Profiling restored slow log OFF, long_query_time=10. Next structural hypothesis: interpolate driver parameters to remove prepare/execute/close round trips.
+Icon metadata/conditional GET candidate score11501 not adopted, retained in e26ffb6; accepted binary restored before batching.
+User asleep, may close Mac. No interactive macOS administrator recovery. Discard measurements spanning sleep; retry after wake. Final persistence/reboot, full reproducibility and complete-history graphs/push outstanding.
+Fork hiroto7/isucon13 branch codex/local-benchmark; push authorized, no PR. At structural stall: fresh profile/spec audit and authorized public-solution comparison before stopping.

@@ -1,0 +1,33 @@
+{
+  "started_at": "20261008T155952Z",
+  "stage": "accepted-db-profile",
+  "decision": "diagnostic",
+  "commit": "e3a772c43f5f387c1c0161e98ea6ee7cb8739468",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "passed",
+  "score": 11231,
+  "reported_score": 11231,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "cpu_profile": true,
+  "db_profile": true,
+  "profiler_exit_code": 0,
+  "exit_code": 0,
+  "resolved_count": 11701,
+  "messages": [
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7532/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7531/livecomment/1053/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7532/livecomment/1058/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7565/livecomment \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:400, actual:201)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7528/livecomment/1032/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[\u30ea\u30af\u30a8\u30b9\u30c8\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8] POST /api/icon: Post \"https://pipe.u.isucon.dev:443/api/icon\": read udp 192.168.2.6:58103->192.168.2.7:53: i/o timeout: \u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\u306b\u3088\u308a\u30ea\u30af\u30a8\u30b9\u30c8\u5931\u6557",
+    "[\u30ea\u30af\u30a8\u30b9\u30c8\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8] GET /api/livestream: Get \"https://pipe.u.isucon.dev:443/api/livestream\": read udp 192.168.2.6:56181->192.168.2.7:53: i/o timeout: \u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\u306b\u3088\u308a\u30ea\u30af\u30a8\u30b9\u30c8\u5931\u6557",
+    "[\u30ea\u30af\u30a8\u30b9\u30c8\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8] POST /api/livestream/7523/enter: Post \"https://yoko890.u.isucon.dev:443/api/livestream/7523/enter\": read udp 192.168.2.6:46096->192.168.2.7:53: i/o timeout: \u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\u306b\u3088\u308a\u30ea\u30af\u30a8\u30b9\u30c8\u5931\u6557",
+    "\u540d\u524d\u89e3\u6c7a\u6210\u529f\u6570 11701",
+    "\u58f2\u4e0a: 11231"
+  ],
+  "finished_at": "2026-10-08T16:01:57.031957+00:00"
+}

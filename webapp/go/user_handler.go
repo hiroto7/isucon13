@@ -404,6 +404,9 @@ func verifyUserSession(c echo.Context) error {
 }
 
 func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
+	if user, ok := responses(ctx).users[userModel.ID]; ok {
+		return user, nil
+	}
 	themeModel := ThemeModel{}
 	if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
 		return User{}, err
@@ -433,5 +436,6 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 		IconHash: fmt.Sprintf("%x", iconHash),
 	}
 
+	responses(ctx).users[userModel.ID] = user
 	return user, nil
 }
