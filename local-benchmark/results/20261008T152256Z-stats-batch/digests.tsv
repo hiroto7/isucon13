@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	4299	17.484	0
+INSERT INTO `users` ( `id` , NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1000	3.037	0
+COMMIT	427	2.985	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , TRUE )	510	1.474	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , FALSE )	490	1.433	0
+ROLLBACK	4202	1.286	0
+START TRANSACTION	8513	1.228	0
+INSERT INTO `tags` ( NAME ) VALUES (?)	103	0.3	0
+INSERT INTO `ng_words` ( `user_id` , `livestream_id` , `word` , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.226	0
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED	854	0.197	0
+INSERT INTO `livestreams` ( `user_id` , `title` , DESCRIPTION , `playlist_url` , `thumbnail_url` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.195	0
+SELECT `u` . `name` AS `username` , `IFNULL` ( `r` . `reactions` , ? ) + `IFNULL` ( `c` . `tips` , ? ) AS `score` FROM `users` `u` LEFT JOIN ( SELECT `l` . `user_id` , COUNT ( * ) AS `reactions` FROM `livestreams` `l` INNER JOIN `reactions` `r` ON `r` . `livestream_id` = `l` . `id` GROUP BY `l` . `user_id` ) `r` ON `r` . `user_id` = `u` . `id` LEFT JOIN ( SELECT `l` . `user_id` , SUM ( `c` . `tip` ) AS `tips` FROM `livestreams` `l` INNER JOIN `livecomments` `c` ON `c` . `livestream_id` = `l` . `id` GROUP BY `l` . `user_id` ) `c` ON `c` . `user_id` = `u` . `id`	8	0.182	19357
+INSERT INTO `livestream_tags` ( `id` , `livestream_id` , `tag_id` ) VALUES (...) /* , ... */	22	0.153	0
+SELECT * FROM `livecomments`	46	0.147	58238
+TRUNCATE TABLE `themes`	1	0.102	0
+INSERT INTO `reservation_slots` ( `slot` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.087	0
+SELECT * FROM `tags`	211	0.08	21733
+TRUNCATE TABLE `livestream_tags`	1	0.063	0
+TRUNCATE TABLE `icons`	1	0.061	0
+TRUNCATE TABLE `tags`	1	0.055	0
+TRUNCATE TABLE `reservation_slots`	1	0.053	0
+TRUNCATE TABLE `livecomments`	1	0.048	0
+TRUNCATE TABLE `livestream_viewers_history`	1	0.041	0
+SELECT * FROM `livestreams` ORDER BY `id` DESC LIMIT ?	84	0.039	4200
+BEGIN	427	0.038	0
+TRUNCATE TABLE `reactions`	1	0.037	0
+TRUNCATE TABLE `ng_words`	1	0.036	0
+TRUNCATE TABLE `users`	1	0.031	0
+TRUNCATE TABLE `livestreams`	1	0.031	0
+INSERT INTO `livecomments` ( `user_id` , `livestream_id` , COMMENT , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.028	0
