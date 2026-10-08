@@ -1,0 +1,221 @@
+diff --git a/webapp/go/icon_metadata.go b/webapp/go/icon_metadata.go
+new file mode 100644
+index 0000000..896606a
+--- /dev/null
++++ b/webapp/go/icon_metadata.go
+@@ -0,0 +1,36 @@
++package main
++
++import (
++	"crypto/sha256"
++	"fmt"
++	"os"
++	"strings"
++	"sync"
++)
++
++// The fallback is an immutable deployed asset, independent of initialized DB data.
++var fallbackHashOnce sync.Once
++var fallbackHashValue string
++var fallbackHashError error
++
++func defaultIconHash() (string, error) {
++	fallbackHashOnce.Do(func() {
++		var image []byte
++		image, fallbackHashError = os.ReadFile(fallbackImage)
++		if fallbackHashError == nil {
++			hash := sha256.Sum256(image)
++			fallbackHashValue = fmt.Sprintf("%x", hash)
++		}
++	})
++	return fallbackHashValue, fallbackHashError
++}
++
++func iconETagMatches(header, hash string) bool {
++	for _, tag := range strings.Split(header, ",") {
++		tag = strings.TrimSpace(tag)
++		if tag == "*" || strings.Trim(strings.TrimPrefix(tag, "W/"), "\"") == hash {
++			return true
++		}
++	}
++	return false
++}
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 93680ae..1577566 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -65,6 +65,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ 	conf.Passwd = "isucon"
+ 	conf.DBName = "isupipe"
+ 	conf.ParseTime = true
++	// Driver escapes parameters and sends one text query instead of preparing each call.
++	conf.InterpolateParams = true
+ 
+ 	if v, ok := os.LookupEnv(networkTypeEnvKey); ok {
+ 		conf.Net = v
+diff --git a/webapp/go/response_cache.go b/webapp/go/response_cache.go
+index 9046e8b..2b2b3a6 100644
+--- a/webapp/go/response_cache.go
++++ b/webapp/go/response_cache.go
+@@ -2,10 +2,7 @@ package main
+ 
+ import (
+ 	"context"
+-	"crypto/sha256"
+ 	"database/sql"
+-	"fmt"
+-	"os"
+ 
+ 	"github.com/jmoiron/sqlx"
+ 	"github.com/labstack/echo/v4"
+@@ -67,9 +64,9 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 	}
+ 	var icons []struct {
+ 		UserID int64  `db:"user_id"`
+-		Image  []byte `db:"image"`
++		Hash string `db:"image_hash"`
+ 	}
+-	query, args, err = sqlx.In("SELECT user_id,image FROM icons WHERE user_id IN (?) ORDER BY id", wanted)
++	query, args, err = sqlx.In("SELECT user_id,image_hash FROM icons WHERE user_id IN (?) ORDER BY id", wanted)
+ 	if err != nil {
+ 		return err
+ 	}
+@@ -79,8 +76,7 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 	hashes := make(map[int64]string)
+ 	for _, icon := range icons {
+ 		if _, ok := hashes[icon.UserID]; !ok {
+-			hash := sha256.Sum256(icon.Image)
+-			hashes[icon.UserID] = fmt.Sprintf("%x", hash)
++			hashes[icon.UserID] = icon.Hash
+ 		}
+ 	}
+ 	fallback := ""
+@@ -92,12 +88,9 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 		hash, ok := hashes[model.ID]
+ 		if !ok {
+ 			if fallback == "" {
+-				image, err := os.ReadFile(fallbackImage)
+-				if err != nil {
+-					return err
+-				}
+-				sum := sha256.Sum256(image)
+-				fallback = fmt.Sprintf("%x", sum)
++				var err error
++				fallback, err = defaultIconHash()
++				if err != nil { return err }
+ 			}
+ 			hash = fallback
+ 		}
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index aa79445..35352cc 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -2,13 +2,10 @@ package main
+ 
+ import (
+ 	"context"
+-	"crypto/sha256"
+ 	"database/sql"
+ 	"encoding/json"
+ 	"errors"
+-	"fmt"
+ 	"net/http"
+-	"os"
+ 	"os/exec"
+ 	"time"
+ 
+@@ -104,15 +101,34 @@ func getIconHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user: "+err.Error())
+ 	}
+ 
+-	var image []byte
+-	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", user.ID); err != nil {
+-		if errors.Is(err, sql.ErrNoRows) {
+-			return c.File(fallbackImage)
+-		} else {
+-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
++	var icon struct {
++		ID   int64  `db:"id"`
++		Hash string `db:"image_hash"`
++	}
++	err = tx.GetContext(ctx, &icon, "SELECT id, image_hash FROM icons WHERE user_id = ?", user.ID)
++	if errors.Is(err, sql.ErrNoRows) {
++		hash, err := defaultIconHash()
++		if err != nil {
++			return echo.NewHTTPError(http.StatusInternalServerError, "failed to hash default icon: "+err.Error())
++		}
++		c.Response().Header().Set("ETag", "\""+hash+"\"")
++		if iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
++			return c.NoContent(http.StatusNotModified)
+ 		}
++		return c.File(fallbackImage)
++	}
++	if err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon metadata: "+err.Error())
++	}
++	c.Response().Header().Set("ETag", "\""+icon.Hash+"\"")
++	if iconETagMatches(c.Request().Header.Get("If-None-Match"), icon.Hash) {
++		return c.NoContent(http.StatusNotModified)
++	}
++	// Metadata and bytes use the same transaction snapshot.
++	var image []byte
++	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE id = ?", icon.ID); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon bytes: "+err.Error())
+ 	}
+-
+ 	return c.Blob(http.StatusOK, "image/jpeg", image)
+ }
+ 
+@@ -412,17 +428,16 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
+ 		return User{}, err
+ 	}
+ 
+-	var image []byte
+-	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", userModel.ID); err != nil {
++	var iconHash string
++	if err := tx.GetContext(ctx, &iconHash, "SELECT image_hash FROM icons WHERE user_id = ?", userModel.ID); err != nil {
+ 		if !errors.Is(err, sql.ErrNoRows) {
+ 			return User{}, err
+ 		}
+-		image, err = os.ReadFile(fallbackImage)
++		iconHash, err = defaultIconHash()
+ 		if err != nil {
+ 			return User{}, err
+ 		}
+ 	}
+-	iconHash := sha256.Sum256(image)
+ 
+ 	user := User{
+ 		ID:          userModel.ID,
+@@ -433,7 +448,7 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
+ 			ID:       themeModel.ID,
+ 			DarkMode: themeModel.DarkMode,
+ 		},
+-		IconHash: fmt.Sprintf("%x", iconHash),
++		IconHash: iconHash,
+ 	}
+ 
+ 	responses(ctx).users[userModel.ID] = user
+diff --git a/webapp/sql/initdb.d/10_schema.sql b/webapp/sql/initdb.d/10_schema.sql
+index 2729842..664c482 100644
+--- a/webapp/sql/initdb.d/10_schema.sql
++++ b/webapp/sql/initdb.d/10_schema.sql
+@@ -14,7 +14,8 @@ CREATE TABLE `users` (
+ CREATE TABLE `icons` (
+   `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   `user_id` BIGINT NOT NULL,
+-  `image` LONGBLOB NOT NULL
++  `image` LONGBLOB NOT NULL,
++  `image_hash` CHAR(64) CHARACTER SET ascii GENERATED ALWAYS AS (SHA2(image, 256)) STORED
+ ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+ 
+ -- ユーザごとのカスタムテーマ
+@@ -107,7 +108,7 @@ CREATE TABLE `reactions` (
+ 
+ -- Match response lookups and moderation history to their owning entity.
+ USE isupipe;
+-CREATE INDEX idx_icons_user ON icons(user_id);
++CREATE INDEX idx_icons_user ON icons(user_id, image_hash);
+ CREATE INDEX idx_themes_user ON themes(user_id);
+ CREATE INDEX idx_streams_user ON livestreams(user_id);
+ CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);

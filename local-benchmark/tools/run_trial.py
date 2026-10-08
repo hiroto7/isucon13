@@ -67,8 +67,17 @@ def main():
             profiler = None
             dbprof_started = False
             start = time.monotonic()
+            wall_start = previous_wall = time.time()
+            row["max_sampling_gap_seconds"] = 0.0
             try:
                 while proc.poll() is None:
+                    now_wall = time.time()
+                    gap = now_wall - previous_wall
+                    previous_wall = now_wall
+                    row["max_sampling_gap_seconds"] = max(row["max_sampling_gap_seconds"], gap)
+                    if gap > 10 or now_wall - wall_start > 240:
+                        row["measurement_excluded"] = "Host sleep/stall or wall-clock timeout"
+                        raise RuntimeError(row["measurement_excluded"])
                     if dbprof is not None and not dbprof_started and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
                         dbprof.start(); dbprof_started = True
                     if args.cpu_profile and profiler is None and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
@@ -81,6 +90,8 @@ def main():
             finally:
                 if proc.poll() is None:
                     proc.kill(); proc.wait()
+                    # Killing the host client does not guarantee the guest benchmark stopped.
+                    mp('exec', args.bench, '--', 'sudo', 'pkill', '-f', '^/opt/bench run ')
                 if profiler is not None:
                     profiler.wait(timeout=75)
                     row['profiler_exit_code'] = profiler.returncode

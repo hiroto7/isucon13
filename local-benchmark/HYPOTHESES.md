@@ -15,3 +15,5 @@ DNS name/type index: passed 7102, DNS responses 30895 vs 9291. Not a score impro
 Moderation: replace all-words x all-comments DELETE round trips with one SQL EXISTS/DELETE, preserve utf8mb4_general_ci and LIKE wildcards verified with same Go driver connection (case, accent, percent/underscore/escape, Japanese, empty).
 
 Request-local response batching adopted: official32448 vs15589, same transaction snapshot; targeted concurrent write checks passed. Next: SQL driver interpolation to eliminate repeated Prepare/CloseStmt commands documented in full DB profile.
+
+Icon metadata retried after response batching: combined with interpolation48361, +49% vs32448; adopted. Earlier11501 on unbatched predecessor remains rejected, illustrating dependencies.

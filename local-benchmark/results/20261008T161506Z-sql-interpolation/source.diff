@@ -1,0 +1,13 @@
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 93680ae..1577566 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -65,6 +65,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ 	conf.Passwd = "isucon"
+ 	conf.DBName = "isupipe"
+ 	conf.ParseTime = true
++	// Driver escapes parameters and sends one text query instead of preparing each call.
++	conf.InterpolateParams = true
+ 
+ 	if v, ok := os.LookupEnv(networkTypeEnvKey); ok {
+ 		conf.Net = v

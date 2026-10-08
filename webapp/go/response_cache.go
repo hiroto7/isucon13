@@ -2,10 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
 	"database/sql"
-	"fmt"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -67,9 +64,9 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 	}
 	var icons []struct {
 		UserID int64  `db:"user_id"`
-		Image  []byte `db:"image"`
+		Hash   string `db:"image_hash"`
 	}
-	query, args, err = sqlx.In("SELECT user_id,image FROM icons WHERE user_id IN (?) ORDER BY id", wanted)
+	query, args, err = sqlx.In("SELECT user_id,image_hash FROM icons WHERE user_id IN (?) ORDER BY id", wanted)
 	if err != nil {
 		return err
 	}
@@ -79,8 +76,7 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 	hashes := make(map[int64]string)
 	for _, icon := range icons {
 		if _, ok := hashes[icon.UserID]; !ok {
-			hash := sha256.Sum256(icon.Image)
-			hashes[icon.UserID] = fmt.Sprintf("%x", hash)
+			hashes[icon.UserID] = icon.Hash
 		}
 	}
 	fallback := ""
@@ -92,12 +88,11 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 		hash, ok := hashes[model.ID]
 		if !ok {
 			if fallback == "" {
-				image, err := os.ReadFile(fallbackImage)
+				var err error
+				fallback, err = defaultIconHash()
 				if err != nil {
 					return err
 				}
-				sum := sha256.Sum256(image)
-				fallback = fmt.Sprintf("%x", sum)
 			}
 			hash = fallback
 		}
