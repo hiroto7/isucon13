@@ -4,16 +4,16 @@ import http.cookies, base64, concurrent.futures, hashlib, http.cookiejar, json, 
 BASE='http://127.0.0.1:8080'
 def client():
  return {}
-def call(opener,path,body=None):
- req=urllib.request.Request(BASE+path,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json','Cookie':opener.get('cookie','')})
+def call(opener,path,body=None,headers=None):
+ req=urllib.request.Request(BASE+path,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json','Cookie':opener.get('cookie',''),**(headers or {})})
  try:
   with urllib.request.urlopen(req,timeout=30) as r:
    if path == '/api/login':
     cookies=http.cookies.SimpleCookie(); cookies.load('; '.join(r.headers.get_all('Set-Cookie') or [])); opener['cookie']='; '.join(k+'='+v.value for k,v in cookies.items())
    return r.status,r.read()
  except urllib.error.HTTPError as e: return e.code,e.read()
-def expect(opener,path,body,status):
- actual,data=call(opener,path,body); assert actual==status,(path,actual,data[:300]); return data
+def expect(opener,path,body,status,headers=None):
+ actual,data=call(opener,path,body,headers); assert actual==status,(path,actual,data[:300]); return data
 suffix=str(time.time_ns())
 users=[]
 for n in range(8):
@@ -33,6 +33,14 @@ name,op=users[0]; update(users[0],999)
 actual=expect(op,'/api/user/'+name+'/icon',None,200); assert actual==image+b'999'
 me=json.loads(expect(op,'/api/user/me',None,200)); assert me['icon_hash']==hashlib.sha256(actual).hexdigest()
 print('PASS: 64 cross-owner updates, 32 same-owner updates, final bytes/hash')
+expect(op,'/api/user/'+name+'/icon',None,304,{'If-None-Match':json.dumps(me['icon_hash'])})
+expect(op,'/api/user/'+name+'/icon',None,200,{'If-None-Match':json.dumps('incorrect')})
+update(users[0],1000)
+changed=expect(op,'/api/user/'+name+'/icon',None,200,{'If-None-Match':json.dumps(me['icon_hash'])})
+assert changed==image+b'1000'
+newme=json.loads(expect(op,'/api/user/me',None,200)); assert newme['icon_hash']==hashlib.sha256(changed).hexdigest()
+print('PASS: matching 304, mismatching 200, update/stale ETag 200 and fresh hash')
+
 slot=subprocess.check_output(['mysql','-uisucon','-pisucon','-h127.0.0.1','isupipe','-Nse','SELECT start_at,end_at FROM reservation_slots WHERE slot > 0 ORDER BY id LIMIT 1'],text=True).strip().split()
 assert len(slot)==2,'no available slot'
 stream=json.loads(expect(op,'/api/livestream/reservation',dict(title='Concurrency',description='',playlist_url='https://example.com/list',thumbnail_url='https://example.com/image',tags=[],start_at=int(slot[0]),end_at=int(slot[1])),201))

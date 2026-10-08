@@ -51,7 +51,7 @@ def main():
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
         mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'pkill -x vmstat || true; nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-           'pkill -x vmstat || true; pkill -x pidstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null & nohup pidstat -u -r -d -p ALL 1 150 > /tmp/trial-pidstat.txt 2>&1 < /dev/null &')
+           'pkill -x vmstat || true; pkill -x pidstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null & nohup pidstat -H -h -u -r -d -C "mysqld|pdns_server|isupipe|nginx" -p ALL 1 150 > /tmp/trial-pidstat.txt 2>&1 < /dev/null &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
             'cd /opt/isucon13/bench && /opt/bench run --enable-ssl --target https://pipe.u.isucon.dev '
             f'--nameserver {args.ip} --result-path /opt/trial/result.json '

@@ -14,7 +14,8 @@ CREATE TABLE `users` (
 CREATE TABLE `icons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT NOT NULL,
-  `image` LONGBLOB NOT NULL
+  `image` LONGBLOB NOT NULL,
+  `image_hash` CHAR(64) CHARACTER SET ascii GENERATED ALWAYS AS (SHA2(image, 256)) STORED
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 -- ユーザごとのカスタムテーマ
@@ -107,7 +108,7 @@ CREATE TABLE `reactions` (
 
 -- Match response lookups and moderation history to their owning entity.
 USE isupipe;
-CREATE INDEX idx_icons_user ON icons(user_id);
+CREATE INDEX idx_icons_user ON icons(user_id, image_hash);
 CREATE INDEX idx_themes_user ON themes(user_id);
 CREATE INDEX idx_streams_user ON livestreams(user_id);
 CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);
