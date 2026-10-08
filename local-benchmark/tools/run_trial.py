@@ -51,7 +51,7 @@ def main():
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
         mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'pkill -x vmstat || true; nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-           'pkill -x vmstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null &')
+           'pkill -x vmstat || true; pkill -x pidstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null & nohup pidstat -u -r -d -p ALL 1 150 > /tmp/trial-pidstat.txt 2>&1 < /dev/null &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
             'cd /opt/isucon13/bench && /opt/bench run --enable-ssl --target https://pipe.u.isucon.dev '
             f'--nameserver {args.ip} --result-path /opt/trial/result.json '
@@ -93,7 +93,7 @@ def main():
            'mysql -B -e "SELECT DIGEST_TEXT,COUNT_STAR,ROUND(SUM_TIMER_WAIT/1e12,3) seconds,SUM_ROWS_EXAMINED '
            'FROM performance_schema.events_statements_summary_by_digest ORDER BY SUM_TIMER_WAIT DESC LIMIT 30" '
            '> /tmp/trial-digests.tsv; chmod 644 /tmp/trial-digests.tsv')
-        for remote, name in [('/tmp/trial-digests.tsv','digests.tsv'),('/tmp/trial-vmstat.txt','vmstat.txt'),('/var/log/nginx/access.log','access.log')]:
+        for remote, name in [('/tmp/trial-digests.tsv','digests.tsv'),('/tmp/trial-vmstat.txt','vmstat.txt'),('/tmp/trial-pidstat.txt','pidstat.txt'),('/var/log/nginx/access.log','access.log')]:
             mp('transfer', f'{args.app}:{remote}', str(out/name))
     except KeyboardInterrupt:
         row['status']='aborted'; row['score']=None

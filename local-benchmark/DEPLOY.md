@@ -12,3 +12,5 @@ Configuration changes must be stored under local-benchmark/config and applied be
 Final: record persisted entities, reboot, verify reads BEFORE initialize, then run complete official benchmark.
 
 DNS candidate: transfer config/dns-index.sql and execute with sudo mysql after baseline provisioning. Confirm SHOW INDEX FROM isudns.records. Rollback DROP INDEX nametype_index ON isudns.records. Zone initialization keeps the table and index.
+
+Accepted relational indexes: apply config/relational-indexes.sql once to baseline database; rollback with config/rollback-relational-indexes.sql. Definitions also in webapp/sql/initdb.d/10_schema.sql for fresh schema. Normal initialization truncates data but preserves indexes.

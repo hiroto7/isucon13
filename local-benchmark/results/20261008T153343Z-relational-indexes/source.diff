@@ -1,0 +1,58 @@
+diff --git a/local-benchmark/config/relational-indexes.sql b/local-benchmark/config/relational-indexes.sql
+new file mode 100644
+index 0000000..1a8076b
+--- /dev/null
++++ b/local-benchmark/config/relational-indexes.sql
+@@ -0,0 +1,11 @@
++USE isupipe;
++CREATE INDEX idx_icons_user ON icons(user_id);
++CREATE INDEX idx_themes_user ON themes(user_id);
++CREATE INDEX idx_streams_user ON livestreams(user_id);
++CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);
++CREATE INDEX idx_stream_tags_tag ON livestream_tags(tag_id, livestream_id);
++CREATE INDEX idx_viewers_stream_user ON livestream_viewers_history(livestream_id, user_id);
++CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_at);
++CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
++CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
++CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);
+diff --git a/local-benchmark/config/rollback-relational-indexes.sql b/local-benchmark/config/rollback-relational-indexes.sql
+new file mode 100644
+index 0000000..6e163f9
+--- /dev/null
++++ b/local-benchmark/config/rollback-relational-indexes.sql
+@@ -0,0 +1,11 @@
++USE isupipe;
++DROP INDEX idx_reactions_stream_created ON reactions;
++DROP INDEX idx_ng_stream_user ON ng_words;
++DROP INDEX idx_reports_stream ON livecomment_reports;
++DROP INDEX idx_comments_stream_created ON livecomments;
++DROP INDEX idx_viewers_stream_user ON livestream_viewers_history;
++DROP INDEX idx_stream_tags_tag ON livestream_tags;
++DROP INDEX idx_stream_tags_stream ON livestream_tags;
++DROP INDEX idx_streams_user ON livestreams;
++DROP INDEX idx_themes_user ON themes;
++DROP INDEX idx_icons_user ON icons;
+diff --git a/webapp/sql/initdb.d/10_schema.sql b/webapp/sql/initdb.d/10_schema.sql
+index 83f3e9f..2729842 100644
+--- a/webapp/sql/initdb.d/10_schema.sql
++++ b/webapp/sql/initdb.d/10_schema.sql
+@@ -103,4 +103,17 @@ CREATE TABLE `reactions` (
+   -- :innocent:, :tada:, etc...
+   `emoji_name` VARCHAR(255) NOT NULL,
+   `created_at` BIGINT NOT NULL
+-) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+\ No newline at end of file
++) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
++
++-- Match response lookups and moderation history to their owning entity.
++USE isupipe;
++CREATE INDEX idx_icons_user ON icons(user_id);
++CREATE INDEX idx_themes_user ON themes(user_id);
++CREATE INDEX idx_streams_user ON livestreams(user_id);
++CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);
++CREATE INDEX idx_stream_tags_tag ON livestream_tags(tag_id, livestream_id);
++CREATE INDEX idx_viewers_stream_user ON livestream_viewers_history(livestream_id, user_id);
++CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_at);
++CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
++CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
++CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);

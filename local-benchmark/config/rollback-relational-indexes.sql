@@ -1,0 +1,11 @@
+USE isupipe;
+DROP INDEX idx_reactions_stream_created ON reactions;
+DROP INDEX idx_ng_stream_user ON ng_words;
+DROP INDEX idx_reports_stream ON livecomment_reports;
+DROP INDEX idx_comments_stream_created ON livecomments;
+DROP INDEX idx_viewers_stream_user ON livestream_viewers_history;
+DROP INDEX idx_stream_tags_tag ON livestream_tags;
+DROP INDEX idx_stream_tags_stream ON livestream_tags;
+DROP INDEX idx_streams_user ON livestreams;
+DROP INDEX idx_themes_user ON themes;
+DROP INDEX idx_icons_user ON icons;

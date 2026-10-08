@@ -1,0 +1,102 @@
+diff --git a/local-benchmark/config/relational-indexes.sql b/local-benchmark/config/relational-indexes.sql
+new file mode 100644
+index 0000000..1a8076b
+--- /dev/null
++++ b/local-benchmark/config/relational-indexes.sql
+@@ -0,0 +1,11 @@
++USE isupipe;
++CREATE INDEX idx_icons_user ON icons(user_id);
++CREATE INDEX idx_themes_user ON themes(user_id);
++CREATE INDEX idx_streams_user ON livestreams(user_id);
++CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);
++CREATE INDEX idx_stream_tags_tag ON livestream_tags(tag_id, livestream_id);
++CREATE INDEX idx_viewers_stream_user ON livestream_viewers_history(livestream_id, user_id);
++CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_at);
++CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
++CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
++CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);
+diff --git a/local-benchmark/config/rollback-relational-indexes.sql b/local-benchmark/config/rollback-relational-indexes.sql
+new file mode 100644
+index 0000000..6e163f9
+--- /dev/null
++++ b/local-benchmark/config/rollback-relational-indexes.sql
+@@ -0,0 +1,11 @@
++USE isupipe;
++DROP INDEX idx_reactions_stream_created ON reactions;
++DROP INDEX idx_ng_stream_user ON ng_words;
++DROP INDEX idx_reports_stream ON livecomment_reports;
++DROP INDEX idx_comments_stream_created ON livecomments;
++DROP INDEX idx_viewers_stream_user ON livestream_viewers_history;
++DROP INDEX idx_stream_tags_tag ON livestream_tags;
++DROP INDEX idx_stream_tags_stream ON livestream_tags;
++DROP INDEX idx_streams_user ON livestreams;
++DROP INDEX idx_themes_user ON themes;
++DROP INDEX idx_icons_user ON icons;
+diff --git a/webapp/go/livecomment_handler.go b/webapp/go/livecomment_handler.go
+index 174d695..5ac70e4 100644
+--- a/webapp/go/livecomment_handler.go
++++ b/webapp/go/livecomment_handler.go
+@@ -188,7 +188,7 @@ func postLivecommentHandler(c echo.Context) error {
+ 	defer tx.Rollback()
+ 
+ 	var livestreamModel LivestreamModel
+-	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", livestreamID); err != nil {
++	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ? FOR UPDATE", livestreamID); err != nil {
+ 		if errors.Is(err, sql.ErrNoRows) {
+ 			return echo.NewHTTPError(http.StatusNotFound, "livestream not found")
+ 		} else {
+@@ -347,7 +347,7 @@ func moderateHandler(c echo.Context) error {
+ 
+ 	// 配信者自身の配信に対するmoderateなのかを検証
+ 	var ownedLivestreams []LivestreamModel
+-	if err := tx.SelectContext(ctx, &ownedLivestreams, "SELECT * FROM livestreams WHERE id = ? AND user_id = ?", livestreamID, userID); err != nil {
++	if err := tx.SelectContext(ctx, &ownedLivestreams, "SELECT * FROM livestreams WHERE id = ? AND user_id = ? FOR UPDATE", livestreamID, userID); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestreams: "+err.Error())
+ 	}
+ 	if len(ownedLivestreams) == 0 {
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index ea0aebf..1779126 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -134,11 +134,16 @@ func postIconHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusBadRequest, "failed to decode the request body as json")
+ 	}
+ 
+-	tx, err := dbConn.BeginTxx(ctx, nil)
++	tx, err := dbConn.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+ 	if err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
+ 	}
+ 	defer tx.Rollback()
++	// Serialize updates for one owner; READ COMMITTED avoids cross-owner gap locks.
++	var lockedUserID int64
++	if err := tx.GetContext(ctx, &lockedUserID, "SELECT id FROM users WHERE id = ? FOR UPDATE", userID); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to lock icon owner: "+err.Error())
++	}
+ 
+ 	if _, err := tx.ExecContext(ctx, "DELETE FROM icons WHERE user_id = ?", userID); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete old user icon: "+err.Error())
+diff --git a/webapp/sql/initdb.d/10_schema.sql b/webapp/sql/initdb.d/10_schema.sql
+index 83f3e9f..2729842 100644
+--- a/webapp/sql/initdb.d/10_schema.sql
++++ b/webapp/sql/initdb.d/10_schema.sql
+@@ -103,4 +103,17 @@ CREATE TABLE `reactions` (
+   -- :innocent:, :tada:, etc...
+   `emoji_name` VARCHAR(255) NOT NULL,
+   `created_at` BIGINT NOT NULL
+-) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+\ No newline at end of file
++) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
++
++-- Match response lookups and moderation history to their owning entity.
++USE isupipe;
++CREATE INDEX idx_icons_user ON icons(user_id);
++CREATE INDEX idx_themes_user ON themes(user_id);
++CREATE INDEX idx_streams_user ON livestreams(user_id);
++CREATE INDEX idx_stream_tags_stream ON livestream_tags(livestream_id, id);
++CREATE INDEX idx_stream_tags_tag ON livestream_tags(tag_id, livestream_id);
++CREATE INDEX idx_viewers_stream_user ON livestream_viewers_history(livestream_id, user_id);
++CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_at);
++CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
++CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
++CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);

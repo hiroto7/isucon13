@@ -1,18 +1,10 @@
 # ISUCON13 current state
 
-Environment now has two VM processes only (app 4vCPU/8GiB; benchmark 4vCPU/4GiB).
-Old orphan PID 51591 required SIGKILL through macOS admin authentication and is gone.
-User prefers unattended work; do not request repeated macOS admin dialogs. Explain and batch any future necessary host recovery first.
-Official initial-code valid exploratory run: 9479, excluded from canonical baseline due to extra VM process.
-Second attempted baseline failed pretest during resource instability; no valid score.
-Next: obtain 3 stable initial-code passes, then prioritize large-work reductions (DNS scans, repeated stats/response construction, moderation).
-No performance changes adopted yet. Source hash manifests matched before measurement.
-Fork hiroto7/isucon13, branch codex/local-benchmark; local results include every preparation failure and attempt.
-Benchmark Go 1.21.2 and official source unchanged; local TLS CA trusted, verification enabled.
-Old isucon14 source/config/results backup remains in task workspace/backups. Host repositories retained.
-Stop after fresh profile/spec alternatives/public solution review leaves no substantial-gain hypothesis.
-
-Initial-code post-recovery scores: 9415, 7595, 6696; median 7595 (100x goal 759500). Host workload introduces significant variation; compare with initial observed best 9479 as well.
-Current candidate: statistics grouped aggregation; not adopted until official score validates.
-
-Profiling: Go pprof listens on 127.0.0.1:6060 in app VM. run_trial --cpu-profile starts 50s CPU sampling only after official load starts and saves CPU/heap files. Profiler runs are flagged; adoption requires a subsequent ordinary run. Current trial moderation-batch-profile tests single SQL spam detection/deletion. DNS index alone did not raise score.
+Accepted score 15589 (initial median 7595: 2.05x; initial best observed 9479: 1.64x). Goal remains 100x.
+Accepted bundle: grouped snapshot stats, DNS name/type index, bulk SQL LIKE moderation, relation lookup indexes, icon write-only READ COMMITTED plus owner lock, stream row locking for moderation/posting.
+Official full benchmark passed; targeted 64 cross-owner and 32 same-owner icon updates and 10 moderation races/160 posts passed. Existing nonfatal report/delete races still occur.
+VM resources fixed: app 4vCPU/8GiB, bench 4vCPU/4GiB; app IP 192.168.2.7. Only two VM processes. No more macOS administrator dialogs expected.
+Go pprof 50s CPU and heap captured; 62.54% allocation under fillUserResponse, mostly SQL icon blob copying. Next large hypothesis: persist icon SHA256 metadata and use conditional GET to eliminate blob transfers.
+Initial post-recovery scores 9415,7595,6696; third overlapped host Archive Utility 438% CPU. Exploratory 9479 excluded from median due extra old VM process. All attempts including setup failures retained.
+Fork hiroto7/isucon13 branch codex/local-benchmark; push authorized, no PR. Benchmark official code unchanged, TLS verification enabled.
+At genuine structural-gain stall: reread spec and fresh profile, then public solution comparison before ending. Final persistence/reboot and full benchmark still outstanding.

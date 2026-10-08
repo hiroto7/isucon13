@@ -134,11 +134,16 @@ func postIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to decode the request body as json")
 	}
 
-	tx, err := dbConn.BeginTxx(ctx, nil)
+	tx, err := dbConn.BeginTxx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
 	}
 	defer tx.Rollback()
+	// Serialize updates for one owner; READ COMMITTED avoids cross-owner gap locks.
+	var lockedUserID int64
+	if err := tx.GetContext(ctx, &lockedUserID, "SELECT id FROM users WHERE id = ? FOR UPDATE", userID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to lock icon owner: "+err.Error())
+	}
 
 	if _, err := tx.ExecContext(ctx, "DELETE FROM icons WHERE user_id = ?", userID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete old user icon: "+err.Error())
