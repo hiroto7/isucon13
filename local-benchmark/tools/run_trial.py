@@ -16,6 +16,7 @@ def main():
     parser.add_argument('--bench', default='isucon13-bench')
     parser.add_argument('--ip', required=True)
     parser.add_argument('--decision', default='pending')
+    parser.add_argument('--cpu-profile', action='store_true')
     args = parser.parse_args()
     lock = BASE / '.run.lock'
     fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
@@ -30,6 +31,7 @@ def main():
                status='preparation_failed', score=None, reported_score=None,
                app=args.app, benchmark=args.bench, ip=args.ip,
                resources='app:4vCPU/8GiB;bench:4vCPU/4GiB', diagnostics='nginx timing, MySQL digests, vmstat')
+    row['cpu_profile'] = args.cpu_profile
     (out/'source.diff').write_text(diff)
     record = out/'result.json'
     record.write_text(json.dumps(row, indent=2)+'\n')
@@ -40,6 +42,11 @@ def main():
             'p=$(systemctl show isupipe-go -p MainPID --value); readlink /proc/$p/exe; '
             'mysql -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest"', capture_output=True)
         (out/'ready.txt').write_text(ready.stdout)
+        schema = mp('exec', args.app, '--', 'sudo', 'mysql', '-e',
+            "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections'); "
+            "SHOW INDEX FROM isudns.records; SHOW CREATE TABLE isupipe.icons; SHOW CREATE TABLE isupipe.livecomments; "
+            "SHOW CREATE TABLE isupipe.ng_words", capture_output=True)
+        (out/'schema.txt').write_text(schema.stdout)
         mp('exec', args.bench, '--', 'sudo', 'mkdir', '-p', '/opt/trial')
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
         mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'pkill -x vmstat || true; nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
@@ -51,7 +58,28 @@ def main():
             '--staff-log-path /opt/trial/staff.log --contestant-log-path /opt/trial/contestant.log']
         row['status']='running'; record.write_text(json.dumps(row,indent=2)+'\n')
         with (out/'console.txt').open('w') as console:
-            proc = subprocess.run(argv, stdout=console, stderr=subprocess.STDOUT, timeout=240)
+            proc = subprocess.Popen(argv, stdout=console, stderr=subprocess.STDOUT)
+            profiler = None
+            start = time.monotonic()
+            try:
+                while proc.poll() is None:
+                    if args.cpu_profile and profiler is None and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
+                        profiler = subprocess.Popen(['multipass','exec',args.app,'--','curl','-fsS','--max-time','65',
+                            'http://127.0.0.1:6060/debug/pprof/profile?seconds=50','-o','/tmp/trial-cpu.pprof'],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if time.monotonic() - start > 240:
+                        raise subprocess.TimeoutExpired(argv, 240)
+                    time.sleep(.5)
+            finally:
+                if proc.poll() is None:
+                    proc.kill(); proc.wait()
+                if profiler is not None:
+                    profiler.wait(timeout=75)
+                    row['profiler_exit_code'] = profiler.returncode
+            if args.cpu_profile and profiler is not None and profiler.returncode == 0:
+                mp('transfer',f'{args.app}:/tmp/trial-cpu.pprof',str(out/'cpu.pprof'))
+                mp('exec',args.app,'--','curl','-fsS','http://127.0.0.1:6060/debug/pprof/heap','-o','/tmp/trial-heap.pprof')
+                mp('transfer',f'{args.app}:/tmp/trial-heap.pprof',str(out/'heap.pprof'))
         row['exit_code'] = proc.returncode
         for name in ['result.json','staff.log','contestant.log','vmstat.txt']:
             mp('transfer', f'{args.bench}:/opt/trial/{name}', str(out/('official-'+name)))

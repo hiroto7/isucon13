@@ -14,3 +14,5 @@ Stop after fresh profile/spec alternatives/public solution review leaves no subs
 
 Initial-code post-recovery scores: 9415, 7595, 6696; median 7595 (100x goal 759500). Host workload introduces significant variation; compare with initial observed best 9479 as well.
 Current candidate: statistics grouped aggregation; not adopted until official score validates.
+
+Profiling: Go pprof listens on 127.0.0.1:6060 in app VM. run_trial --cpu-profile starts 50s CPU sampling only after official load starts and saves CPU/heap files. Profiler runs are flagged; adoption requires a subsequent ordinary run. Current trial moderation-batch-profile tests single SQL spam detection/deletion. DNS index alone did not raise score.
