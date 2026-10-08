@@ -42,6 +42,7 @@ def main():
         (out/'ready.txt').write_text(ready.stdout)
         mp('exec', args.bench, '--', 'sudo', 'mkdir', '-p', '/opt/trial')
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json')
+        mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'vmstat 1 150 > /opt/trial/vmstat.txt &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
            ': > /var/log/nginx/access.log; vmstat 1 150 > /tmp/trial-vmstat.txt &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
@@ -52,7 +53,7 @@ def main():
         with (out/'console.txt').open('w') as console:
             proc = subprocess.run(argv, stdout=console, stderr=subprocess.STDOUT, timeout=240)
         row['exit_code'] = proc.returncode
-        for name in ['result.json','staff.log','contestant.log']:
+        for name in ['result.json','staff.log','contestant.log','vmstat.txt']:
             mp('transfer', f'{args.bench}:/opt/trial/{name}', str(out/('official-'+name)))
         official = json.loads((out/'official-result.json').read_text())
         row['reported_score'] = official.get('score')
