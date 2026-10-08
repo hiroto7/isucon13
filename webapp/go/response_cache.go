@@ -10,7 +10,6 @@ import (
 
 type responseCacheKey struct{}
 type responseCache struct {
-	writeEpoch uint64
 	generation uint64
 	users      map[int64]User
 	streams    map[int64]Livestream
@@ -20,7 +19,7 @@ type responseCache struct {
 func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		_, _, generation := cachedIconHash("")
-		cache := &responseCache{writeEpoch: writeEpoch.Load(), generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
+		cache := &responseCache{generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
 		return next(c)
 	}

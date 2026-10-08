@@ -189,11 +189,64 @@ func postLivecommentHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to decode the request body as json")
 	}
 
-	value, err := enqueueWrite(&writeJob{ctx: ctx, epoch: responses(ctx).writeEpoch, userID: userID, streamID: int64(livestreamID), comment: req.Comment, tip: req.Tip})
+	tx, err := dbConn.BeginTxx(ctx, nil)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
 	}
-	return c.JSON(http.StatusCreated, value)
+	defer tx.Rollback()
+
+	var livestreamModel LivestreamModel
+	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ? FOR UPDATE", livestreamID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound, "livestream not found")
+		} else {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestream: "+err.Error())
+		}
+	}
+
+	// Keep MySQL LIKE wildcard, accent and case semantics of the original parameters.
+	var hitSpam int
+	query := `SELECT EXISTS(SELECT 1 FROM ng_words
+		WHERE user_id = ? AND livestream_id = ?
+		AND CONVERT(? USING utf8mb4) COLLATE utf8mb4_general_ci
+		LIKE CONCAT('%', CONVERT(word USING utf8mb4) COLLATE utf8mb4_general_ci, '%'))`
+	if err := tx.GetContext(ctx, &hitSpam, query, livestreamModel.UserID, livestreamModel.ID, req.Comment); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to check spam: "+err.Error())
+	}
+	if hitSpam >= 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, "このコメントがスパム判定されました")
+	}
+
+	now := time.Now().Unix()
+	livecommentModel := LivecommentModel{
+		UserID:       userID,
+		LivestreamID: int64(livestreamID),
+		Comment:      req.Comment,
+		Tip:          req.Tip,
+		CreatedAt:    now,
+	}
+
+	rs, err := tx.NamedExecContext(ctx, "INSERT INTO livecomments (user_id, livestream_id, comment, tip, created_at) VALUES (:user_id, :livestream_id, :comment, :tip, :created_at)", livecommentModel)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert livecomment: "+err.Error())
+	}
+
+	livecommentID, err := rs.LastInsertId()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get last inserted livecomment id: "+err.Error())
+	}
+	livecommentModel.ID = livecommentID
+
+	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livecomment: "+err.Error())
+	}
+
+	if err := tx.Commit(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, livecomment)
 }
 
 func reportLivecommentHandler(c echo.Context) error {

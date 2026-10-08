@@ -8,9 +8,6 @@ import (
 )
 
 func init() {
-	http.HandleFunc("/debug/write-batches", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]int64{"batches": writeBatches.Load(), "committed_rows": writeRows.Load(), "max_batch": writeMaxBatch.Load()})
-	})
 	http.HandleFunc("/debug/dbstats", func(w http.ResponseWriter, r *http.Request) {
 		if dbConn == nil {
 			http.Error(w, "DB unavailable", 503)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -112,11 +113,40 @@ func postReactionHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to decode the request body as json")
 	}
 
-	value, err := enqueueWrite(&writeJob{ctx: ctx, epoch: responses(ctx).writeEpoch, userID: userID, streamID: int64(livestreamID), reaction: true, emoji: req.EmojiName})
+	tx, err := dbConn.BeginTxx(ctx, nil)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
 	}
-	return c.JSON(http.StatusCreated, value)
+	defer tx.Rollback()
+
+	reactionModel := ReactionModel{
+		UserID:       int64(userID),
+		LivestreamID: int64(livestreamID),
+		EmojiName:    req.EmojiName,
+		CreatedAt:    time.Now().Unix(),
+	}
+
+	result, err := tx.NamedExecContext(ctx, "INSERT INTO reactions (user_id, livestream_id, emoji_name, created_at) VALUES (:user_id, :livestream_id, :emoji_name, :created_at)", reactionModel)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert reaction: "+err.Error())
+	}
+
+	reactionID, err := result.LastInsertId()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get last inserted reaction id: "+err.Error())
+	}
+	reactionModel.ID = reactionID
+
+	reaction, err := fillReactionResponse(ctx, tx, reactionModel)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill reaction: "+err.Error())
+	}
+
+	if err := tx.Commit(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, reaction)
 }
 
 func fillReactionResponse(ctx context.Context, tx *sqlx.Tx, reactionModel ReactionModel) (Reaction, error) {

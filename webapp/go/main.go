@@ -110,9 +110,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
 }
 
 func initializeHandler(c echo.Context) error {
-	writeLifecycle.Lock()
-	defer writeLifecycle.Unlock()
-	writeEpoch.Add(1)
+	dnsLifecycle.Lock()
+	defer dnsLifecycle.Unlock()
 	clearIconHashes()
 	defer clearIconHashes()
 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
@@ -201,9 +200,6 @@ func main() {
 	}
 	defer conn.Close()
 	dbConn = conn
-	if err := startWriteBatcher(); err != nil {
-		e.Logger.Fatal(err)
-	}
 
 	subdomainAddr, ok := os.LookupEnv(powerDNSSubdomainAddressEnvKey)
 	if !ok {
