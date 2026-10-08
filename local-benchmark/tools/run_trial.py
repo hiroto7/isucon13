@@ -35,6 +35,7 @@ def main():
                resources='app:4vCPU/8GiB;bench:4vCPU/4GiB', diagnostics='nginx timing, MySQL digests, vmstat')
     row['cpu_profile'] = args.cpu_profile
     row['db_profile'] = args.db_profile
+    (out/'host-processes-before.txt').write_text(subprocess.check_output(['ps','-Ao','pcpu,comm'],text=True))
     row['profiler_execution'] = 'detached guest jobs' if args.cpu_profile or args.db_profile else 'none'
     dbprof = DBProfile(args.app, out, mp) if args.db_profile else None
     (out/'source.diff').write_text(diff)
@@ -46,6 +47,8 @@ def main():
         ready = mp('exec', args.app, '--', 'sudo', 'sh', '-c',
             'set -e; systemctl is-active mysql pdns nginx isupipe-go; sha256sum /home/isucon/webapp/go/isupipe; '
             'p=$(systemctl show isupipe-go -p MainPID --value); readlink /proc/$p/exe; '
+            'sha256sum /etc/powerdns/pdns.conf /etc/nginx/sites-available/isupipe.conf /home/isucon/env.sh; '
+            'if test -f /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf; then sha256sum /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf; fi; '
             'mysql -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest"', capture_output=True)
         (out/'ready.txt').write_text(ready.stdout)
         stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
@@ -53,7 +56,7 @@ def main():
         batches = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/write-batches'],capture_output=True,text=True,timeout=10)
         (out/'write-batches-before.json').write_text(batches.stdout)
         schema = mp('exec', args.app, '--', 'sudo', 'mysql', '-e',
-            "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections','auto_increment_increment','innodb_redo_log_capacity','log_bin'); "
+            "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections','auto_increment_increment','innodb_redo_log_capacity','log_bin','sync_binlog','innodb_flush_log_at_timeout'); "
             "SHOW INDEX FROM isudns.records; SHOW CREATE TABLE isupipe.icons; SHOW CREATE TABLE isupipe.livecomments; "
             "SHOW CREATE TABLE isupipe.reservation_slots; SHOW CREATE TABLE isupipe.ng_words", capture_output=True)
         (out/'schema.txt').write_text(schema.stdout)
@@ -61,7 +64,7 @@ def main():
         mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
         mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'pkill -x vmstat || true; nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-           'pkill -x vmstat || true; pkill -x pidstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null & nohup pidstat -H -h -u -r -d -C "mysqld|pdns_server|isupipe|nginx" -p ALL 1 150 > /tmp/trial-pidstat.txt 2>&1 < /dev/null &')
+           'pkill -x vmstat || true; pkill -x pidstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null & nohup pidstat -H -h -u -r -d -C "mysqld|pdns_server|isupipe|nginx|systemd-journal|rsyslogd|ksoftirqd|jbd2" -p ALL 1 150 > /tmp/trial-pidstat.txt 2>&1 < /dev/null &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
             'cd /opt/isucon13/bench && /opt/bench run --enable-ssl --target https://pipe.u.isucon.dev '
             f'--nameserver {args.ip} --result-path /opt/trial/result.json '

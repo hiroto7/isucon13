@@ -62,6 +62,16 @@ def style(ax):
     ax.spines[['top', 'right']].set_visible(False)
 
 
+def category(row):
+    if row.get('cpu_profile') or row.get('db_profile') or row['decision'] == 'diagnostic':
+        return 'diagnostic'
+    if row['decision'] in ('rejected', 'not_adopted'):
+        return 'rejected'
+    if row['decision'] == 'adopted':
+        return 'adopted'
+    return 'passed'
+
+
 def save_all(trials, output):
     valid = [r for r in trials if r['valid']]
     failed = [r for r in trials if not r['valid']]
@@ -70,8 +80,8 @@ def save_all(trials, output):
     # NaN breaks the line at failed trials; these are not plotted as score zero.
     ax.plot([r['trial'] for r in trials], [r['score'] if r['valid'] else math.nan for r in trials],
             color='#93b4db', linewidth=1.2, zorder=1)
-    for rejected, color, label in [(False, '#2563eb', 'Passed'), (True, '#d97706', 'Passed, rejected candidate')]:
-        rows = [r for r in valid if (r['decision'] == 'rejected') == rejected]
+    for kind, color, label in [('passed', '#2563eb', 'Passed / incorporated'), ('adopted', '#16a34a', 'Adopted'), ('diagnostic', '#64748b', 'Profiler diagnostic'), ('rejected', '#d97706', 'Passed, not adopted')]:
+        rows = [r for r in valid if category(r) == kind]
         ax.scatter([r['trial'] for r in rows], [r['score'] for r in rows],
                    color=color, s=25, label=label, zorder=3)
     if failed:
@@ -114,9 +124,14 @@ def save_records(trials, output):
     fig, ax = plt.subplots(figsize=(16, 6.5), layout='constrained')
     xs = list(range(1, len(records)+1))
     ax.plot(xs, [r['score'] for r in records], color='#2563eb', linewidth=2, marker='o', markersize=5)
-    rejected = [(x, r) for x, r in zip(xs, records) if r['decision'] == 'rejected']
+    rejected = [(x, r) for x, r in zip(xs, records) if category(r) == 'rejected']
     if rejected:
         ax.scatter([x for x, r in rejected], [r['score'] for x, r in rejected], color='#d97706', s=36, zorder=3, label='Rejected candidate with a valid record score')
+        ax.legend(loc='upper left', frameon=False, fontsize=9)
+    diagnostic = [(x, r) for x, r in zip(xs, records) if category(r) == 'diagnostic']
+    if diagnostic:
+        ax.scatter([x for x, r in diagnostic], [r['score'] for x, r in diagnostic], color='#64748b', s=36, zorder=3, label='Profiler diagnostic')
+    if rejected or diagnostic:
         ax.legend(loc='upper left', frameon=False, fontsize=9)
     for index, (x, row) in enumerate(zip(xs, records)):
         offset = 14 if index % 2 == 0 else -22

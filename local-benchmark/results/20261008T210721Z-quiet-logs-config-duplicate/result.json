@@ -1,0 +1,10 @@
+{
+  "started_at": "20261008T210721Z",
+  "stage": "quiet-logs-config-duplicate",
+  "status": "preparation_failed",
+  "decision": "not_adopted",
+  "score": null,
+  "reported_score": null,
+  "commit": "93afca46e02325cb1c9c2acea31666cf01b70c83",
+  "error": "nginx -t: duplicate log_format trial; new file name differed from existing trial.conf; reload not executed"
+}

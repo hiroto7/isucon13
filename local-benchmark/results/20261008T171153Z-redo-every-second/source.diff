@@ -1,0 +1,11 @@
+diff --git a/local-benchmark/config/mysql-every-second.cnf b/local-benchmark/config/mysql-every-second.cnf
+new file mode 100644
+index 0000000..46b7104
+--- /dev/null
++++ b/local-benchmark/config/mysql-every-second.cnf
+@@ -0,0 +1,5 @@
++[mysqld]
++skip-log-bin
++# Candidate: normal-reboot persistence, not power-loss durability.
++innodb_flush_log_at_trx_commit=2
++innodb_flush_log_at_timeout=1

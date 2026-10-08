@@ -1,0 +1,10 @@
+active
+active
+active
+active
+9d74a3bf9da3b4c237677f6446f7436957c340b223ac658f2c5b2a79d615498f  /home/isucon/webapp/go/isupipe
+/home/isucon/webapp/go/isupipe
+aa2939c403831aa6bbd8bc1d2da9c5f9fa42ebdff4888ebf5bfa6319b6f7c5ef  /etc/powerdns/pdns.conf
+c4347220313b700cf1b94d1368e073def29fe11d25a93089cf159b489cb50a80  /etc/nginx/sites-available/isupipe.conf
+681f00c14b4f36e47d1c9e2526cd991574341159a5f21fd55ea0db3a0d2679c4  /home/isucon/env.sh
+611b3b7e30c8423f8505a64f8ca0815ab7a0b67b998297f72aaeb8e0fcd7f8ac  /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf

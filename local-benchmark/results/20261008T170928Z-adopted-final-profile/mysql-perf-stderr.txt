@@ -1,0 +1,2 @@
+[ perf record: Woken up 178 times to write data ]
+[ perf record: Captured and wrote 44.747 MB /tmp/mysql-perf.data (5449 samples) ]

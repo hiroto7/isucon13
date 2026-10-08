@@ -129,8 +129,10 @@ func main() {
 	e := echo.New()
 	e.Use(responseCacheMiddleware)
 	e.Debug = false
-	e.Logger.SetLevel(echolog.DEBUG)
-	e.Use(middleware.Logger())
+	e.Logger.SetLevel(echolog.WARN)
+	if os.Getenv("ISUCON13_ACCESS_LOG") == "1" {
+		e.Use(middleware.Logger())
+	}
 	cookieStore := sessions.NewCookieStore(secret)
 	cookieStore.Options.Domain = "*.u.isucon.dev"
 	e.Use(session.Middleware(cookieStore))

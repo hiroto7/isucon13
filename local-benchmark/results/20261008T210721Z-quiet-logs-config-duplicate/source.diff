@@ -1,0 +1,65 @@
+diff --git a/local-benchmark/config/mysql-every-second.cnf b/local-benchmark/config/mysql-every-second.cnf
+new file mode 100644
+index 0000000..46b7104
+--- /dev/null
++++ b/local-benchmark/config/mysql-every-second.cnf
+@@ -0,0 +1,5 @@
++[mysqld]
++skip-log-bin
++# Candidate: normal-reboot persistence, not power-loss durability.
++innodb_flush_log_at_trx_commit=2
++innodb_flush_log_at_timeout=1
+diff --git a/local-benchmark/config/nginx-buffered-log.conf b/local-benchmark/config/nginx-buffered-log.conf
+new file mode 100644
+index 0000000..e47b77a
+--- /dev/null
++++ b/local-benchmark/config/nginx-buffered-log.conf
+@@ -0,0 +1,2 @@
++log_format trial escape=json '{"time":"$time_iso8601","method":"$request_method","uri":"$uri","status":$status,"request_time":$request_time,"upstream_time":"$upstream_response_time","bytes":$body_bytes_sent}';
++access_log /var/log/nginx/access.log trial buffer=256k flush=1s;
+diff --git a/local-benchmark/config/pdns-quiet.conf b/local-benchmark/config/pdns-quiet.conf
+new file mode 100644
+index 0000000..4893302
+--- /dev/null
++++ b/local-benchmark/config/pdns-quiet.conf
+@@ -0,0 +1,23 @@
++api=yes
++api-key=isudns
++webserver=yes
++include-dir=/etc/powerdns/pdns.d
++launch=gmysql
++gmysql-port=3306
++gmysql-user=isudns
++gmysql-dbname=isudns
++gmysql-password=isudns
++local-port=53
++security-poll-suffix=
++setgid=pdns
++setuid=pdns
++cache-ttl=0
++negquery-cache-ttl=0
++query-cache-ttl=0
++zone-cache-refresh-interval=0
++zone-metadata-cache-ttl=0
++
++log-dns-queries=no
++loglevel=4
++log-dns-details=no
++
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index ee39caf..5ad274e 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -129,8 +129,10 @@ func main() {
+ 	e := echo.New()
+ 	e.Use(responseCacheMiddleware)
+ 	e.Debug = false
+-	e.Logger.SetLevel(echolog.DEBUG)
+-	e.Use(middleware.Logger())
++	e.Logger.SetLevel(echolog.WARN)
++	if os.Getenv("ISUCON13_ACCESS_LOG") == "1" {
++		e.Use(middleware.Logger())
++	}
+ 	cookieStore := sessions.NewCookieStore(secret)
+ 	cookieStore.Options.Domain = "*.u.isucon.dev"
+ 	e.Use(session.Middleware(cookieStore))

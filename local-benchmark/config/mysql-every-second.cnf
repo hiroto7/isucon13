@@ -1,0 +1,5 @@
+[mysqld]
+skip-log-bin
+# Candidate: normal-reboot persistence, not power-loss durability.
+innodb_flush_log_at_trx_commit=2
+innodb_flush_log_at_timeout=1

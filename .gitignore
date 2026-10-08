@@ -8,3 +8,6 @@ local-benchmark/**/diagnostics.txt
 local-benchmark/.run.lock
 **/__pycache__/
 local-benchmark/**/*.data
+
+# Host app inventory stays local; publish only aggregate CPU measurements.
+local-benchmark/results/*/host-processes-before.txt
