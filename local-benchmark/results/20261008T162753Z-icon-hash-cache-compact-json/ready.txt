@@ -1,0 +1,6 @@
+active
+active
+active
+active
+987f34b92285bdae4fce615100fa9a36c562a9ff6c57611656f1cdd251062d70  /home/isucon/webapp/go/isupipe
+/home/isucon/webapp/go/isupipe

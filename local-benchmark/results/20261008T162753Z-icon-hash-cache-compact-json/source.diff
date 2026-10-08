@@ -1,0 +1,108 @@
+diff --git a/webapp/go/icon_cache.go b/webapp/go/icon_cache.go
+new file mode 100644
+index 0000000..99e80e3
+--- /dev/null
++++ b/webapp/go/icon_cache.go
+@@ -0,0 +1,37 @@
++package main
++
++import "sync"
++
++// Only public metadata is cached. Image bodies always come from the DB snapshot.
++// Writes invalidate after commit, before returning success. Generation checks
++// prevent an older transaction from repopulating metadata after invalidation.
++var iconCache = struct {
++	sync.RWMutex
++	generation uint64
++	hashes     map[string]string
++}{hashes: make(map[string]string)}
++
++func cachedIconHash(name string) (string, bool, uint64) {
++	iconCache.RLock()
++	defer iconCache.RUnlock()
++	hash, ok := iconCache.hashes[name]
++	return hash, ok, iconCache.generation
++}
++func rememberIconHash(name, hash string, generation uint64) {
++	iconCache.Lock()
++	defer iconCache.Unlock()
++	if generation == iconCache.generation {
++		iconCache.hashes[name] = hash
++	}
++}
++func invalidateIconHash(name string) {
++	iconCache.Lock()
++	defer iconCache.Unlock()
++	iconCache.generation++
++	if name == "" {
++		iconCache.hashes = make(map[string]string)
++	} else {
++		delete(iconCache.hashes, name)
++	}
++}
++func clearIconHashes() { invalidateIconHash("") }
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 1577566..e1212be 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -109,6 +109,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ }
+ 
+ func initializeHandler(c echo.Context) error {
++	clearIconHashes()
++	defer clearIconHashes()
+ 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
+ 		c.Logger().Warnf("init.sh failed with err=%s", string(out))
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
+@@ -123,7 +125,7 @@ func initializeHandler(c echo.Context) error {
+ func main() {
+ 	e := echo.New()
+ 	e.Use(responseCacheMiddleware)
+-	e.Debug = true
++	e.Debug = false
+ 	e.Logger.SetLevel(echolog.DEBUG)
+ 	e.Use(middleware.Logger())
+ 	cookieStore := sessions.NewCookieStore(secret)
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index 35352cc..bcf729f 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -87,6 +87,12 @@ func getIconHandler(c echo.Context) error {
+ 
+ 	username := c.Param("username")
+ 
++	hash, cached, generation := cachedIconHash(username)
++	if cached && iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
++		c.Response().Header().Set("ETag", "\""+hash+"\"")
++		return c.NoContent(http.StatusNotModified)
++	}
++
+ 	tx, err := dbConn.BeginTxx(ctx, nil)
+ 	if err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
+@@ -111,6 +117,7 @@ func getIconHandler(c echo.Context) error {
+ 		if err != nil {
+ 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to hash default icon: "+err.Error())
+ 		}
++		rememberIconHash(username, hash, generation)
+ 		c.Response().Header().Set("ETag", "\""+hash+"\"")
+ 		if iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
+ 			return c.NoContent(http.StatusNotModified)
+@@ -120,6 +127,7 @@ func getIconHandler(c echo.Context) error {
+ 	if err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon metadata: "+err.Error())
+ 	}
++	rememberIconHash(username, icon.Hash, generation)
+ 	c.Response().Header().Set("ETag", "\""+icon.Hash+"\"")
+ 	if iconETagMatches(c.Request().Header.Get("If-None-Match"), icon.Hash) {
+ 		return c.NoContent(http.StatusNotModified)
+@@ -179,6 +187,9 @@ func postIconHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
+ 	}
+ 
++	name, _ := sess.Values[defaultUsernameKey].(string)
++	invalidateIconHash(name)
++
+ 	return c.JSON(http.StatusCreated, &PostIconResponse{
+ 		ID: iconID,
+ 	})

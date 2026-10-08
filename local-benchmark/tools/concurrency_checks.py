@@ -47,6 +47,21 @@ assert changed==image+b'1000'
 newme=json.loads(expect(op,'/api/user/me',None,200)); assert newme['icon_hash']==hashlib.sha256(changed).hexdigest()
 print('PASS: matching ETag 200/304, mismatching 200, stale ETag 200 and fresh hash')
 
+# Slow old snapshot reads must never repopulate metadata after a committed write.
+for n in range(10):
+ old=json.loads(expect(op,'/api/user/me',None,200))['icon_hash']
+ def read_icon(_): expect(op,'/api/user/'+name+'/icon',None,200)
+ with concurrent.futures.ThreadPoolExecutor(max_workers=17) as pool:
+  tasks=[pool.submit(read_icon,j) for j in range(8)]+[pool.submit(update,users[0],2000+n)]+[pool.submit(read_icon,j) for j in range(8)]
+  for task in tasks: task.result()
+ actual=expect(op,'/api/user/'+name+'/icon',None,200,{'If-None-Match':json.dumps(old)})
+ assert actual==image+str(2000+n).encode()
+ fresh=json.loads(expect(op,'/api/user/me',None,200))['icon_hash']
+ assert fresh==hashlib.sha256(actual).hexdigest()
+ status,_=call(op,'/api/user/'+name+'/icon',headers={'If-None-Match':json.dumps(fresh)})
+ assert status in (200,304),status
+print('PASS: 10 cache read/write races, 160 overlapping reads, no stale 304 after write')
+
 slot=subprocess.check_output(['mysql','-uisucon','-pisucon','-h127.0.0.1','isupipe','-Nse','SELECT start_at,end_at FROM reservation_slots WHERE slot > 0 ORDER BY id LIMIT 1'],text=True).strip().split()
 assert len(slot)==2,'no available slot'
 stream=json.loads(expect(op,'/api/livestream/reservation',dict(title='Concurrency',description='',playlist_url='https://example.com/list',thumbnail_url='https://example.com/image',tags=[],start_at=int(slot[0]),end_at=int(slot[1])),201))

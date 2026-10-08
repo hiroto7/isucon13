@@ -87,6 +87,12 @@ func getIconHandler(c echo.Context) error {
 
 	username := c.Param("username")
 
+	hash, cached, generation := cachedIconHash(username)
+	if cached && iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
+		c.Response().Header().Set("ETag", "\""+hash+"\"")
+		return c.NoContent(http.StatusNotModified)
+	}
+
 	tx, err := dbConn.BeginTxx(ctx, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction: "+err.Error())
@@ -111,6 +117,7 @@ func getIconHandler(c echo.Context) error {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to hash default icon: "+err.Error())
 		}
+		rememberIconHash(username, hash, generation)
 		c.Response().Header().Set("ETag", "\""+hash+"\"")
 		if iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
 			return c.NoContent(http.StatusNotModified)
@@ -120,6 +127,7 @@ func getIconHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon metadata: "+err.Error())
 	}
+	rememberIconHash(username, icon.Hash, generation)
 	c.Response().Header().Set("ETag", "\""+icon.Hash+"\"")
 	if iconETagMatches(c.Request().Header.Get("If-None-Match"), icon.Hash) {
 		return c.NoContent(http.StatusNotModified)
@@ -178,6 +186,9 @@ func postIconHandler(c echo.Context) error {
 	if err := tx.Commit(); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
 	}
+
+	name, _ := sess.Values[defaultUsernameKey].(string)
+	invalidateIconHash(name)
 
 	return c.JSON(http.StatusCreated, &PostIconResponse{
 		ID: iconID,

@@ -1,6 +1,6 @@
 # ISUCON13 current state
 
-Accepted score 48361 (initial median 7595: 6.37x; initial exploratory best 9479: 5.10x). Goal: 759500, 100x median.
+Accepted score 87349 (initial median 7595: 11.50x; initial exploratory best 9479: 9.21x). Goal: 759500, 100x median.
 Accepted: grouped snapshot statistics; DNS name/type index; bulk SQL LIKE moderation with original general_ci semantics; relation lookup indexes; icon write READ COMMITTED + owner lock; stream row lock for posting/moderation; request-local response batching.
 Response batching: user/theme/icon reads deduplicated and batched; stream tags joined in one batch; comment/reaction lists reuse stream/user DTOs. All use the caller's transaction snapshot and no cache crosses requests.
 Official full benchmark passed 32448; 64 cross-owner and 32 same-owner icon updates and 10 moderation races/160 posts passed. Nonfatal report/deletion errors and benchmark moderated-spam 400/201 discrepancies remain and require investigation.
@@ -14,3 +14,5 @@ Adopted additional bundle: driver parameter interpolation + generated stored ico
 Next: fresh profiling of accepted state, then structural DNS/application bottleneck.
 
 Fresh profile: tags/icon blob pressure eliminated; 305k statements, DNS metadata42852, SQL COMMIT178 aggregate seconds during heavy instrumentation. JSON indentation accounts34% allocation. DNS-cache49885 and DB-pool32 52612 are inconclusive standalone candidates, not adopted. DNS config/source and pool restored; next is synchronized icon-hash cache to remove304 SQL entirely + compact JSON.
+
+Icon metadata cache + compact JSON adopted87349 (+81%). Cached matching304 needs noSQL. Icon commit invalidates before201; generation blocks older reads repopulating stalehash, init clears before/after. 10 network cache races/160reads passed. DBpool10 now17,711 waits/74.47 aggregate seconds; workload changed substantially. Next: immutable user metadata reuse with write/initialization invalidation, and reservation range lock reduction identified in fullSQL profile.

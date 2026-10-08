@@ -109,6 +109,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
 }
 
 func initializeHandler(c echo.Context) error {
+	clearIconHashes()
+	defer clearIconHashes()
 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
 		c.Logger().Warnf("init.sh failed with err=%s", string(out))
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
@@ -123,7 +125,7 @@ func initializeHandler(c echo.Context) error {
 func main() {
 	e := echo.New()
 	e.Use(responseCacheMiddleware)
-	e.Debug = true
+	e.Debug = false
 	e.Logger.SetLevel(echolog.DEBUG)
 	e.Use(middleware.Logger())
 	cookieStore := sessions.NewCookieStore(secret)

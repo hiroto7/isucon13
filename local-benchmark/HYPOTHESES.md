@@ -17,3 +17,5 @@ Moderation: replace all-words x all-comments DELETE round trips with one SQL EXI
 Request-local response batching adopted: official32448 vs15589, same transaction snapshot; targeted concurrent write checks passed. Next: SQL driver interpolation to eliminate repeated Prepare/CloseStmt commands documented in full DB profile.
 
 Icon metadata retried after response batching: combined with interpolation48361, +49% vs32448; adopted. Earlier11501 on unbatched predecessor remains rejected, illustrating dependencies.
+
+Synchronized icon hash cache + compact JSON adopted87349 (+81%vs48361). Hash-only entries, matching304 noSQL, generation fence acrosswrite andinit; stale-read HTTP races passed. Next immutable user DTO cache and reservation interval indexing/remove per-slot reread.
