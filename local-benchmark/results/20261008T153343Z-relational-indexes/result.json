@@ -16,19 +16,19 @@
   "exit_code": 0,
   "resolved_count": 47424,
   "messages": [
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7523/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7523/livecomment/1013/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/icon \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:500)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7525/livecomment/1021/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7525/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7529/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1036/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1042/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1048/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7643/livecomment \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:400, actual:201)",
+    "[一般エラー] GET /api/livestream/7523/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)",
+    "[一般エラー] POST /api/livestream/7523/livecomment/1013/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/icon へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:500)",
+    "[一般エラー] POST /api/livestream/7525/livecomment/1021/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] GET /api/livestream/7525/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)",
+    "[一般エラー] GET /api/livestream/7529/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1036/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1042/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1048/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7643/livecomment へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:400, actual:201)",
     "canceled",
-    "\u540d\u524d\u89e3\u6c7a\u6210\u529f\u6570 47424",
-    "\u58f2\u4e0a: 16541"
+    "名前解決成功数 47424",
+    "売上: 16541"
   ],
   "finished_at": "2026-10-08T15:35:08.206138+00:00"
 }

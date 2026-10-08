@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--decision', default='pending')
     parser.add_argument('--cpu-profile', action='store_true')
     parser.add_argument('--db-profile', action='store_true')
+    parser.add_argument('--dns-service', choices=['pdns','app'], default='pdns')
     args = parser.parse_args()
     lock = BASE / '.run.lock'
     fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
@@ -33,11 +34,12 @@ def main():
                status='preparation_failed', score=None, reported_score=None,
                app=args.app, benchmark=args.bench, ip=args.ip,
                resources='app:4vCPU/8GiB;bench:4vCPU/4GiB', diagnostics='nginx timing, MySQL digests, vmstat')
+    row['dns_service'] = args.dns_service
     row['cpu_profile'] = args.cpu_profile
     row['db_profile'] = args.db_profile
     (out/'host-processes-before.txt').write_text(subprocess.check_output(['ps','-Ao','pcpu,comm'],text=True))
     row['profiler_execution'] = 'detached guest jobs' if args.cpu_profile or args.db_profile else 'none'
-    dbprof = DBProfile(args.app, out, mp) if args.db_profile else None
+    dbprof = DBProfile(args.app, out, mp, args.dns_service) if args.db_profile else None
     (out/'source.diff').write_text(diff)
     record = out/'result.json'
     record.write_text(json.dumps(row, indent=2)+'\n')
@@ -45,7 +47,7 @@ def main():
         if dbprof is not None: dbprof.setup()
         # Verify current service and binary before starting. Deploy is a separate operation.
         ready = mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-            'set -e; systemctl is-active mysql pdns nginx isupipe-go; sha256sum /home/isucon/webapp/go/isupipe; '
+            'set -e; systemctl is-active mysql nginx isupipe-go'+(' pdns' if args.dns_service=='pdns' else '')+'; ss -lntup; sha256sum /home/isucon/webapp/go/isupipe; '
             'p=$(systemctl show isupipe-go -p MainPID --value); readlink /proc/$p/exe; '
             'sha256sum /etc/powerdns/pdns.conf /etc/nginx/sites-available/isupipe.conf /home/isucon/env.sh; '
             'if test -f /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf; then sha256sum /etc/mysql/mysql.conf.d/zzz-isucon-performance.cnf; fi; '
@@ -53,6 +55,8 @@ def main():
         (out/'ready.txt').write_text(ready.stdout)
         stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
         (out/'dbstats-before.json').write_text(stats.stdout)
+        dnsstats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dnsstats'],capture_output=True,text=True,timeout=10)
+        (out/'dnsstats-before.json').write_text(dnsstats.stdout)
         batches = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/write-batches'],capture_output=True,text=True,timeout=10)
         (out/'write-batches-before.json').write_text(batches.stdout)
         schema = mp('exec', args.app, '--', 'sudo', 'mysql', '-e',
@@ -121,6 +125,8 @@ def main():
         row['messages'] = official.get('messages')
         stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
         (out/'dbstats-after.json').write_text(stats.stdout)
+        dnsstats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dnsstats'],capture_output=True,text=True,timeout=10)
+        (out/'dnsstats-after.json').write_text(dnsstats.stdout)
         batches = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/write-batches'],capture_output=True,text=True,timeout=10)
         (out/'write-batches-after.json').write_text(batches.stdout)
         mp('exec',args.app,'--','sudo','sh','-c',

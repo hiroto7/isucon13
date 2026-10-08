@@ -1,0 +1,530 @@
+diff --git a/local-benchmark/config/go-dns-service.conf b/local-benchmark/config/go-dns-service.conf
+new file mode 100644
+index 0000000..4df432f
+--- /dev/null
++++ b/local-benchmark/config/go-dns-service.conf
+@@ -0,0 +1,3 @@
++[Service]
++AmbientCapabilities=CAP_NET_BIND_SERVICE
++CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+diff --git a/webapp/go/dns_backend.go b/webapp/go/dns_backend.go
+new file mode 100644
+index 0000000..5152d01
+--- /dev/null
++++ b/webapp/go/dns_backend.go
+@@ -0,0 +1,246 @@
++package main
++
++import (
++	"fmt"
++	"net"
++	"os"
++	"os/exec"
++	"strings"
++	"sync"
++	"sync/atomic"
++	"time"
++
++	"github.com/go-sql-driver/mysql"
++	"github.com/jmoiron/sqlx"
++	"github.com/miekg/dns"
++	"golang.org/x/time/rate"
++)
++
++// The SQL registry remains the durable source of truth and pdnsutil validates names.
++var dnsLifecycle sync.RWMutex
++var dnsPublishMu sync.Mutex
++var dnsRegistryConn *sqlx.DB
++var dnsAuthorityService atomic.Pointer[dnsAuthority]
++
++type dnsRecord struct {
++	Name    string `db:"name"`
++	Type    string `db:"type"`
++	Content string `db:"content"`
++	TTL     uint32 `db:"ttl"`
++}
++type dnsZone struct {
++	names map[string][]dns.RR
++	soa   dns.RR
++}
++type dnsRate struct {
++	limiter  *rate.Limiter
++	lastSeen time.Time
++}
++type dnsAuthority struct {
++	zone     atomic.Pointer[dnsZone]
++	mu       sync.Mutex
++	clients  map[string]*dnsRate
++	fallback *rate.Limiter
++	positive atomic.Uint64
++	negative atomic.Uint64
++	dropped  atomic.Uint64
++}
++
++func newDNSAuthority() *dnsAuthority {
++	return &dnsAuthority{clients: make(map[string]*dnsRate), fallback: rate.NewLimiter(100, 100)}
++}
++func (a *dnsAuthority) allowNegative(w dns.ResponseWriter) bool {
++	// UDP negative-response limiting is general abuse protection, never a name/IP pattern.
++	// TCP can still retrieve an authoritative negative answer.
++	if strings.HasPrefix(w.RemoteAddr().Network(), "tcp") {
++		return true
++	}
++	ip, _, err := net.SplitHostPort(w.RemoteAddr().String())
++	if err != nil {
++		ip = w.RemoteAddr().String()
++	}
++	now := time.Now()
++	a.mu.Lock()
++	defer a.mu.Unlock()
++	entry := a.clients[ip]
++	if entry == nil {
++		if len(a.clients) >= 4096 {
++			for key, value := range a.clients {
++				if now.Sub(value.lastSeen) > time.Minute {
++					delete(a.clients, key)
++				}
++			}
++			if len(a.clients) >= 4096 {
++				return a.fallback.AllowN(now, 1)
++			}
++		}
++		entry = &dnsRate{limiter: rate.NewLimiter(100, 100)}
++		a.clients[ip] = entry
++	}
++	entry.lastSeen = now
++	return entry.limiter.AllowN(now, 1)
++}
++func (a *dnsAuthority) ServeDNS(w dns.ResponseWriter, request *dns.Msg) {
++	response := new(dns.Msg)
++	response.SetReply(request)
++	response.Authoritative = true
++	response.Compress = true
++	if request.Opcode != dns.OpcodeQuery || len(request.Question) != 1 {
++		response.Rcode = dns.RcodeRefused
++		_ = w.WriteMsg(response)
++		return
++	}
++	question := request.Question[0]
++	if question.Qclass != dns.ClassINET {
++		response.Rcode = dns.RcodeRefused
++		_ = w.WriteMsg(response)
++		return
++	}
++	zone := a.zone.Load()
++	if zone == nil {
++		response.Rcode = dns.RcodeServerFailure
++		_ = w.WriteMsg(response)
++		return
++	}
++	records, exists := zone.names[dns.CanonicalName(question.Name)]
++	for _, record := range records {
++		if record.Header().Rrtype == question.Qtype || question.Qtype == dns.TypeANY {
++			response.Answer = append(response.Answer, dns.Copy(record))
++		}
++	}
++	if len(response.Answer) > 0 {
++		a.positive.Add(1)
++		_ = w.WriteMsg(response)
++		return
++	}
++	if !a.allowNegative(w) {
++		a.dropped.Add(1)
++		return
++	}
++	if !exists {
++		response.Rcode = dns.RcodeNameError
++	}
++	if zone.soa != nil {
++		response.Ns = []dns.RR{dns.Copy(zone.soa)}
++	}
++	a.negative.Add(1)
++	_ = w.WriteMsg(response)
++}
++func buildDNSZone(old *dnsZone, records []dnsRecord) (*dnsZone, error) {
++	zone := &dnsZone{names: make(map[string][]dns.RR)}
++	if old != nil {
++		zone.soa = old.soa
++		for name, values := range old.names {
++			zone.names[name] = values
++		}
++	}
++	for _, record := range records {
++		rr, err := dns.NewRR(fmt.Sprintf("%s %d IN %s %s", dns.Fqdn(record.Name), record.TTL, record.Type, record.Content))
++		if err != nil {
++			return nil, fmt.Errorf("DNS record %q: %w", record.Name, err)
++		}
++		key := dns.CanonicalName(rr.Header().Name)
++		// Neither an old snapshot nor its record slices may be modified after publication.
++		values := append([]dns.RR(nil), zone.names[key]...)
++		zone.names[key] = append(values, rr)
++		if rr.Header().Rrtype == dns.TypeSOA && key == "u.isucon.dev." {
++			zone.soa = rr
++		}
++	}
++	return zone, nil
++}
++
++const dnsRecordsSQL = `SELECT r.name,r.type,r.content,r.ttl FROM records r
++ JOIN domains d ON d.id=r.domain_id WHERE d.name='u.isucon.dev' AND r.disabled=0`
++
++func refreshDNSZone() error {
++	authority := dnsAuthorityService.Load()
++	if authority == nil {
++		return nil
++	}
++	dnsPublishMu.Lock()
++	defer dnsPublishMu.Unlock()
++	var records []dnsRecord
++	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" ORDER BY r.id"); err != nil {
++		return err
++	}
++	zone, err := buildDNSZone(nil, records)
++	if err != nil {
++		return err
++	}
++	authority.zone.Store(zone)
++	return nil
++}
++func registerDNS(name string) ([]byte, error) {
++	command := exec.Command("pdnsutil", "add-record", "u.isucon.dev", name, "A", "0", powerDNSSubdomainAddress)
++	authority := dnsAuthorityService.Load()
++	if authority == nil {
++		return command.CombinedOutput()
++	}
++	dnsPublishMu.Lock()
++	defer dnsPublishMu.Unlock()
++	var maximum int64
++	if err := dnsRegistryConn.Get(&maximum, "SELECT COALESCE(MAX(id),0) FROM records"); err != nil {
++		return nil, err
++	}
++	output, err := command.CombinedOutput()
++	if err != nil {
++		return output, err
++	}
++	var records []dnsRecord
++	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" AND r.id>? ORDER BY r.id", maximum); err != nil {
++		return output, err
++	}
++	zone, err := buildDNSZone(authority.zone.Load(), records)
++	if err != nil {
++		return output, err
++	}
++	authority.zone.Store(zone)
++	return output, nil
++}
++func startDNSAuthority() error {
++	if os.Getenv("ISUCON13_POWERDNS_BACKEND") != "go" {
++		return nil
++	}
++	config := mysql.NewConfig()
++	config.User = "isudns"
++	config.Passwd = "isudns"
++	config.DBName = "isudns"
++	config.Net = "unix"
++	config.Addr = "/var/run/mysqld/mysqld.sock"
++	config.InterpolateParams = true
++	conn, err := sqlx.Open("mysql", config.FormatDSN())
++	if err != nil {
++		return err
++	}
++	conn.SetMaxOpenConns(2)
++	conn.SetMaxIdleConns(2)
++	if err := conn.Ping(); err != nil {
++		conn.Close()
++		return err
++	}
++	dnsRegistryConn = conn
++	authority := newDNSAuthority()
++	dnsAuthorityService.Store(authority)
++	if err := refreshDNSZone(); err != nil {
++		return err
++	}
++	udp, err := net.ListenPacket("udp", ":53")
++	if err != nil {
++		return err
++	}
++	tcp, err := net.Listen("tcp", ":53")
++	if err != nil {
++		udp.Close()
++		return err
++	}
++	for _, server := range []*dns.Server{{PacketConn: udp, Handler: authority}, {Listener: tcp, Handler: authority}} {
++		go func(server *dns.Server) {
++			if err := server.ActivateAndServe(); err != nil {
++				fmt.Fprintln(os.Stderr, "DNS server failed:", err)
++				os.Exit(1)
++			}
++		}(server)
++	}
++	return nil
++}
+diff --git a/webapp/go/dns_backend_test.go b/webapp/go/dns_backend_test.go
+new file mode 100644
+index 0000000..854bea9
+--- /dev/null
++++ b/webapp/go/dns_backend_test.go
+@@ -0,0 +1,125 @@
++package main
++
++import (
++	"fmt"
++	"github.com/miekg/dns"
++	"net"
++	"sync"
++	"testing"
++)
++
++type dnsTestWriter struct {
++	remote   net.Addr
++	messages []*dns.Msg
++}
++
++func (w *dnsTestWriter) LocalAddr() net.Addr  { return &net.UDPAddr{IP: net.IPv4zero, Port: 53} }
++func (w *dnsTestWriter) RemoteAddr() net.Addr { return w.remote }
++func (w *dnsTestWriter) WriteMsg(m *dns.Msg) error {
++	w.messages = append(w.messages, m.Copy())
++	return nil
++}
++func (w *dnsTestWriter) Write(p []byte) (int, error) { return len(p), nil }
++func (w *dnsTestWriter) Close() error                { return nil }
++func (w *dnsTestWriter) TsigStatus() error           { return nil }
++func (w *dnsTestWriter) TsigTimersOnly(bool)         {}
++func (w *dnsTestWriter) Hijack()                     {}
++func dnsFixture(t *testing.T) *dnsAuthority {
++	t.Helper()
++	a := newDNSAuthority()
++	zone, err := buildDNSZone(nil, []dnsRecord{
++		{Name: "known.u.isucon.dev", Type: "A", Content: "192.0.2.7", TTL: 0},
++		{Name: "u.isucon.dev", Type: "SOA", Content: "ns.u.isucon.dev. hostmaster.u.isucon.dev. 1 3600 600 86400 0", TTL: 0},
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	a.zone.Store(zone)
++	return a
++}
++func dnsRequest(a *dnsAuthority, name string, qtype uint16, tcp bool) *dnsTestWriter {
++	remote := net.Addr(&net.UDPAddr{IP: net.IPv4(192, 0, 2, 100), Port: 12345})
++	if tcp {
++		remote = &net.TCPAddr{IP: net.IPv4(192, 0, 2, 100), Port: 12345}
++	}
++	w := &dnsTestWriter{remote: remote}
++	m := new(dns.Msg)
++	m.SetQuestion(name, qtype)
++	a.ServeDNS(w, m)
++	return w
++}
++func TestDNSNegativeFloodDoesNotThrottleKnownNames(t *testing.T) {
++	a := dnsFixture(t)
++	dropped := 0
++	for n := 0; n < 500; n++ {
++		w := dnsRequest(a, fmt.Sprintf("missing%d.u.isucon.dev.", n), dns.TypeA, false)
++		if len(w.messages) == 0 {
++			dropped++
++		} else if w.messages[0].Rcode != dns.RcodeNameError || len(w.messages[0].Answer) != 0 {
++			t.Fatal("unknown must not receive an A record")
++		}
++		known := dnsRequest(a, "KNOWN.U.ISUCON.DEV.", dns.TypeA, false)
++		if len(known.messages) != 1 || !known.messages[0].Authoritative || len(known.messages[0].Answer) != 1 {
++			t.Fatal("known query throttled or not authoritative")
++		}
++		if known.messages[0].Answer[0].(*dns.A).A.String() != "192.0.2.7" {
++			t.Fatal("wrong address")
++		}
++	}
++	if dropped == 0 {
++		t.Fatal("negative flood was not limited")
++	}
++	tcp := dnsRequest(a, "missing.u.isucon.dev.", dns.TypeA, true)
++	if len(tcp.messages) != 1 || tcp.messages[0].Rcode != dns.RcodeNameError {
++		t.Fatal("TCP negative fallback lost")
++	}
++}
++func TestDNSPublicationKeepsOldSnapshotAndConcurrentReads(t *testing.T) {
++	a := dnsFixture(t)
++	before := a.zone.Load()
++	after, err := buildDNSZone(before, []dnsRecord{{Name: "new.u.isucon.dev", Type: "A", Content: "192.0.2.8", TTL: 0}})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, exists := before.names["new.u.isucon.dev."]; exists {
++		t.Fatal("published old snapshot mutated")
++	}
++	a.zone.Store(after)
++	if len(dnsRequest(a, "new.u.isucon.dev.", dns.TypeA, false).messages[0].Answer) != 1 {
++		t.Fatal("new name invisible")
++	}
++	var group sync.WaitGroup
++	for n := 0; n < 8; n++ {
++		group.Add(1)
++		go func() {
++			defer group.Done()
++			for j := 0; j < 500; j++ {
++				w := dnsRequest(a, "known.u.isucon.dev.", dns.TypeA, false)
++				if len(w.messages) != 1 || len(w.messages[0].Answer) != 1 {
++					t.Error("known query lost during publication")
++					return
++				}
++			}
++		}()
++	}
++	for n := 0; n < 100; n++ {
++		update, err := buildDNSZone(after, []dnsRecord{{Name: fmt.Sprintf("addition%d.u.isucon.dev", n), Type: "A", Content: "192.0.2.9", TTL: 0}})
++		if err != nil {
++			t.Fatal(err)
++		}
++		a.zone.Store(update)
++	}
++	group.Wait()
++}
++func TestDNSNegativeClientStateIsBounded(t *testing.T) {
++	a := dnsFixture(t)
++	m := new(dns.Msg)
++	m.SetQuestion("missing.u.isucon.dev.", dns.TypeA)
++	for n := 0; n < 6000; n++ {
++		w := &dnsTestWriter{remote: &net.UDPAddr{IP: net.IPv4(192, byte(n/65536), byte(n/256), byte(n)), Port: 12345}}
++		a.ServeDNS(w, m)
++	}
++	if len(a.clients) > 4096 {
++		t.Fatal("unbounded client limiter state")
++	}
++}
+diff --git a/webapp/go/go.mod b/webapp/go/go.mod
+index f4cda49..f697040 100644
+--- a/webapp/go/go.mod
++++ b/webapp/go/go.mod
+@@ -10,7 +10,7 @@ require (
+ 	github.com/labstack/echo-contrib v0.15.0
+ 	github.com/labstack/echo/v4 v4.11.1
+ 	github.com/labstack/gommon v0.4.0
+-	golang.org/x/crypto v0.11.0
++	golang.org/x/crypto v0.13.0
+ )
+ 
+ require (
+@@ -19,10 +19,13 @@ require (
+ 	github.com/gorilla/securecookie v1.1.2 // indirect
+ 	github.com/mattn/go-colorable v0.1.13 // indirect
+ 	github.com/mattn/go-isatty v0.0.19 // indirect
++	github.com/miekg/dns v1.1.56 // indirect
+ 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+ 	github.com/valyala/fasttemplate v1.2.2 // indirect
+-	golang.org/x/net v0.12.0 // indirect
+-	golang.org/x/sys v0.10.0 // indirect
+-	golang.org/x/text v0.11.0 // indirect
++	golang.org/x/mod v0.12.0 // indirect
++	golang.org/x/net v0.15.0 // indirect
++	golang.org/x/sys v0.12.0 // indirect
++	golang.org/x/text v0.13.0 // indirect
+ 	golang.org/x/time v0.3.0 // indirect
++	golang.org/x/tools v0.13.0 // indirect
+ )
+diff --git a/webapp/go/go.sum b/webapp/go/go.sum
+index 2087927..a29fc2c 100644
+--- a/webapp/go/go.sum
++++ b/webapp/go/go.sum
+@@ -35,6 +35,8 @@ github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APP
+ github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
+ github.com/mattn/go-sqlite3 v1.14.6 h1:dNPt6NO46WmLVt2DLNpwczCmdV5boIZ6g/tlDrlRUbg=
+ github.com/mattn/go-sqlite3 v1.14.6/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
++github.com/miekg/dns v1.1.56 h1:5imZaSeoRNvpM9SzWNhEcP9QliKiz20/dA2QabIGVnE=
++github.com/miekg/dns v1.1.56/go.mod h1:cRm6Oo2C8TY9ZS/TqsSrseAcncm74lfK5G+ikN2SWWY=
+ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+@@ -48,8 +50,14 @@ github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQ
+ github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
+ golang.org/x/crypto v0.11.0 h1:6Ewdq3tDic1mg5xRO4milcWCfMVQhI4NkqWWvqejpuA=
+ golang.org/x/crypto v0.11.0/go.mod h1:xgJhtzW8F9jGdVFWZESrid1U1bjeNy4zgy5cRr/CIio=
++golang.org/x/crypto v0.13.0 h1:mvySKfSWJ+UKUii46M40LOvyWfN0s2U+46/jDd0e6Ck=
++golang.org/x/crypto v0.13.0/go.mod h1:y6Z2r+Rw4iayiXXAIxJIDAJ1zMW4yaTpebo8fPOliYc=
++golang.org/x/mod v0.12.0 h1:rmsUpXtvNzj340zd98LZ4KntptpfRHwpFOHG188oHXc=
++golang.org/x/mod v0.12.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
+ golang.org/x/net v0.12.0 h1:cfawfvKITfUsFCeJIHJrbSxpeu/E81khclypR0GVT50=
+ golang.org/x/net v0.12.0/go.mod h1:zEVYFnQC7m/vmpQFELhcD1EWkZlX69l4oqgmer6hfKA=
++golang.org/x/net v0.15.0 h1:ugBLEUaxABaB5AJqW9enI0ACdci2RUd4eP51NTBvuJ8=
++golang.org/x/net v0.15.0/go.mod h1:idbUs1IY1+zTqbi8yxTbhexhEEk5ur9LInksu6HrEpk=
+ golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.0.0-20211103235746-7861aae1554b/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+@@ -57,10 +65,16 @@ golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBc
+ golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/sys v0.10.0 h1:SqMFp9UcQJZa+pmYuAKjd9xq1f0j5rLcDIk0mj4qAsA=
+ golang.org/x/sys v0.10.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
++golang.org/x/sys v0.12.0 h1:CM0HF96J0hcLAwsHPJZjfdNzs0gftsLfgKt57wWHJ0o=
++golang.org/x/sys v0.12.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/text v0.11.0 h1:LAntKIrcmeSKERyiOh0XMV39LXS8IE9UL2yP7+f5ij4=
+ golang.org/x/text v0.11.0/go.mod h1:TvPlkZtksWOMsz7fbANvkp4WM8x/WCo/om8BMLbz+aE=
++golang.org/x/text v0.13.0 h1:ablQoSUd0tRdKxZewP80B+BaqeKJuVhuRxj/dkrun3k=
++golang.org/x/text v0.13.0/go.mod h1:TvPlkZtksWOMsz7fbANvkp4WM8x/WCo/om8BMLbz+aE=
+ golang.org/x/time v0.3.0 h1:rg5rLMjNzMS1RkNLzCG38eapWhnYLFYXDXj2gOlr8j4=
+ golang.org/x/time v0.3.0/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
++golang.org/x/tools v0.13.0 h1:Iey4qkscZuv0VvIt8E0neZjtPVQFSc870HQ448QgEmQ=
++golang.org/x/tools v0.13.0/go.mod h1:HvlwmtVNQAhOuCjW7xxvovg8wbNq7LwfXh/k7wXUl58=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+ gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 5ad274e..2145ca6 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -112,6 +112,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ }
+ 
+ func initializeHandler(c echo.Context) error {
++	dnsLifecycle.Lock()
++	defer dnsLifecycle.Unlock()
+ 	clearIconHashes()
+ 	defer clearIconHashes()
+ 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
+@@ -119,6 +121,9 @@ func initializeHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
+ 	}
+ 
++	if err := refreshDNSZone(); err != nil {
++		return echo.NewHTTPError(http.StatusInternalServerError, "failed to reload DNS: "+err.Error())
++	}
+ 	c.Request().Header.Add("Content-Type", "application/json;charset=utf-8")
+ 	return c.JSON(http.StatusOK, InitializeResponse{
+ 		Language: "golang",
+@@ -210,6 +215,10 @@ func main() {
+ 	}
+ 	powerDNSSubdomainAddress = subdomainAddr
+ 
++	if err := startDNSAuthority(); err != nil {
++		e.Logger.Errorf("failed to start DNS: %v", err)
++		os.Exit(1)
++	}
+ 	// HTTPサーバ起動
+ 	listenAddr := net.JoinHostPort("", strconv.Itoa(listenPort))
+ 	if err := e.Start(listenAddr); err != nil {
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index fc2e255..8ebce3d 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -6,7 +6,6 @@ import (
+ 	"encoding/json"
+ 	"errors"
+ 	"net/http"
+-	"os/exec"
+ 	"time"
+ 
+ 	"github.com/google/uuid"
+@@ -238,6 +237,8 @@ func getMeHandler(c echo.Context) error {
+ // ユーザ登録API
+ // POST /api/register
+ func registerHandler(c echo.Context) error {
++	dnsLifecycle.RLock()
++	defer dnsLifecycle.RUnlock()
+ 	ctx := c.Request().Context()
+ 	defer c.Request().Body.Close()
+ 
+@@ -288,7 +289,7 @@ func registerHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert user theme: "+err.Error())
+ 	}
+ 
+-	if out, err := exec.Command("pdnsutil", "add-record", "u.isucon.dev", req.Name, "A", "0", powerDNSSubdomainAddress).CombinedOutput(); err != nil {
++	if out, err := registerDNS(req.Name); err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, string(out)+": "+err.Error())
+ 	}

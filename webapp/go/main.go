@@ -112,6 +112,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
 }
 
 func initializeHandler(c echo.Context) error {
+	dnsLifecycle.Lock()
+	defer dnsLifecycle.Unlock()
 	clearIconHashes()
 	defer clearIconHashes()
 	if out, err := exec.Command("../sql/init.sh").CombinedOutput(); err != nil {
@@ -119,6 +121,9 @@ func initializeHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
 	}
 
+	if err := refreshDNSZone(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to reload DNS: "+err.Error())
+	}
 	c.Request().Header.Add("Content-Type", "application/json;charset=utf-8")
 	return c.JSON(http.StatusOK, InitializeResponse{
 		Language: "golang",
@@ -210,6 +215,10 @@ func main() {
 	}
 	powerDNSSubdomainAddress = subdomainAddr
 
+	if err := startDNSAuthority(); err != nil {
+		e.Logger.Errorf("failed to start DNS: %v", err)
+		os.Exit(1)
+	}
 	// HTTPサーバ起動
 	listenAddr := net.JoinHostPort("", strconv.Itoa(listenPort))
 	if err := e.Start(listenAddr); err != nil {

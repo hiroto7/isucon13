@@ -1,8 +1,9 @@
 """MySQL-specific profiling. Restore settings even when the official trial fails."""
 import json, pathlib, subprocess, shlex
 class DBProfile:
- def __init__(self, app, out, mp):
+ def __init__(self, app, out, mp, dns_service="pdns"):
   self.app,self.out,self.mp=app,out,mp; self.proc=None; self.original=None
+  self.services=["isupipe-go"]+(["pdns"] if dns_service=="pdns" else [])
  def sql(self,statement):
   return self.mp('exec',self.app,'--','sudo','mysql','-NBe',statement,capture_output=True).stdout
  def setup(self):
@@ -11,7 +12,7 @@ class DBProfile:
   self.sql("SET GLOBAL slow_query_log=OFF; SET GLOBAL long_query_time=0; SET GLOBAL log_output='FILE'; SET GLOBAL slow_query_log_file='/var/lib/mysql/trial-slow.log'")
   self.mp('exec',self.app,'--','sudo','install','-o','mysql','-g','mysql','-m','640','/dev/null','/var/lib/mysql/trial-slow.log')
   # GLOBAL long_query_time is inherited only by new sessions, including PowerDNS.
-  self.mp('exec',self.app,'--','sudo','systemctl','restart','isupipe-go','pdns')
+  self.mp('exec',self.app,'--','sudo','systemctl','restart',*self.services)
  def start(self):
   self.sql('SET GLOBAL slow_query_log=ON')
   (self.out/'mysql-status-before.txt').write_text(self.sql('SHOW GLOBAL STATUS'))
@@ -36,5 +37,5 @@ class DBProfile:
   finally:
    def quoted(v): return "'"+str(v).replace("'","''")+"'"
    self.sql('SET GLOBAL long_query_time='+str(self.original['long_query_time'])+'; SET GLOBAL log_output='+quoted(self.original['log_output'])+'; SET GLOBAL slow_query_log_file='+quoted(self.original['slow_query_log_file'])+'; SET GLOBAL slow_query_log='+str(int(self.original['slow_query_log'])))
-   self.mp('exec',self.app,'--','sudo','systemctl','restart','isupipe-go','pdns')
+   self.mp('exec',self.app,'--','sudo','systemctl','restart',*self.services)
    (self.out/'mysql-restored-settings.txt').write_text(self.sql("SHOW VARIABLES WHERE Variable_name IN ('slow_query_log','long_query_time','slow_query_log_file','log_output')"))

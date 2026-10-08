@@ -15,13 +15,13 @@
   "exit_code": 0,
   "resolved_count": 9713,
   "messages": [
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1039/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1037/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1039/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1037/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
     "timeout",
-    "[\u30ea\u30af\u30a8\u30b9\u30c8\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8] GET /api/user/murakamisotaro0/statistics: Get \"https://pipe.u.isucon.dev:443/api/user/murakamisotaro0/statistics\": context deadline exceeded (Client.Timeout exceeded while awaiting headers): \u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\u306b\u3088\u308a\u30ea\u30af\u30a8\u30b9\u30c8\u5931\u6557",
-    "[\u30ea\u30af\u30a8\u30b9\u30c8\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8] POST /api/livestream/reservation: Post \"https://yoichitakahashi0.u.isucon.dev:443/api/livestream/reservation\": read udp 192.168.2.6:57596->192.168.2.7:53: i/o timeout: \u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\u306b\u3088\u308a\u30ea\u30af\u30a8\u30b9\u30c8\u5931\u6557",
-    "\u540d\u524d\u89e3\u6c7a\u6210\u529f\u6570 9713",
-    "\u58f2\u4e0a: 7595"
+    "[リクエストタイムアウト] GET /api/user/murakamisotaro0/statistics: Get \"https://pipe.u.isucon.dev:443/api/user/murakamisotaro0/statistics\": context deadline exceeded (Client.Timeout exceeded while awaiting headers): タイムアウトによりリクエスト失敗",
+    "[リクエストタイムアウト] POST /api/livestream/reservation: Post \"https://yoichitakahashi0.u.isucon.dev:443/api/livestream/reservation\": read udp 192.168.2.6:57596->192.168.2.7:53: i/o timeout: タイムアウトによりリクエスト失敗",
+    "名前解決成功数 9713",
+    "売上: 7595"
   ],
   "finished_at": "2026-10-08T15:19:53.349061+00:00"
 }

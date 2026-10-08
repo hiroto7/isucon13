@@ -1,1 +1,9 @@
-{"started_at":"20261008T145743Z","stage":"bench-provision","status":"preparation_failed","decision":"not_applicable","score":null,"reported_score":null,"error":"cloud-init HOME unset prevented Go module cache lookup; retry with explicit HOME/GOPATH/GOCACHE"}
+{
+  "started_at": "20261008T145743Z",
+  "stage": "bench-provision",
+  "status": "preparation_failed",
+  "decision": "not_applicable",
+  "score": null,
+  "reported_score": null,
+  "error": "cloud-init HOME unset prevented Go module cache lookup; retry with explicit HOME/GOPATH/GOCACHE"
+}

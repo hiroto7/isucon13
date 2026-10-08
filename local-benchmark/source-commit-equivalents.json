@@ -1,0 +1,6 @@
+{
+  "d238099f1518f7f0c813f682733e4ff82e119ffd": {
+    "public_source_commit": "a4ab49d2884310997839630bebd2b64e44131ff6",
+    "reason": "Unpublished HEAD amended to omit raw host process inventory; webapp/config trees identical"
+  }
+}

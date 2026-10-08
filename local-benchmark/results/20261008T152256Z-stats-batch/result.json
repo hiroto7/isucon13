@@ -15,13 +15,13 @@
   "exit_code": 0,
   "resolved_count": 9291,
   "messages": [
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7529/livecomment/1040/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7531/livecomment/1067/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7536/livecomment/1109/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7531/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
-    "[\u4e00\u822c\u30a8\u30e9\u30fc] GET /api/livestream/7536/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:200, actual:500)",
-    "\u540d\u524d\u89e3\u6c7a\u6210\u529f\u6570 9291",
-    "\u58f2\u4e0a: 8454"
+    "[一般エラー] POST /api/livestream/7529/livecomment/1040/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7531/livecomment/1067/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7536/livecomment/1109/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] GET /api/livestream/7531/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)",
+    "[一般エラー] GET /api/livestream/7536/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:200, actual:500)",
+    "名前解決成功数 9291",
+    "売上: 8454"
   ],
   "finished_at": "2026-10-08T15:24:18.681844+00:00"
 }

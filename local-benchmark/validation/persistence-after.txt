@@ -1,0 +1,1 @@
+PASS after reboot BEFORE initialize: exact API/icon/DNS/table inventory snapshots, password login and persisted moderation
