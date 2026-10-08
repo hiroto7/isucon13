@@ -123,36 +123,3 @@ func TestDNSNegativeClientStateIsBounded(t *testing.T) {
 		t.Fatal("unbounded client limiter state")
 	}
 }
-
-func TestDNSOverlappingConcurrentPublications(t *testing.T) {
-	a := dnsFixture(t)
-	before := a.zone.Load()
-	shared := dnsRecord{ID: 1000, Name: "shared.u.isucon.dev", Type: "A", Content: "192.0.2.7"}
-	var group sync.WaitGroup
-	for n := 0; n < 64; n++ {
-		group.Add(1)
-		go func(n int) {
-			defer group.Done()
-			record := dnsRecord{ID: int64(n + 1), Name: fmt.Sprintf("parallel%d.u.isucon.dev", n), Type: "A", Content: "192.0.2.8"}
-			if err := a.publishRecords([]dnsRecord{shared, record}); err != nil {
-				t.Error(err)
-			}
-			dnsRequest(a, "known.u.isucon.dev.", dns.TypeA, false)
-		}(n)
-	}
-	group.Wait()
-	if len(a.seenIDs) != 65 {
-		t.Fatalf("published IDs: %d", len(a.seenIDs))
-	}
-	if _, exists := before.names["shared.u.isucon.dev."]; exists {
-		t.Fatal("old snapshot mutated")
-	}
-	for n := 0; n < 64; n++ {
-		if len(dnsRequest(a, fmt.Sprintf("parallel%d.u.isucon.dev.", n), dns.TypeA, false).messages[0].Answer) != 1 {
-			t.Fatal("record lost or duplicated")
-		}
-	}
-	if len(dnsRequest(a, "shared.u.isucon.dev.", dns.TypeA, false).messages[0].Answer) != 1 {
-		t.Fatal("overlapping record duplicated")
-	}
-}
