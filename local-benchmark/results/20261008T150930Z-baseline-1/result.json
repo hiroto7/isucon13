@@ -1,0 +1,28 @@
+{
+  "started_at": "20261008T150930Z",
+  "stage": "baseline-1",
+  "decision": "excluded_baseline",
+  "commit": "45c71010c1639fec2221d97b7d3009222dcc66da",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "passed",
+  "score": 9479,
+  "reported_score": 9479,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "exit_code": 0,
+  "resolved_count": 11989,
+  "messages": [
+    "[一般エラー] POST /api/livestream/7529/livecomment/1040/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1041/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1043/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[一般エラー] POST /api/livestream/7529/livecomment/1045/report へのリクエストに対して、期待されたHTTPステータスコードが確認できませんでした (expected:201, actual:404)",
+    "[リクエストタイムアウト] GET /api/livestream: Get \"https://pipe.u.isucon.dev:443/api/livestream\": read udp 192.168.2.6:37588->192.168.2.7:53: i/o timeout: タイムアウトによりリクエスト失敗",
+    "名前解決成功数 11989",
+    "売上: 9479"
+  ],
+  "finished_at": "2026-10-08T15:10:55.873058+00:00",
+  "environment_note": "A previous orphan app VM process survived SIGTERM; valid score retained but not used for fixed-resource baseline."
+}

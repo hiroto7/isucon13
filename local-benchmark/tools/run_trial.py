@@ -41,10 +41,10 @@ def main():
             'mysql -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest"', capture_output=True)
         (out/'ready.txt').write_text(ready.stdout)
         mp('exec', args.bench, '--', 'sudo', 'mkdir', '-p', '/opt/trial')
-        mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json')
-        mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
+        mp('exec', args.bench, '--', 'sudo', 'rm', '-f', '/opt/trial/result.json', '/opt/trial/staff.log', '/opt/trial/contestant.log')
+        mp('exec', args.bench, '--', 'sudo', 'sh', '-c', 'pkill -x vmstat || true; nohup vmstat 1 150 > /opt/trial/vmstat.txt 2>&1 < /dev/null &')
         mp('exec', args.app, '--', 'sudo', 'sh', '-c',
-           ': > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null &')
+           'pkill -x vmstat || true; : > /var/log/nginx/access.log; nohup vmstat 1 150 > /tmp/trial-vmstat.txt 2>&1 < /dev/null &')
         argv = ['multipass','exec',args.bench,'--','sudo','sh','-c',
             'cd /opt/isucon13/bench && /opt/bench run --enable-ssl --target https://pipe.u.isucon.dev '
             f'--nameserver {args.ip} --result-path /opt/trial/result.json '

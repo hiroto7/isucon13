@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	4934	13.808	0
+COMMIT	477	2.248	0
+INSERT INTO `users` ( `id` , NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1000	2.121	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , TRUE )	510	1.039	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , FALSE )	490	1.007	0
+ROLLBACK	4691	0.959	0
+START TRANSACTION	9636	0.94	0
+INSERT INTO `ng_words` ( `user_id` , `livestream_id` , `word` , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.205	0
+INSERT INTO `tags` ( NAME ) VALUES (?)	103	0.186	0
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED	954	0.165	0
+INSERT INTO `livestream_tags` ( `id` , `livestream_id` , `tag_id` ) VALUES (...) /* , ... */	22	0.162	0
+SELECT * FROM `livecomments`	65	0.136	84660
+INSERT INTO `livestreams` ( `user_id` , `title` , DESCRIPTION , `playlist_url` , `thumbnail_url` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.134	0
+INSERT INTO `reservation_slots` ( `slot` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.104	0
+SELECT * FROM `tags`	235	0.069	24205
+SELECT * FROM `livestreams` ORDER BY `id` DESC LIMIT ?	117	0.051	5850
+TRUNCATE TABLE `themes`	1	0.042	0
+TRUNCATE TABLE `ng_words`	1	0.037	0
+TRUNCATE TABLE `reservation_slots`	1	0.032	0
+TRUNCATE TABLE `icons`	1	0.029	0
+TRUNCATE TABLE `livestream_viewers_history`	1	0.027	0
+BEGIN	477	0.026	0
+TRUNCATE TABLE `reactions`	1	0.025	0
+TRUNCATE TABLE `livestreams`	1	0.025	0
+TRUNCATE TABLE `livecomment_reports`	1	0.024	0
+TRUNCATE TABLE `users`	1	0.024	0
+TRUNCATE TABLE `livestream_tags`	1	0.023	0
+SELECT * FROM `users`	11	0.023	13098
+INSERT INTO `livecomments` ( `user_id` , `livestream_id` , COMMENT , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.022	0
+TRUNCATE TABLE `tags`	1	0.021	0

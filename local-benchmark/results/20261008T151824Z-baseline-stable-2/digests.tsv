@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	3992	16.265	0
+INSERT INTO `users` ( `id` , NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1000	2.628	0
+COMMIT	394	2.549	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , TRUE )	510	1.256	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , FALSE )	490	1.072	0
+ROLLBACK	3849	1.015	0
+START TRANSACTION	7850	0.888	0
+INSERT INTO `ng_words` ( `user_id` , `livestream_id` , `word` , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.411	0
+INSERT INTO `tags` ( NAME ) VALUES (?)	103	0.28	0
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED	788	0.173	0
+SELECT * FROM `livecomments`	51	0.146	62451
+TRUNCATE TABLE `themes`	1	0.141	0
+INSERT INTO `livestream_tags` ( `id` , `livestream_id` , `tag_id` ) VALUES (...) /* , ... */	22	0.119	0
+INSERT INTO `livestreams` ( `user_id` , `title` , DESCRIPTION , `playlist_url` , `thumbnail_url` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.113	0
+INSERT INTO `reservation_slots` ( `slot` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.088	0
+TRUNCATE TABLE `icons`	1	0.063	0
+SELECT * FROM `tags`	198	0.059	20394
+TRUNCATE TABLE `livestreams`	1	0.057	0
+TRUNCATE TABLE `tags`	1	0.049	0
+TRUNCATE TABLE `users`	1	0.045	0
+SELECT * FROM `livestreams` ORDER BY `id` DESC LIMIT ?	87	0.037	4350
+TRUNCATE TABLE `livestream_viewers_history`	1	0.036	0
+TRUNCATE TABLE `ng_words`	1	0.035	0
+TRUNCATE TABLE `reservation_slots`	1	0.034	0
+TRUNCATE TABLE `livestream_tags`	1	0.033	0
+TRUNCATE TABLE `livecomments`	1	0.032	0
+TRUNCATE TABLE `livecomment_reports`	1	0.029	0
+TRUNCATE TABLE `reactions`	1	0.028	0
+SELECT * FROM `users`	9	0.023	10407
+BEGIN	394	0.021	0

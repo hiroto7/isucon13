@@ -1,12 +1,16 @@
 # ISUCON13 current state
 
-Phase: app VM rebuilding after stop-all interrupted setup and daemon restart left orphan QEMU.
-No performance changes or valid benchmarks yet. Initial baseline not established.
-App VM: isucon13-app, Ubuntu 22.04 ARM64, 4 vCPU/8 GiB/40 GiB.
-Benchmark VM: isucon13-bench, 4 vCPU/4 GiB/12 GiB, pinned official bench built with Go 1.21.2.
-Benchmark HOME/GOPATH cloud-init issue repaired by explicit env; /opt/bench-ready exists.
-private-isu: stopped, disk preserved; no guest backup obtained, do not delete it.
-isucon14: deleted after complete backup and 11 Go files matched host; host repo retained.
-Target 100x median of 3 normal initial runs, fixed resources. Fork hiroto7/isucon13, branch codex/local-benchmark.
-Next: verify cloud-init/service readiness, trust app public certificate in benchmark VM, verify deployment source manifests, install stable diagnostic log config, run baseline.
-Stop when fresh profiling/spec alternatives/public solution review leaves no grounded substantial-gain hypothesis.
+Environment now has two VM processes only (app 4vCPU/8GiB; benchmark 4vCPU/4GiB).
+Old orphan PID 51591 required SIGKILL through macOS admin authentication and is gone.
+User prefers unattended work; do not request repeated macOS admin dialogs. Explain and batch any future necessary host recovery first.
+Official initial-code valid exploratory run: 9479, excluded from canonical baseline due to extra VM process.
+Second attempted baseline failed pretest during resource instability; no valid score.
+Next: obtain 3 stable initial-code passes, then prioritize large-work reductions (DNS scans, repeated stats/response construction, moderation).
+No performance changes adopted yet. Source hash manifests matched before measurement.
+Fork hiroto7/isucon13, branch codex/local-benchmark; local results include every preparation failure and attempt.
+Benchmark Go 1.21.2 and official source unchanged; local TLS CA trusted, verification enabled.
+Old isucon14 source/config/results backup remains in task workspace/backups. Host repositories retained.
+Stop after fresh profile/spec alternatives/public solution review leaves no substantial-gain hypothesis.
+
+Initial-code post-recovery scores: 9415, 7595, 6696; median 7595 (100x goal 759500). Host workload introduces significant variation; compare with initial observed best 9479 as well.
+Current candidate: statistics grouped aggregation; not adopted until official score validates.

@@ -1,0 +1,31 @@
+DIGEST_TEXT	COUNT_STAR	seconds	SUM_ROWS_EXAMINED
+COMMIT	138	7.306	0
+INSERT INTO `users` ( `id` , NAME , `display_name` , DESCRIPTION , PASSWORD ) VALUES (...)	1000	3.95	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , TRUE )	510	1.814	0
+INSERT INTO `themes` ( `user_id` , `dark_mode` ) VALUES ( ? , FALSE )	490	1.74	0
+INSERT INTO `ng_words` ( `user_id` , `livestream_id` , `word` , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.334	0
+INSERT INTO `tags` ( NAME ) VALUES (?)	103	0.276	0
+INSERT INTO `livestreams` ( `user_id` , `title` , DESCRIPTION , `playlist_url` , `thumbnail_url` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.235	0
+INSERT INTO `livestream_tags` ( `id` , `livestream_id` , `tag_id` ) VALUES (...) /* , ... */	22	0.178	0
+SHOW INDEX FROM `isudns` . `records`	1	0.129	29
+SELECT * FROM `tags`	4	0.122	412
+START TRANSACTION	144	0.111	0
+INSERT INTO `reservation_slots` ( `slot` , `start_at` , `end_at` ) VALUES (...) /* , ... */	1	0.093	0
+TRUNCATE TABLE `icons`	1	0.072	0
+TRUNCATE TABLE `themes`	1	0.054	0
+TRUNCATE TABLE `livestream_viewers_history`	1	0.054	0
+TRUNCATE TABLE `reservation_slots`	1	0.054	0
+TRUNCATE TABLE `users`	1	0.053	0
+TRUNCATE TABLE `ng_words`	1	0.051	0
+TRUNCATE TABLE `livestreams`	1	0.048	0
+ALTER TABLE `icons` AUTO_INCREMENT = ?	1	0.042	0
+TRUNCATE TABLE `tags`	1	0.041	0
+TRUNCATE TABLE `livestream_tags`	1	0.038	0
+TRUNCATE TABLE `livecomment_reports`	1	0.036	0
+TRUNCATE TABLE `reactions`	1	0.036	0
+COMMIT	3	0.034	0
+INSERT INTO `livecomments` ( `user_id` , `livestream_id` , COMMENT , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.03	0
+TRUNCATE TABLE `livecomments`	1	0.026	0
+ALTER TABLE `themes` AUTO_INCREMENT = ?	1	0.023	0
+ALTER TABLE `livecomments` AUTO_INCREMENT = ?	1	0.018	0
+INSERT INTO `reactions` ( `emoji_name` , `user_id` , `livestream_id` , `created_at` ) VALUES ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... , `UNIX_TIMESTAMP` ( ) ) , ( ?, ... ,	1	0.018	0

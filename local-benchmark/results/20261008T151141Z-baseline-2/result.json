@@ -1,0 +1,22 @@
+{
+  "started_at": "20261008T151141Z",
+  "stage": "baseline-2",
+  "decision": "baseline",
+  "commit": "45c71010c1639fec2221d97b7d3009222dcc66da",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "failed",
+  "score": null,
+  "reported_score": 0,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "exit_code": 0,
+  "resolved_count": 0,
+  "messages": [
+    "\u6574\u5408\u6027\u30c1\u30a7\u30c3\u30af\u306b\u5931\u6557\u3057\u307e\u3057\u305f",
+    "\u30d9\u30f3\u30c1\u30de\u30fc\u30af\u8d70\u884c\u304c\u7d99\u7d9a\u3067\u304d\u306a\u3044\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f"
+  ],
+  "finished_at": "2026-10-08T15:13:30.628462+00:00"
+}
