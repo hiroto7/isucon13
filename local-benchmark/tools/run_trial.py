@@ -4,7 +4,7 @@ import argparse, datetime as dt, hashlib, json, os, pathlib, subprocess, sys, ti
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BASE = ROOT / 'local-benchmark'
 def run(argv, **kwargs):
-    return subprocess.run(argv, check=True, text=True, **kwargs)
+    return subprocess.run(argv, check=True, text=True, timeout=180, **kwargs)
 def mp(*argv, **kwargs):
     return run(['multipass', *argv], **kwargs)
 def capture(argv):
@@ -50,7 +50,7 @@ def main():
             '--staff-log-path /opt/trial/staff.log --contestant-log-path /opt/trial/contestant.log']
         row['status']='running'; record.write_text(json.dumps(row,indent=2)+'\n')
         with (out/'console.txt').open('w') as console:
-            proc = subprocess.run(argv, stdout=console, stderr=subprocess.STDOUT)
+            proc = subprocess.run(argv, stdout=console, stderr=subprocess.STDOUT, timeout=240)
         row['exit_code'] = proc.returncode
         for name in ['result.json','staff.log','contestant.log']:
             mp('transfer', f'{args.bench}:/opt/trial/{name}', str(out/('official-'+name)))

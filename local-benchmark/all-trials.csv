@@ -1,3 +1,4 @@
 trial,run,started_at,stage,decision,status,score,reported_score,record_high,commit,diff_sha256
 1,20261008T145000Z-environment-recovery,20261008T145000Z,environment-recovery,not_applicable,preparation_failed,,,False,8f6afdc3603f0c661368de4659a7240862f59623,
 2,20261008T145743Z-bench-provision,20261008T145743Z,bench-provision,not_applicable,preparation_failed,,,False,,
+3,20261008T150100Z-app-rebuild,20261008T150100Z,app-rebuild,not_applicable,preparation_failed,,,False,,

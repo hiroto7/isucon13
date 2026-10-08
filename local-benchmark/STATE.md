@@ -1,13 +1,12 @@
 # ISUCON13 current state
 
-Phase: environment preparation blocked on Multipass daemon restart.
-No performance changes; no benchmark run; baseline is not established.
-Official source: upstream-commit.txt. Branch: codex/local-benchmark. Fork: hiroto7/isucon13.
-Old isucon14 VM: source/config/results backup in calling task workspace/backups/isucon14-preserve.tar.gz.
-All 11 guest Go source files match the host repo. Host repos must remain.
-private-isu: inaccessible via SSH; no backup yet; MUST NOT DELETE before saving guest-only changes.
-Normal stop and forced stop hung. Pending CLI processes terminated to avoid concurrent restart operations.
-Administrator recovery requested: sudo launchctl kickstart -k system/com.canonical.multipassd.
-After recovery: save private-isu, delete named old VMs individually, check available disk, launch app/bench VMs per DEPLOY.md.
-Target: 100x median of 3 normal initial runs with fixed resources.
-Stop after current profiling/spec alternatives/public solution review leaves no substantial gain hypothesis.
+Phase: app VM rebuilding after stop-all interrupted setup and daemon restart left orphan QEMU.
+No performance changes or valid benchmarks yet. Initial baseline not established.
+App VM: isucon13-app, Ubuntu 22.04 ARM64, 4 vCPU/8 GiB/40 GiB.
+Benchmark VM: isucon13-bench, 4 vCPU/4 GiB/12 GiB, pinned official bench built with Go 1.21.2.
+Benchmark HOME/GOPATH cloud-init issue repaired by explicit env; /opt/bench-ready exists.
+private-isu: stopped, disk preserved; no guest backup obtained, do not delete it.
+isucon14: deleted after complete backup and 11 Go files matched host; host repo retained.
+Target 100x median of 3 normal initial runs, fixed resources. Fork hiroto7/isucon13, branch codex/local-benchmark.
+Next: verify cloud-init/service readiness, trust app public certificate in benchmark VM, verify deployment source manifests, install stable diagnostic log config, run baseline.
+Stop when fresh profiling/spec alternatives/public solution review leaves no grounded substantial-gain hypothesis.

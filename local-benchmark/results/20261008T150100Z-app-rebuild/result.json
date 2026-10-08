@@ -1,0 +1,9 @@
+{
+  "started_at": "20261008T150100Z",
+  "stage": "app-rebuild",
+  "status": "preparation_failed",
+  "decision": "not_applicable",
+  "score": null,
+  "reported_score": null,
+  "error": "User closed Multipass GUI, triggering stop-all during setup. Daemon restarted with admin auth; orphan QEMU process terminated; app VM recreated before any baseline measurement. Benchmark VM retained."
+}
