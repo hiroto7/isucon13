@@ -1,0 +1,9 @@
+
+# Local experiment artifacts
+local-benchmark/.venv/
+local-benchmark/**/*.pprof
+local-benchmark/**/*.log
+local-benchmark/**/console.txt
+local-benchmark/**/diagnostics.txt
+local-benchmark/.run.lock
+**/__pycache__/

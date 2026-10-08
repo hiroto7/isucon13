@@ -1,0 +1,10 @@
+{
+  "started_at": "20261008T145000Z",
+  "stage": "environment-recovery",
+  "decision": "not_applicable",
+  "status": "preparation_failed",
+  "score": null,
+  "reported_score": null,
+  "commit": "8f6afdc3603f0c661368de4659a7240862f59623",
+  "error": "Existing private-isu inaccessible via SSH; normal and forced stop hang; Multipass commands blocked. Requires administrator restart of daemon. No benchmark started."
+}

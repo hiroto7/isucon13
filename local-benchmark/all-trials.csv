@@ -1,0 +1,2 @@
+trial,run,started_at,stage,decision,status,score,reported_score,record_high,commit,diff_sha256
+1,20261008T145000Z-environment-recovery,20261008T145000Z,environment-recovery,not_applicable,preparation_failed,,,False,8f6afdc3603f0c661368de4659a7240862f59623,
