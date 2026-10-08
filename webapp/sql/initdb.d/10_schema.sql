@@ -118,3 +118,6 @@ CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_
 CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
 CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
 CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);
+
+-- Bound reservation locking reads to the requested interval.
+CREATE INDEX idx_reservation_range ON reservation_slots(start_at,end_at);

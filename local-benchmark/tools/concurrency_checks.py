@@ -78,3 +78,15 @@ for n in range(10):
  assert not any(word in c['comment'] for c in comments),(n,comments)
  expect(op,f'/api/livestream/{sid}/livecomment',dict(comment=word,tip=0),400)
 print('PASS: 10 moderation races, 160 concurrent posts, no surviving spam')
+
+# A fixture with one remaining slot must have exactly one concurrent winner.
+mysql=['mysql','-uisucon','-pisucon','-h127.0.0.1','isupipe','-Nse']
+start,end=map(int,slot)
+subprocess.check_call(mysql+[f'UPDATE reservation_slots SET slot=1 WHERE start_at={start} AND end_at={end}'])
+request=dict(title='Last slot',description='',playlist_url='https://example.com/list',thumbnail_url='https://example.com/image',tags=[],start_at=start,end_at=end)
+with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+ results=list(pool.map(lambda n:call(users[n%8][1],'/api/livestream/reservation',request)[0],range(32)))
+assert results.count(201)==1 and results.count(400)==31,results
+remaining=int(subprocess.check_output(mysql+[f'SELECT slot FROM reservation_slots WHERE start_at={start} AND end_at={end}'],text=True))
+assert remaining==0,remaining
+print('PASS: 32 concurrent reservations for one slot, exactly one winner and zero remaining')

@@ -431,6 +431,9 @@ func verifyUserSession(c echo.Context) error {
 }
 
 func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
+	if user, ok := cachedUserMetadata(userModel.ID); ok {
+		return user, nil
+	}
 	if user, ok := responses(ctx).users[userModel.ID]; ok {
 		return user, nil
 	}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serialize deployment/benchmarks and retain valid, failed and interrupted trials."""
 from db_profile import DBProfile
-import argparse, datetime as dt, hashlib, json, os, pathlib, subprocess, sys, time
+import argparse, datetime as dt, hashlib, json, os, pathlib, subprocess, sys, time, shlex
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BASE = ROOT / 'local-benchmark'
 def run(argv, **kwargs):
@@ -35,6 +35,7 @@ def main():
                resources='app:4vCPU/8GiB;bench:4vCPU/4GiB', diagnostics='nginx timing, MySQL digests, vmstat')
     row['cpu_profile'] = args.cpu_profile
     row['db_profile'] = args.db_profile
+    row['profiler_execution'] = 'detached guest jobs' if args.cpu_profile or args.db_profile else 'none'
     dbprof = DBProfile(args.app, out, mp) if args.db_profile else None
     (out/'source.diff').write_text(diff)
     record = out/'result.json'
@@ -83,9 +84,10 @@ def main():
                     if dbprof is not None and not dbprof_started and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
                         dbprof.start(); dbprof_started = True
                     if args.cpu_profile and profiler is None and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
-                        profiler = subprocess.Popen(['multipass','exec',args.app,'--','curl','-fsS','--max-time','65',
-                            'http://127.0.0.1:6060/debug/pprof/profile?seconds=50','-o','/tmp/trial-cpu.pprof'],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        script = 'curl -fsS --max-time 65 "http://127.0.0.1:6060/debug/pprof/profile?seconds=50" -o /tmp/trial-cpu.pprof; code=$?; echo "$code" >/tmp/trial-cpu.exit'
+                        launcher = 'rm -f /tmp/trial-cpu.pprof /tmp/trial-cpu.exit; nohup sh -c '+shlex.quote(script)+' >/tmp/trial-cpu.stderr 2>&1 </dev/null &'
+                        profiler = subprocess.Popen(['multipass','exec',args.app,'--','sh','-c',launcher],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+
                     if time.monotonic() - start > 240:
                         raise subprocess.TimeoutExpired(argv, 240)
                     time.sleep(.5)
@@ -96,8 +98,10 @@ def main():
                     mp('exec', args.bench, '--', 'sudo', 'pkill', '-f', '^/opt/bench run ')
                 if profiler is not None:
                     profiler.wait(timeout=75)
-                    row['profiler_exit_code'] = profiler.returncode
-            if args.cpu_profile and profiler is not None and profiler.returncode == 0:
+                    row['profiler_launcher_exit_code'] = profiler.returncode
+                    status = mp('exec',args.app,'--','cat','/tmp/trial-cpu.exit',capture_output=True)
+                    row['profiler_exit_code'] = int(status.stdout)
+            if args.cpu_profile and profiler is not None and row.get('profiler_exit_code') == 0:
                 mp('transfer',f'{args.app}:/tmp/trial-cpu.pprof',str(out/'cpu.pprof'))
                 mp('exec',args.app,'--','curl','-fsS','http://127.0.0.1:6060/debug/pprof/heap','-o','/tmp/trial-heap.pprof')
                 mp('transfer',f'{args.app}:/tmp/trial-heap.pprof',str(out/'heap.pprof'))

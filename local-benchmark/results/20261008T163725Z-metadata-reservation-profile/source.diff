@@ -1,0 +1,168 @@
+diff --git a/local-benchmark/config/reservation-range.sql b/local-benchmark/config/reservation-range.sql
+new file mode 100644
+index 0000000..1b090ac
+--- /dev/null
++++ b/local-benchmark/config/reservation-range.sql
+@@ -0,0 +1,2 @@
++USE isupipe;
++CREATE INDEX idx_reservation_range ON reservation_slots(start_at,end_at);
+diff --git a/local-benchmark/config/rollback-reservation-range.sql b/local-benchmark/config/rollback-reservation-range.sql
+new file mode 100644
+index 0000000..e6e3268
+--- /dev/null
++++ b/local-benchmark/config/rollback-reservation-range.sql
+@@ -0,0 +1,2 @@
++USE isupipe;
++DROP INDEX idx_reservation_range ON reservation_slots;
+diff --git a/webapp/go/icon_cache.go b/webapp/go/icon_cache.go
+index 99e80e3..c03fa5a 100644
+--- a/webapp/go/icon_cache.go
++++ b/webapp/go/icon_cache.go
+@@ -9,7 +9,8 @@ var iconCache = struct {
+ 	sync.RWMutex
+ 	generation uint64
+ 	hashes     map[string]string
+-}{hashes: make(map[string]string)}
++	users      map[int64]User
++}{hashes: make(map[string]string), users: make(map[int64]User)}
+ 
+ func cachedIconHash(name string) (string, bool, uint64) {
+ 	iconCache.RLock()
+@@ -30,8 +31,32 @@ func invalidateIconHash(name string) {
+ 	iconCache.generation++
+ 	if name == "" {
+ 		iconCache.hashes = make(map[string]string)
++		iconCache.users = make(map[int64]User)
+ 	} else {
+ 		delete(iconCache.hashes, name)
++		for id, user := range iconCache.users {
++			if user.Name == name {
++				delete(iconCache.users, id)
++				break
++			}
++		}
+ 	}
+ }
+ func clearIconHashes() { invalidateIconHash("") }
++
++// Users and themes are immutable after registration. The only mutable DTO field
++// is the icon hash, invalidated alongside the icon endpoint cache.
++func cachedUserMetadata(id int64) (User, bool) {
++	iconCache.RLock()
++	defer iconCache.RUnlock()
++	user, ok := iconCache.users[id]
++	return user, ok
++}
++func rememberUserMetadata(user User, generation uint64) {
++	iconCache.Lock()
++	defer iconCache.Unlock()
++	if generation == iconCache.generation {
++		iconCache.users[user.ID] = user
++		iconCache.hashes[user.Name] = user.IconHash
++	}
++}
+diff --git a/webapp/go/livestream_handler.go b/webapp/go/livestream_handler.go
+index 1afb41d..9ece8cf 100644
+--- a/webapp/go/livestream_handler.go
++++ b/webapp/go/livestream_handler.go
+@@ -106,17 +106,14 @@ func reserveLivestreamHandler(c echo.Context) error {
+ 	// 予約枠をみて、予約が可能か調べる
+ 	// NOTE: 並列な予約のoverbooking防止にFOR UPDATEが必要
+ 	var slots []*ReservationSlotModel
+-	if err := tx.SelectContext(ctx, &slots, "SELECT * FROM reservation_slots WHERE start_at >= ? AND end_at <= ? FOR UPDATE", req.StartAt, req.EndAt); err != nil {
++	if err := tx.SelectContext(ctx, &slots, "SELECT * FROM reservation_slots WHERE start_at >= ? AND start_at < ? AND end_at <= ? FOR UPDATE", req.StartAt, req.EndAt, req.EndAt); err != nil {
+ 		c.Logger().Warnf("予約枠一覧取得でエラー発生: %+v", err)
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get reservation_slots: "+err.Error())
+ 	}
+ 	for _, slot := range slots {
+-		var count int
+-		if err := tx.GetContext(ctx, &count, "SELECT slot FROM reservation_slots WHERE start_at = ? AND end_at = ?", slot.StartAt, slot.EndAt); err != nil {
+-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get reservation_slots: "+err.Error())
+-		}
++
+ 		c.Logger().Infof("%d ~ %d予約枠の残数 = %d\n", slot.StartAt, slot.EndAt, slot.Slot)
+-		if count < 1 {
++		if slot.Slot < 1 {
+ 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("予約期間 %d ~ %dに対して、予約区間 %d ~ %dが予約できません", termStartAt.Unix(), termEndAt.Unix(), req.StartAt, req.EndAt))
+ 		}
+ 	}
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index e1212be..90c29e9 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -100,6 +100,7 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ 		return nil, err
+ 	}
+ 	db.SetMaxOpenConns(10)
++	db.SetMaxIdleConns(10)
+ 
+ 	if err := db.Ping(); err != nil {
+ 		return nil, err
+diff --git a/webapp/go/response_cache.go b/webapp/go/response_cache.go
+index fa1adf8..3b8c6e7 100644
+--- a/webapp/go/response_cache.go
++++ b/webapp/go/response_cache.go
+@@ -10,14 +10,16 @@ import (
+ 
+ type responseCacheKey struct{}
+ type responseCache struct {
+-	users   map[int64]User
+-	streams map[int64]Livestream
+-	tags    map[int64][]Tag
++	generation uint64
++	users      map[int64]User
++	streams    map[int64]Livestream
++	tags       map[int64][]Tag
+ }
+ 
+ func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+ 	return func(c echo.Context) error {
+-		cache := &responseCache{users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
++		_, _, generation := cachedIconHash("")
++		cache := &responseCache{generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
+ 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
+ 		return next(c)
+ 	}
+@@ -32,6 +34,9 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 	seen := make(map[int64]bool)
+ 	wanted := make([]int64, 0, len(ids))
+ 	for _, id := range ids {
++		if user, ok := cachedUserMetadata(id); ok {
++			cache.users[id] = user
++		}
+ 		if _, ok := cache.users[id]; !ok && !seen[id] {
+ 			seen[id] = true
+ 			wanted = append(wanted, id)
+@@ -97,6 +102,7 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
+ 			hash = fallback
+ 		}
+ 		cache.users[model.ID] = User{ID: model.ID, Name: model.Name, DisplayName: model.DisplayName, Description: model.Description, Theme: Theme{ID: theme.ID, DarkMode: theme.DarkMode}, IconHash: hash}
++		rememberUserMetadata(cache.users[model.ID], cache.generation)
+ 	}
+ 	return nil
+ }
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index bcf729f..fc2e255 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -431,6 +431,9 @@ func verifyUserSession(c echo.Context) error {
+ }
+ 
+ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
++	if user, ok := cachedUserMetadata(userModel.ID); ok {
++		return user, nil
++	}
+ 	if user, ok := responses(ctx).users[userModel.ID]; ok {
+ 		return user, nil
+ 	}
+diff --git a/webapp/sql/initdb.d/10_schema.sql b/webapp/sql/initdb.d/10_schema.sql
+index 664c482..090b4df 100644
+--- a/webapp/sql/initdb.d/10_schema.sql
++++ b/webapp/sql/initdb.d/10_schema.sql
+@@ -118,3 +118,6 @@ CREATE INDEX idx_comments_stream_created ON livecomments(livestream_id, created_
+ CREATE INDEX idx_reports_stream ON livecomment_reports(livestream_id);
+ CREATE INDEX idx_ng_stream_user ON ng_words(livestream_id, user_id);
+ CREATE INDEX idx_reactions_stream_created ON reactions(livestream_id, created_at);
++
++-- Bound reservation locking reads to the requested interval.
++CREATE INDEX idx_reservation_range ON reservation_slots(start_at,end_at);

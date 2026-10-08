@@ -10,14 +10,16 @@ import (
 
 type responseCacheKey struct{}
 type responseCache struct {
-	users   map[int64]User
-	streams map[int64]Livestream
-	tags    map[int64][]Tag
+	generation uint64
+	users      map[int64]User
+	streams    map[int64]Livestream
+	tags       map[int64][]Tag
 }
 
 func responseCacheMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cache := &responseCache{users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
+		_, _, generation := cachedIconHash("")
+		cache := &responseCache{generation: generation, users: make(map[int64]User), streams: make(map[int64]Livestream), tags: make(map[int64][]Tag)}
 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), responseCacheKey{}, cache)))
 		return next(c)
 	}
@@ -32,6 +34,9 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 	seen := make(map[int64]bool)
 	wanted := make([]int64, 0, len(ids))
 	for _, id := range ids {
+		if user, ok := cachedUserMetadata(id); ok {
+			cache.users[id] = user
+		}
 		if _, ok := cache.users[id]; !ok && !seen[id] {
 			seen[id] = true
 			wanted = append(wanted, id)
@@ -97,6 +102,7 @@ func prefetchUsers(ctx context.Context, tx *sqlx.Tx, ids []int64) error {
 			hash = fallback
 		}
 		cache.users[model.ID] = User{ID: model.ID, Name: model.Name, DisplayName: model.DisplayName, Description: model.Description, Theme: Theme{ID: theme.ID, DarkMode: theme.DarkMode}, IconHash: hash}
+		rememberUserMetadata(cache.users[model.ID], cache.generation)
 	}
 	return nil
 }

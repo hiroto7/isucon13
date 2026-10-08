@@ -1,5 +1,5 @@
 """MySQL-specific profiling. Restore settings even when the official trial fails."""
-import json, pathlib, subprocess
+import json, pathlib, subprocess, shlex
 class DBProfile:
  def __init__(self, app, out, mp):
   self.app,self.out,self.mp=app,out,mp; self.proc=None; self.original=None
@@ -15,9 +15,10 @@ class DBProfile:
  def start(self):
   self.sql('SET GLOBAL slow_query_log=ON')
   (self.out/'mysql-status-before.txt').write_text(self.sql('SHOW GLOBAL STATUS'))
-  self.proc=subprocess.Popen(['multipass','exec',self.app,'--','sudo','sh','-c',
-   'perf record -e cpu-clock -F 99 --call-graph dwarf,8192 -p $(pgrep -x mysqld) -o /tmp/mysql-perf.data -- sleep 50'],
-   stdout=subprocess.DEVNULL,stderr=(self.out/'mysql-perf-stderr.txt').open('w'))
+  script = 'perf record -e cpu-clock -F 99 --call-graph dwarf,8192 -p $(pgrep -x mysqld) -o /tmp/mysql-perf.data -- sleep 50; code=$?; echo "$code" > /tmp/mysql-perf.exit'
+  launcher = 'rm -f /tmp/mysql-perf.exit /tmp/mysql-perf.data; nohup sh -c '+shlex.quote(script)+' >/tmp/mysql-perf-stderr.txt 2>&1 </dev/null &'
+  self.proc=subprocess.Popen(['multipass','exec',self.app,'--','sudo','sh','-c',launcher],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+
  def finish(self):
   if self.original is None: return
   self.sql('SET GLOBAL slow_query_log=OFF')
@@ -25,12 +26,12 @@ class DBProfile:
    (self.out/'mysql-status-after.txt').write_text(self.sql('SHOW GLOBAL STATUS'))
    if self.proc is not None:
     self.proc.wait(timeout=60)
-    (self.out/'mysql-profiler-status.json').write_text(json.dumps({'exit_code':self.proc.returncode})+'\n')
+    (self.out/'mysql-profiler-status.json').write_text(json.dumps({'launcher_exit_code':self.proc.returncode, 'exit_code':int(self.mp('exec',self.app,'--','cat','/tmp/mysql-perf.exit',capture_output=True).stdout)})+'\n')
     self.mp('exec',self.app,'--','sudo','sh','-c',
      'pt-query-digest --limit 20 /var/lib/mysql/trial-slow.log > /tmp/mysql-queries.txt; '
      'perf report -i /tmp/mysql-perf.data --stdio --no-children --sort dso,symbol > /tmp/mysql-cpu.txt; '
      'cp /var/lib/mysql/trial-slow.log /tmp/mysql-slow.log; chmod 644 /tmp/mysql-queries.txt /tmp/mysql-cpu.txt /tmp/mysql-slow.log /tmp/mysql-perf.data')
-    for remote,name in [('/tmp/mysql-queries.txt','mysql-queries.txt'),('/tmp/mysql-cpu.txt','mysql-cpu.txt'),('/tmp/mysql-slow.log','mysql-slow.log'),('/tmp/mysql-perf.data','mysql-perf.data')]:
+    for remote,name in [('/tmp/mysql-perf-stderr.txt','mysql-perf-stderr.txt'),('/tmp/mysql-queries.txt','mysql-queries.txt'),('/tmp/mysql-cpu.txt','mysql-cpu.txt'),('/tmp/mysql-slow.log','mysql-slow.log'),('/tmp/mysql-perf.data','mysql-perf.data')]:
      self.mp('transfer',f'{self.app}:{remote}',str(self.out/name))
   finally:
    def quoted(v): return "'"+str(v).replace("'","''")+"'"
