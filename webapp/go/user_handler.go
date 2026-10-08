@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 	"time"
 
@@ -101,34 +104,15 @@ func getIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user: "+err.Error())
 	}
 
-	var icon struct {
-		ID   int64  `db:"id"`
-		Hash string `db:"image_hash"`
-	}
-	err = tx.GetContext(ctx, &icon, "SELECT id, image_hash FROM icons WHERE user_id = ?", user.ID)
-	if errors.Is(err, sql.ErrNoRows) {
-		hash, err := defaultIconHash()
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to hash default icon: "+err.Error())
-		}
-		c.Response().Header().Set("ETag", "\""+hash+"\"")
-		if iconETagMatches(c.Request().Header.Get("If-None-Match"), hash) {
-			return c.NoContent(http.StatusNotModified)
-		}
-		return c.File(fallbackImage)
-	}
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon metadata: "+err.Error())
-	}
-	c.Response().Header().Set("ETag", "\""+icon.Hash+"\"")
-	if iconETagMatches(c.Request().Header.Get("If-None-Match"), icon.Hash) {
-		return c.NoContent(http.StatusNotModified)
-	}
-	// Metadata and bytes use the same transaction snapshot.
 	var image []byte
-	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE id = ?", icon.ID); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get icon bytes: "+err.Error())
+	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", user.ID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return c.File(fallbackImage)
+		} else {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
+		}
 	}
+
 	return c.Blob(http.StatusOK, "image/jpeg", image)
 }
 
@@ -425,16 +409,17 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 		return User{}, err
 	}
 
-	var iconHash string
-	if err := tx.GetContext(ctx, &iconHash, "SELECT image_hash FROM icons WHERE user_id = ?", userModel.ID); err != nil {
+	var image []byte
+	if err := tx.GetContext(ctx, &image, "SELECT image FROM icons WHERE user_id = ?", userModel.ID); err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return User{}, err
 		}
-		iconHash, err = defaultIconHash()
+		image, err = os.ReadFile(fallbackImage)
 		if err != nil {
 			return User{}, err
 		}
 	}
+	iconHash := sha256.Sum256(image)
 
 	user := User{
 		ID:          userModel.ID,
@@ -445,7 +430,7 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (Us
 			ID:       themeModel.ID,
 			DarkMode: themeModel.DarkMode,
 		},
-		IconHash: iconHash,
+		IconHash: fmt.Sprintf("%x", iconHash),
 	}
 
 	return user, nil

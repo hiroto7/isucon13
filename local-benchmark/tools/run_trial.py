@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Serialize deployment/benchmarks and retain valid, failed and interrupted trials."""
+from db_profile import DBProfile
 import argparse, datetime as dt, hashlib, json, os, pathlib, subprocess, sys, time
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 BASE = ROOT / 'local-benchmark'
@@ -17,6 +18,7 @@ def main():
     parser.add_argument('--ip', required=True)
     parser.add_argument('--decision', default='pending')
     parser.add_argument('--cpu-profile', action='store_true')
+    parser.add_argument('--db-profile', action='store_true')
     args = parser.parse_args()
     lock = BASE / '.run.lock'
     fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
@@ -32,10 +34,13 @@ def main():
                app=args.app, benchmark=args.bench, ip=args.ip,
                resources='app:4vCPU/8GiB;bench:4vCPU/4GiB', diagnostics='nginx timing, MySQL digests, vmstat')
     row['cpu_profile'] = args.cpu_profile
+    row['db_profile'] = args.db_profile
+    dbprof = DBProfile(args.app, out, mp) if args.db_profile else None
     (out/'source.diff').write_text(diff)
     record = out/'result.json'
     record.write_text(json.dumps(row, indent=2)+'\n')
     try:
+        if dbprof is not None: dbprof.setup()
         # Verify current service and binary before starting. Deploy is a separate operation.
         ready = mp('exec', args.app, '--', 'sudo', 'sh', '-c',
             'set -e; systemctl is-active mysql pdns nginx isupipe-go; sha256sum /home/isucon/webapp/go/isupipe; '
@@ -60,9 +65,12 @@ def main():
         with (out/'console.txt').open('w') as console:
             proc = subprocess.Popen(argv, stdout=console, stderr=subprocess.STDOUT)
             profiler = None
+            dbprof_started = False
             start = time.monotonic()
             try:
                 while proc.poll() is None:
+                    if dbprof is not None and not dbprof_started and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
+                        dbprof.start(); dbprof_started = True
                     if args.cpu_profile and profiler is None and 'ベンチマーク走行を開始します' in (out/'console.txt').read_text():
                         profiler = subprocess.Popen(['multipass','exec',args.app,'--','curl','-fsS','--max-time','65',
                             'http://127.0.0.1:6060/debug/pprof/profile?seconds=50','-o','/tmp/trial-cpu.pprof'],
@@ -102,6 +110,9 @@ def main():
         if row['status']=='running': row['status']='aborted'
         if row['status'] != 'passed': row['score']=None
     finally:
+        if dbprof is not None:
+            try: dbprof.finish()
+            except Exception as e: row['db_profile_error'] = str(e)
         row['finished_at']=dt.datetime.now(dt.timezone.utc).isoformat()
         record.write_text(json.dumps(row,indent=2)+'\n')
         lock.unlink(missing_ok=True)

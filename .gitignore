@@ -7,3 +7,4 @@ local-benchmark/**/console.txt
 local-benchmark/**/diagnostics.txt
 local-benchmark/.run.lock
 **/__pycache__/
+local-benchmark/**/*.data

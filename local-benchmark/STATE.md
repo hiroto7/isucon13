@@ -8,3 +8,6 @@ Go pprof 50s CPU and heap captured; 62.54% allocation under fillUserResponse, mo
 Initial post-recovery scores 9415,7595,6696; third overlapped host Archive Utility 438% CPU. Exploratory 9479 excluded from median due extra old VM process. All attempts including setup failures retained.
 Fork hiroto7/isucon13 branch codex/local-benchmark; push authorized, no PR. Benchmark official code unchanged, TLS verification enabled.
 At genuine structural-gain stall: reread spec and fresh profile, then public solution comparison before ending. Final persistence/reboot and full benchmark still outstanding.
+
+Icon metadata/conditional candidate score 11501: not adopted; candidate saved in e26ffb6 and result diff. Accepted Go/schema restored (binary SHA256 349f08d2e1c423a84a3f45c114aafd8d2d9240fc84d4e1e3cb8059849b658369).
+Next: detailed DB profile (--db-profile) of accepted state before further implementation. perf cpu-clock tested, MySQL has 44173 dynamic symbols; pt-query-digest installed.
