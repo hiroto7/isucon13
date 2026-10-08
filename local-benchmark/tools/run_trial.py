@@ -47,6 +47,8 @@ def main():
             'p=$(systemctl show isupipe-go -p MainPID --value); readlink /proc/$p/exe; '
             'mysql -e "TRUNCATE TABLE performance_schema.events_statements_summary_by_digest"', capture_output=True)
         (out/'ready.txt').write_text(ready.stdout)
+        stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
+        (out/'dbstats-before.json').write_text(stats.stdout)
         schema = mp('exec', args.app, '--', 'sudo', 'mysql', '-e',
             "SELECT VERSION(); SHOW VARIABLES WHERE Variable_name IN ('innodb_buffer_pool_size','innodb_flush_log_at_trx_commit','max_connections'); "
             "SHOW INDEX FROM isudns.records; SHOW CREATE TABLE isupipe.icons; SHOW CREATE TABLE isupipe.livecomments; "
@@ -108,6 +110,8 @@ def main():
         row['score'] = official.get('score') if row['status']=='passed' else None
         row['resolved_count'] = official.get('resolved_count')
         row['messages'] = official.get('messages')
+        stats = subprocess.run(['multipass','exec',args.app,'--','curl','-fsS','--max-time','2','http://127.0.0.1:6060/debug/dbstats'],capture_output=True,text=True,timeout=10)
+        (out/'dbstats-after.json').write_text(stats.stdout)
         mp('exec',args.app,'--','sudo','sh','-c',
            'mysql -B -e "SELECT DIGEST_TEXT,COUNT_STAR,ROUND(SUM_TIMER_WAIT/1e12,3) seconds,SUM_ROWS_EXAMINED '
            'FROM performance_schema.events_statements_summary_by_digest ORDER BY SUM_TIMER_WAIT DESC LIMIT 30" '

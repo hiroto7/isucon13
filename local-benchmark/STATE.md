@@ -12,3 +12,5 @@ Fork hiroto7/isucon13 branch codex/local-benchmark; push authorized, no PR. At s
 
 Adopted additional bundle: driver parameter interpolation + generated stored icon SHA256 with covering lookup index + metadata-only user DTO and conditional GET. Combined48361 vs32448; standalone interpolation35561 inconclusive and not independently adopted. Source uses generated hash so writes/initialization cannot omit updating it; metadata and image are read in same RR snapshot.
 Next: fresh profiling of accepted state, then structural DNS/application bottleneck.
+
+Fresh profile: tags/icon blob pressure eliminated; 305k statements, DNS metadata42852, SQL COMMIT178 aggregate seconds during heavy instrumentation. JSON indentation accounts34% allocation. DNS-cache49885 and DB-pool32 52612 are inconclusive standalone candidates, not adopted. DNS config/source and pool restored; next is synchronized icon-hash cache to remove304 SQL entirely + compact JSON.

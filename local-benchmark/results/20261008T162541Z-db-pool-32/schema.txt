@@ -1,0 +1,18 @@
+VERSION()
+8.0.46-0ubuntu0.22.04.4
+Variable_name	Value
+innodb_buffer_pool_size	134217728
+innodb_flush_log_at_trx_commit	1
+max_connections	151
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+records	0	PRIMARY	1	id	A	1282	NULL	NULL		BTREE			YES	NULL
+records	1	domain_id	1	domain_id	A	1	NULL	NULL	YES	BTREE			YES	NULL
+records	1	ordername	1	ordername	A	1	NULL	NULL	YES	BTREE			YES	NULL
+records	1	nametype_index	1	name	A	1643	NULL	NULL	YES	BTREE			YES	NULL
+records	1	nametype_index	2	type	A	1645	NULL	NULL	YES	BTREE			YES	NULL
+Table	Create Table
+icons	CREATE TABLE `icons` (\n  `id` bigint NOT NULL AUTO_INCREMENT,\n  `user_id` bigint NOT NULL,\n  `image` longblob NOT NULL,\n  `image_hash` char(64) CHARACTER SET ascii COLLATE ascii_general_ci GENERATED ALWAYS AS (sha2(`image`,256)) STORED,\n  PRIMARY KEY (`id`),\n  KEY `idx_icons_user` (`user_id`,`image_hash`)\n) ENGINE=InnoDB AUTO_INCREMENT=763 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+Table	Create Table
+livecomments	CREATE TABLE `livecomments` (\n  `id` bigint NOT NULL AUTO_INCREMENT,\n  `user_id` bigint NOT NULL,\n  `livestream_id` bigint NOT NULL,\n  `comment` varchar(255) COLLATE utf8mb4_bin NOT NULL,\n  `tip` bigint NOT NULL DEFAULT '0',\n  `created_at` bigint NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `idx_comments_stream_created` (`livestream_id`,`created_at`)\n) ENGINE=InnoDB AUTO_INCREMENT=4614 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
+Table	Create Table
+ng_words	CREATE TABLE `ng_words` (\n  `id` bigint NOT NULL AUTO_INCREMENT,\n  `user_id` bigint NOT NULL,\n  `livestream_id` bigint NOT NULL,\n  `word` varchar(255) COLLATE utf8mb4_bin NOT NULL,\n  `created_at` bigint NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `ng_words_word` (`word`),\n  KEY `idx_ng_stream_user` (`livestream_id`,`user_id`)\n) ENGINE=InnoDB AUTO_INCREMENT=15541 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin

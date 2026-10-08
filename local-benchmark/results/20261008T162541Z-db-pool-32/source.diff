@@ -1,0 +1,108 @@
+diff --git a/webapp/go/dns_cache.go b/webapp/go/dns_cache.go
+deleted file mode 100644
+index abbcd3a..0000000
+--- a/webapp/go/dns_cache.go
++++ /dev/null
+@@ -1,35 +0,0 @@
+-package main
+-
+-import (
+-	"context"
+-	"fmt"
+-	"io"
+-	"net/http"
+-	"net/url"
+-	"os"
+-	"time"
+-)
+-
+-var dnsAPIClient = &http.Client{Timeout: 2 * time.Second}
+-
+-func purgeDNSName(ctx context.Context, name string) error {
+-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, "http://127.0.0.1:8081/api/v1/servers/localhost/cache/flush?domain="+url.QueryEscape(name+"."), nil)
+-	if err != nil {
+-		return err
+-	}
+-	key := os.Getenv("ISUCON13_POWERDNS_API_KEY")
+-	if key == "" {
+-		key = "isudns"
+-	}
+-	req.Header.Set("X-API-Key", key)
+-	resp, err := dnsAPIClient.Do(req)
+-	if err != nil {
+-		return err
+-	}
+-	defer resp.Body.Close()
+-	io.Copy(io.Discard, resp.Body)
+-	if resp.StatusCode != http.StatusOK {
+-		return fmt.Errorf("DNS cache flush status %d", resp.StatusCode)
+-	}
+-	return nil
+-}
+diff --git a/webapp/go/main.go b/webapp/go/main.go
+index 1577566..391c21d 100644
+--- a/webapp/go/main.go
++++ b/webapp/go/main.go
+@@ -99,7 +99,8 @@ func connectDB(logger echo.Logger) (*sqlx.DB, error) {
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-	db.SetMaxOpenConns(10)
++	db.SetMaxOpenConns(32)
++	db.SetMaxIdleConns(32)
+ 
+ 	if err := db.Ping(); err != nil {
+ 		return nil, err
+diff --git a/webapp/go/profile.go b/webapp/go/profile.go
+index 3e90e35..e8af270 100644
+--- a/webapp/go/profile.go
++++ b/webapp/go/profile.go
+@@ -1,12 +1,20 @@
+ package main
+ 
+ import (
++	"encoding/json"
+ 	"log"
+ 	"net/http"
+ 	_ "net/http/pprof"
+ )
+ 
+ func init() {
++	http.HandleFunc("/debug/dbstats", func(w http.ResponseWriter, r *http.Request) {
++		if dbConn == nil {
++			http.Error(w, "DB unavailable", 503)
++			return
++		}
++		json.NewEncoder(w).Encode(dbConn.Stats())
++	})
+ 	go func() {
+ 		if err := http.ListenAndServe("127.0.0.1:6060", nil); err != nil {
+ 			log.Printf("profiling listener: %v", err)
+diff --git a/webapp/go/user_handler.go b/webapp/go/user_handler.go
+index 5b1f0d4..35352cc 100644
+--- a/webapp/go/user_handler.go
++++ b/webapp/go/user_handler.go
+@@ -281,11 +281,6 @@ func registerHandler(c echo.Context) error {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, string(out)+": "+err.Error())
+ 	}
+ 
+-	// Purge negative packet-cache answers before acknowledging a new DNS name.
+-	if err := purgeDNSName(ctx, req.Name+".u.isucon.dev"); err != nil {
+-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to flush DNS name: "+err.Error())
+-	}
+-
+ 	user, err := fillUserResponse(ctx, tx, userModel)
+ 	if err != nil {
+ 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())
+diff --git a/webapp/pdns/init_zone.sh b/webapp/pdns/init_zone.sh
+index ff1b98d..6602191 100755
+--- a/webapp/pdns/init_zone.sh
++++ b/webapp/pdns/init_zone.sh
+@@ -14,7 +14,3 @@ trap 'rm -rf $temp_dir' EXIT
+ sed 's/<ISUCON_SUBDOMAIN_ADDRESS>/'$ISUCON_SUBDOMAIN_ADDRESS'/g' u.isucon.dev.zone > ${temp_dir}/u.isucon.dev.zone
+ pdnsutil load-zone u.isucon.dev ${temp_dir}/u.isucon.dev.zone
+ 
+-
+-# The positive DNS caches expire within two seconds. Wait before initialization
+-# acknowledges replacement of the entire zone, including removed user names.
+-sleep 3
