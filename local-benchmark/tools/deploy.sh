@@ -9,10 +9,11 @@ git -C "$root" ls-files -co --exclude-standard webapp/go webapp/sql webapp/pdns 
   mkdir -p "$tmp/$(dirname "$path")"
   cp "$root/$path" "$tmp/$path"
 done
-(cd "$tmp" && tar czf source.tar.gz webapp)
+(cd "$tmp" && COPYFILE_DISABLE=1 tar --no-xattrs -czf source.tar.gz webapp)
 multipass transfer "$tmp/source.tar.gz" "$app:/tmp/source.tar.gz"
 multipass exec "$app" -- sudo bash -c 'set -euo pipefail
 systemctl stop isupipe-go
+find /home/isucon/webapp/go /home/isucon/webapp/sql /home/isucon/webapp/pdns -type f -name "._*" -delete
 find /home/isucon/webapp/go -maxdepth 1 -name "*.go" -delete
 tar xzf /tmp/source.tar.gz -C /home/isucon
 chown -R isucon:isucon /home/isucon/webapp

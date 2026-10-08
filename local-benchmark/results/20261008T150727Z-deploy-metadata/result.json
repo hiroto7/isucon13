@@ -1,0 +1,9 @@
+{
+  "started_at": "20261008T150727Z",
+  "stage": "deploy-metadata",
+  "status": "preparation_failed",
+  "decision": "not_applicable",
+  "score": null,
+  "reported_score": null,
+  "error": "Complete source manifest detected macOS AppleDouble metadata files in tar upload. Deployment halted before benchmark. Suppress archive xattrs and delete only generated ._* files inside managed go/sql/pdns directories."
+}
