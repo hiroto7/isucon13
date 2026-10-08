@@ -10,3 +10,5 @@ Run tools/run_trial.py STAGE --ip APP_IP. Deployments and runs are serialized by
 Rollback code, schema and config to the accepted state, then initialize and validate; do not roll back code alone.
 Configuration changes must be stored under local-benchmark/config and applied before deployment.
 Final: record persisted entities, reboot, verify reads BEFORE initialize, then run complete official benchmark.
+
+DNS candidate: transfer config/dns-index.sql and execute with sudo mysql after baseline provisioning. Confirm SHOW INDEX FROM isudns.records. Rollback DROP INDEX nametype_index ON isudns.records. Zone initialization keeps the table and index.
