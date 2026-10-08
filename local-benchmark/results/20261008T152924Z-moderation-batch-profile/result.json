@@ -1,7 +1,7 @@
 {
   "started_at": "20261008T152924Z",
   "stage": "moderation-batch-profile",
-  "decision": "pending",
+  "decision": "diagnostic",
   "commit": "4f5b2279d23ea9a3d5342514c2a59b8b28fac2da",
   "diff_sha256": "daa2b68ce3629e0bd8b7ec7a5ee3708f1133cf793dd9acb7ed2f91320febee40",
   "status": "passed",

@@ -1,7 +1,7 @@
 {
   "started_at": "20261008T153343Z",
   "stage": "relational-indexes",
-  "decision": "pending",
+  "decision": "not_adopted",
   "commit": "f640bfe7d4f600e5588927adc06dcb0059184b27",
   "diff_sha256": "c3428eb2c81b505f86c0015d1c151957538c0285a79910e692e0a67dbc5d8fbd",
   "status": "passed",

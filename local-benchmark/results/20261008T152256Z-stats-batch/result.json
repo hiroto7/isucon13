@@ -1,7 +1,7 @@
 {
   "started_at": "20261008T152256Z",
   "stage": "stats-batch",
-  "decision": "pending",
+  "decision": "incorporated",
   "commit": "0ba61c150e207ae85a83c273279e41338d8b3b90",
   "diff_sha256": "afa7b3dcdf5cc512065d6be5b8830457517761360bc2d65ffec14361461e3c6b",
   "status": "passed",

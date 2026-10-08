@@ -43,7 +43,7 @@ def load_trials(results_dir, stages_file):
 
 def write_csv(path, trials):
     fields = ['trial', 'run', 'started_at', 'stage', 'decision', 'status', 'score',
-              'reported_score', 'record_high', 'commit', 'diff_sha256']
+              'reported_score', 'record_high', 'commit', 'public_source_commit', 'diff_sha256']
     with path.open('w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator='\n')
         writer.writeheader()
@@ -100,7 +100,7 @@ def save_all(trials, output):
             x = row['trial']-.5
             if previous_day is not None:
                 ax.axvline(x, color='#64748b', alpha=.35, linestyle=':')
-            ax.text(x+.5, .97, day+' JST', transform=ax.get_xaxis_transform(), fontsize=9, color='#475569', va='top')
+            ax.text(x+.5, .97 if previous_day is None else .93, day+' JST', transform=ax.get_xaxis_transform(), fontsize=9, color='#475569', va='top')
             previous_day = day
     ax.set_xlim(.4, len(trials)+.8)
     ax.set_ylim(-maximum*.125, maximum*1.2)

@@ -1,7 +1,7 @@
 {
   "started_at": "20261008T152506Z",
   "stage": "dns-index",
-  "decision": "pending",
+  "decision": "incorporated",
   "commit": "df6933a310d201deae3bda89c83761bd562465c5",
   "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "status": "passed",

@@ -38,6 +38,16 @@ def main():
     row['cpu_profile'] = args.cpu_profile
     row['db_profile'] = args.db_profile
     (out/'host-processes-before.txt').write_text(subprocess.check_output(['ps','-Ao','pcpu,comm'],text=True))
+    cpu = []
+    for line in (out/'host-processes-before.txt').read_text().splitlines()[1:]:
+        parts = line.strip().split(None, 1)
+        if len(parts) == 2:
+            cpu.append((float(parts[0]), 'qemu-system' in parts[1]))
+    (out/'host-load-summary.json').write_text(json.dumps(dict(
+        total_cpu_percent=round(sum(value for value, _ in cpu), 1),
+        vm_cpu_percent=round(sum(value for value, vm in cpu if vm), 1),
+        max_other_process_cpu_percent=max([value for value, vm in cpu if not vm] or [0]),
+        note='ps snapshot before trial, per-core percentages; raw process names retained locally only'), indent=2)+'\n')
     row['profiler_execution'] = 'detached guest jobs' if args.cpu_profile or args.db_profile else 'none'
     dbprof = DBProfile(args.app, out, mp, args.dns_service) if args.db_profile else None
     (out/'source.diff').write_text(diff)

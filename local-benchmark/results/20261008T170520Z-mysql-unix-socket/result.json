@@ -1,7 +1,7 @@
 {
   "started_at": "20261008T170520Z",
   "stage": "mysql-unix-socket",
-  "decision": "pending",
+  "decision": "not_adopted",
   "commit": "799123b630ecf870263487c7f723e97dd0ae5de5",
   "diff_sha256": "5c5b195388fa40d3685a8c9740eb918270ce42f9582b954f73407cd84e1f5795",
   "status": "failed",

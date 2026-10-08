@@ -1,0 +1,10 @@
+Restored7bd08d8 application code via f72c217; deploy.sh complete source manifest comparison passed.
+VM binary SHA2569183ae8eddf12b83c293c4b505eff509f30284413f5964d94a10418136c6b1d5 matches reboot-tested accepted binary.
+concurrency_checks.py executed after final candidate rollback: exit0.
+PASS64 cross-owner icon updates;32 same-owner updates;final bytes/hash.
+PASS matching ETag200/304,mismatch200,stale ETag200 and fresh hash.
+PASS10 cache races/160 overlapping reads,no stale304 after completed write.
+PASS10 moderation races/160 posts,no surviving spam.
+PASS128 mixed writes,exact committedIDs/authors/tips/content.
+PASS32 reservations,one winner,zero remaining capacity.
+No additional full benchmark after rollback: accepted source/binary identical to already reboot-tested225280.
