@@ -1,0 +1,223 @@
+File: isupipe
+Type: cpu
+Time: 2026-10-09 00:29:44 JST
+Duration: 50.08s, Total samples = 22.79s (45.50%)
+Showing nodes accounting for 19.26s, 84.51% of 22.79s total
+Dropped 579 nodes (cum <= 0.11s)
+      flat  flat%   sum%        cum   cum%
+    10.56s 46.34% 46.34%     10.56s 46.34%  runtime/internal/syscall.Syscall6
+     4.70s 20.62% 66.96%      4.70s 20.62%  runtime.futex
+     0.55s  2.41% 69.37%      0.55s  2.41%  golang.org/x/crypto/blowfish.encryptBlock
+     0.38s  1.67% 71.04%      0.38s  1.67%  crypto/sha256.sha256block
+     0.26s  1.14% 72.18%      0.26s  1.14%  runtime.write1
+     0.22s  0.97% 73.15%      1.08s  4.74%  runtime.mallocgc
+     0.17s  0.75% 73.89%      0.20s  0.88%  runtime.unlock2
+     0.16s   0.7% 74.59%      0.16s   0.7%  runtime.usleep
+     0.15s  0.66% 75.25%      0.74s  3.25%  runtime.selectgo
+     0.13s  0.57% 75.82%      0.13s  0.57%  runtime.memclrNoHeapPointers
+     0.13s  0.57% 76.39%      0.13s  0.57%  runtime.writeHeapBits.flush
+     0.12s  0.53% 76.92%      0.56s  2.46%  runtime.bgsweep
+     0.11s  0.48% 77.40%      0.23s  1.01%  runtime.lock2
+     0.10s  0.44% 77.84%      0.12s  0.53%  runtime.casgstatus
+     0.10s  0.44% 78.28%      0.13s  0.57%  runtime.greyobject
+     0.09s  0.39% 78.67%      5.32s 23.34%  runtime.netpoll
+     0.09s  0.39% 79.07%      0.32s  1.40%  runtime.scanobject
+     0.06s  0.26% 79.33%      1.96s  8.60%  github.com/go-sql-driver/mysql.(*buffer).fill
+     0.06s  0.26% 79.60%      0.13s  0.57%  runtime.sweepone
+     0.04s  0.18% 79.77%      1.20s  5.27%  github.com/go-sql-driver/mysql.(*mysqlConn).readResultSetHeaderPacket
+     0.04s  0.18% 79.95%      9.34s 40.98%  runtime.findRunnable
+     0.04s  0.18% 80.12%         6s 26.33%  syscall.Syscall
+     0.03s  0.13% 80.25%      0.49s  2.15%  database/sql.convertAssignRows
+     0.03s  0.13% 80.39%      0.12s  0.53%  database/sql.driverArgsConnLocked
+     0.03s  0.13% 80.52%      2.85s 12.51%  database/sql.rowsiFromStatement
+     0.03s  0.13% 80.65%      2.51s 11.01%  database/sql.withLock
+     0.03s  0.13% 80.78%      1.52s  6.67%  github.com/go-sql-driver/mysql.(*mysqlStmt).writeExecutePacket
+     0.03s  0.13% 80.91%      0.57s  2.50%  golang.org/x/crypto/blowfish.ExpandKey
+     0.03s  0.13% 81.04%      1.92s  8.42%  internal/poll.(*FD).Read
+     0.03s  0.13% 81.18%      2.95s 12.94%  main.fillUserResponse
+     0.03s  0.13% 81.31%      0.69s  3.03%  runtime.entersyscall
+     0.03s  0.13% 81.44%      0.15s  0.66%  runtime.heapBitsSetType
+     0.02s 0.088% 81.53%      0.12s  0.53%  context.WithCancel
+     0.02s 0.088% 81.61%      0.16s   0.7%  context.WithCancel.func1
+     0.02s 0.088% 81.70%      0.15s  0.66%  database/sql.(*DB).queryDC.func1
+     0.02s 0.088% 81.79%      0.12s  0.53%  database/sql.(*Rows).awaitDone
+     0.02s 0.088% 81.88%      1.98s  8.69%  github.com/go-sql-driver/mysql.(*buffer).readNext
+     0.02s 0.088% 81.97%         2s  8.78%  github.com/go-sql-driver/mysql.(*mysqlConn).readPacket
+     0.02s 0.088% 82.05%      2.74s 12.02%  github.com/go-sql-driver/mysql.(*mysqlStmt).QueryContext
+     0.02s 0.088% 82.14%      2.16s  9.48%  github.com/jmoiron/sqlx.(*Row).scanAny
+     0.02s 0.088% 82.23%      0.13s  0.57%  runtime.(*mheap).alloc.func1
+     0.02s 0.088% 82.32%      0.20s  0.88%  runtime.freeSomeWbufs
+     0.02s 0.088% 82.40%      2.74s 12.02%  runtime.futexsleep
+     0.02s 0.088% 82.49%      0.62s  2.72%  runtime.injectglist
+     0.02s 0.088% 82.58%      0.27s  1.18%  runtime.makeslice
+     0.02s 0.088% 82.67%      0.66s  2.90%  runtime.reentersyscall
+     0.02s 0.088% 82.76%      0.18s  0.79%  runtime.runqgrab
+     0.02s 0.088% 82.84%      9.47s 41.55%  runtime.schedule
+     0.02s 0.088% 82.93%      0.23s  1.01%  runtime.stealWork
+     0.02s 0.088% 83.02%      0.22s  0.97%  syscall.Close
+     0.01s 0.044% 83.06%      0.14s  0.61%  context.(*cancelCtx).cancel
+     0.01s 0.044% 83.11%      1.71s  7.50%  database/sql.(*DB).queryDC.func2
+     0.01s 0.044% 83.15%      0.39s  1.71%  database/sql.(*DB).retry
+     0.01s 0.044% 83.19%      0.38s  1.67%  database/sql.(*Rows).Next
+     0.01s 0.044% 83.24%      0.50s  2.19%  database/sql.(*Rows).Scan
+     0.01s 0.044% 83.28%      1.55s  6.80%  database/sql.(*Rows).close
+     0.01s 0.044% 83.33%      0.12s  0.53%  database/sql.(*Rows).close.func1
+     0.01s 0.044% 83.37%      0.40s  1.76%  database/sql.(*Rows).initContextClose
+     0.01s 0.044% 83.41%      0.22s  0.97%  database/sql.(*Tx).ExecContext
+     0.01s 0.044% 83.46%      1.22s  5.35%  database/sql.(*driverStmt).Close
+     0.01s 0.044% 83.50%      2.75s 12.07%  database/sql.ctxDriverStmtQuery
+     0.01s 0.044% 83.55%      1.75s  7.68%  github.com/go-sql-driver/mysql.(*mysqlConn).PrepareContext
+     0.01s 0.044% 83.59%      0.27s  1.18%  github.com/go-sql-driver/mysql.(*mysqlConn).exec
+     0.01s 0.044% 83.63%      3.49s 15.31%  github.com/go-sql-driver/mysql.(*mysqlConn).writePacket
+     0.01s 0.044% 83.68%      2.66s 11.67%  github.com/go-sql-driver/mysql.(*mysqlStmt).query
+     0.01s 0.044% 83.72%      0.72s  3.16%  github.com/go-sql-driver/mysql.(*mysqlStmt).readPrepareResultPacket
+     0.01s 0.044% 83.76%      1.91s  8.38%  github.com/jmoiron/sqlx.(*Row).Scan
+     0.01s 0.044% 83.81%      6.72s 29.49%  github.com/jmoiron/sqlx.GetContext
+     0.01s 0.044% 83.85%      0.14s  0.61%  github.com/jmoiron/sqlx/reflectx.(*Mapper).TraversalsByName
+     0.01s 0.044% 83.90%      0.96s  4.21%  main.getIconHandler
+     0.01s 0.044% 83.94%      3.73s 16.37%  net.(*netFD).Write
+     0.01s 0.044% 83.98%     11.67s 51.21%  net/http.(*conn).serve
+     0.01s 0.044% 84.03%      0.26s  1.14%  os.(*File).Write
+     0.01s 0.044% 84.07%      0.12s  0.53%  runtime.(*mcache).refill
+     0.01s 0.044% 84.12%      0.59s  2.59%  runtime.entersyscall_sysmon
+     0.01s 0.044% 84.16%      0.52s  2.28%  runtime.goready (inline)
+     0.01s 0.044% 84.20%      0.36s  1.58%  runtime.growslice
+     0.01s 0.044% 84.25%      0.60s  2.63%  runtime.injectglist.func1
+     0.01s 0.044% 84.29%      2.61s 11.45%  runtime.mPark (inline)
+     0.01s 0.044% 84.34%      0.13s  0.57%  runtime.markroot
+     0.01s 0.044% 84.38%      0.42s  1.84%  runtime.newobject
+     0.01s 0.044% 84.42%      0.45s  1.97%  runtime.send
+     0.01s 0.044% 84.47%      5.13s 22.51%  runtime/internal/syscall.EpollWait
+     0.01s 0.044% 84.51%      1.85s  8.12%  syscall.read
+         0     0% 84.51%      0.24s  1.05%  bufio.(*Writer).Flush
+         0     0% 84.51%      0.22s  0.97%  bufio.(*Writer).Write
+         0     0% 84.51%      0.34s  1.49%  bytes.Clone (inline)
+         0     0% 84.51%      0.38s  1.67%  crypto/sha256.(*digest).Write
+         0     0% 84.51%      0.39s  1.71%  crypto/sha256.Sum256
+         0     0% 84.51%      0.38s  1.67%  crypto/sha256.block
+         0     0% 84.51%      0.39s  1.71%  database/sql.(*DB).BeginTx
+         0     0% 84.51%      0.38s  1.67%  database/sql.(*DB).BeginTx.func1
+         0     0% 84.51%      0.38s  1.67%  database/sql.(*DB).begin
+         0     0% 84.51%      0.28s  1.23%  database/sql.(*DB).beginDC
+         0     0% 84.51%      0.27s  1.18%  database/sql.(*DB).beginDC.func1
+         0     0% 84.51%      0.20s  0.88%  database/sql.(*DB).execDC
+         0     0% 84.51%      5.18s 22.73%  database/sql.(*DB).queryDC
+         0     0% 84.51%      1.52s  6.67%  database/sql.(*Rows).Close
+         0     0% 84.51%      5.18s 22.73%  database/sql.(*Tx).QueryContext
+         0     0% 84.51%      0.27s  1.18%  database/sql.ctxDriverBegin
+         0     0% 84.51%      1.75s  7.68%  database/sql.ctxDriverPrepare
+         0     0% 84.51%      0.14s  0.61%  encoding/json.(*Decoder).Decode
+         0     0% 84.51%      0.25s  1.10%  encoding/json.(*Encoder).Encode
+         0     0% 84.51%      0.27s  1.18%  github.com/go-sql-driver/mysql.(*mysqlConn).BeginTx
+         0     0% 84.51%      1.36s  5.97%  github.com/go-sql-driver/mysql.(*mysqlConn).Prepare
+         0     0% 84.51%      0.23s  1.01%  github.com/go-sql-driver/mysql.(*mysqlConn).begin
+         0     0% 84.51%      0.50s  2.19%  github.com/go-sql-driver/mysql.(*mysqlConn).finish (partial-inline)
+         0     0% 84.51%      0.18s  0.79%  github.com/go-sql-driver/mysql.(*mysqlConn).startWatcher.func1
+         0     0% 84.51%      0.80s  3.51%  github.com/go-sql-driver/mysql.(*mysqlConn).writeCommandPacketStr
+         0     0% 84.51%      1.21s  5.31%  github.com/go-sql-driver/mysql.(*mysqlConn).writeCommandPacketUint32
+         0     0% 84.51%      1.21s  5.31%  github.com/go-sql-driver/mysql.(*mysqlStmt).Close
+         0     0% 84.51%      0.13s  0.57%  github.com/gorilla/securecookie.(*SecureCookie).Decode
+         0     0% 84.51%      0.13s  0.57%  github.com/gorilla/securecookie.DecodeMulti
+         0     0% 84.51%      0.16s   0.7%  github.com/gorilla/sessions.(*CookieStore).Get
+         0     0% 84.51%      0.14s  0.61%  github.com/gorilla/sessions.(*CookieStore).New
+         0     0% 84.51%      0.15s  0.66%  github.com/gorilla/sessions.(*Registry).Get
+         0     0% 84.51%      0.39s  1.71%  github.com/jmoiron/sqlx.(*DB).BeginTxx
+         0     0% 84.51%      6.72s 29.49%  github.com/jmoiron/sqlx.(*Tx).GetContext (inline)
+         0     0% 84.51%      0.20s  0.88%  github.com/jmoiron/sqlx.(*Tx).NamedExecContext (inline)
+         0     0% 84.51%      4.55s 19.96%  github.com/jmoiron/sqlx.(*Tx).QueryRowxContext
+         0     0% 84.51%      0.64s  2.81%  github.com/jmoiron/sqlx.(*Tx).QueryxContext
+         0     0% 84.51%      1.06s  4.65%  github.com/jmoiron/sqlx.(*Tx).SelectContext (inline)
+         0     0% 84.51%      0.20s  0.88%  github.com/jmoiron/sqlx.NamedExecContext
+         0     0% 84.51%      1.06s  4.65%  github.com/jmoiron/sqlx.SelectContext
+         0     0% 84.51%      0.42s  1.84%  github.com/jmoiron/sqlx.scanAll
+         0     0% 84.51%      0.16s   0.7%  github.com/labstack/echo-contrib/session.Get
+         0     0% 84.51%     11.08s 48.62%  github.com/labstack/echo/v4.(*Echo).ServeHTTP
+         0     0% 84.51%      0.15s  0.66%  github.com/labstack/echo/v4.(*Echo).Start
+         0     0% 84.51%     10.80s 47.39%  github.com/labstack/echo/v4.(*Echo).add.func1
+         0     0% 84.51%      0.22s  0.97%  github.com/labstack/echo/v4.(*Response).Write
+         0     0% 84.51%      0.14s  0.61%  github.com/labstack/echo/v4.(*context).Blob
+         0     0% 84.51%      0.27s  1.18%  github.com/labstack/echo/v4.(*context).JSON
+         0     0% 84.51%      0.27s  1.18%  github.com/labstack/echo/v4.(*context).json
+         0     0% 84.51%      0.25s  1.10%  github.com/labstack/echo/v4.DefaultJSONSerializer.Serialize
+         0     0% 84.51%      0.13s  0.57%  github.com/labstack/echo/v4.tcpKeepAliveListener.Accept
+         0     0% 84.51%     11.07s 48.57%  github.com/labstack/echo/v4/middleware.LoggerWithConfig.func2.1
+         0     0% 84.51%      0.29s  1.27%  golang.org/x/crypto/bcrypt.CompareHashAndPassword
+         0     0% 84.51%      0.31s  1.36%  golang.org/x/crypto/bcrypt.GenerateFromPassword
+         0     0% 84.51%      0.59s  2.59%  golang.org/x/crypto/bcrypt.bcrypt
+         0     0% 84.51%      0.58s  2.54%  golang.org/x/crypto/bcrypt.expensiveBlowfishSetup
+         0     0% 84.51%      0.30s  1.32%  golang.org/x/crypto/bcrypt.newFromPassword
+         0     0% 84.51%      0.27s  1.18%  internal/poll.(*FD).Close
+         0     0% 84.51%      3.96s 17.38%  internal/poll.(*FD).Write
+         0     0% 84.51%      0.27s  1.18%  internal/poll.(*FD).decref
+         0     0% 84.51%      0.27s  1.18%  internal/poll.(*FD).destroy
+         0     0% 84.51%      0.22s  0.97%  internal/poll.(*SysFile).destroy (inline)
+         0     0% 84.51%      5.77s 25.32%  internal/poll.ignoringEINTRIO (inline)
+         0     0% 84.51%      0.18s  0.79%  main.fillLivecommentReportResponse
+         0     0% 84.51%      2.56s 11.23%  main.fillLivecommentResponse
+         0     0% 84.51%      5.65s 24.79%  main.fillLivestreamResponse
+         0     0% 84.51%      2.05s  9.00%  main.fillReactionResponse
+         0     0% 84.51%      2.18s  9.57%  main.getLivecommentsHandler
+         0     0% 84.51%      1.87s  8.21%  main.getReactionsHandler
+         0     0% 84.51%      0.41s  1.80%  main.loginHandler
+         0     0% 84.51%      0.15s  0.66%  main.main
+         0     0% 84.51%     10.80s 47.39%  main.main.Middleware.MiddlewareWithConfig.func1.1
+         0     0% 84.51%      0.17s  0.75%  main.postIconHandler
+         0     0% 84.51%      0.62s  2.72%  main.postLivecommentHandler
+         0     0% 84.51%      0.45s  1.97%  main.postReactionHandler
+         0     0% 84.51%      0.56s  2.46%  main.registerHandler
+         0     0% 84.51%      0.15s  0.66%  main.reportLivecommentHandler
+         0     0% 84.51%      0.46s  2.02%  main.reserveLivestreamHandler
+         0     0% 84.51%      2.71s 11.89%  main.searchLivestreamsHandler
+         0     0% 84.51%      0.16s   0.7%  main.verifyUserSession
+         0     0% 84.51%      0.13s  0.57%  net.(*TCPListener).AcceptTCP
+         0     0% 84.51%      0.13s  0.57%  net.(*TCPListener).accept
+         0     0% 84.51%      0.25s  1.10%  net.(*conn).Close
+         0     0% 84.51%      1.93s  8.47%  net.(*conn).Read
+         0     0% 84.51%      3.73s 16.37%  net.(*conn).Write
+         0     0% 84.51%      0.25s  1.10%  net.(*netFD).Close
+         0     0% 84.51%      1.92s  8.42%  net.(*netFD).Read
+         0     0% 84.51%      0.15s  0.66%  net/http.(*Server).Serve
+         0     0% 84.51%      0.22s  0.97%  net/http.(*chunkWriter).Write
+         0     0% 84.51%      0.26s  1.14%  net/http.(*conn).close
+         0     0% 84.51%      0.15s  0.66%  net/http.(*conn).readRequest
+         0     0% 84.51%      0.26s  1.14%  net/http.(*conn).serve.func1
+         0     0% 84.51%      0.22s  0.97%  net/http.(*response).Write
+         0     0% 84.51%      0.22s  0.97%  net/http.(*response).write
+         0     0% 84.51%      0.27s  1.18%  net/http.checkConnErrorWriter.Write
+         0     0% 84.51%     11.08s 48.62%  net/http.serverHandler.ServeHTTP
+         0     0% 84.51%      0.25s  1.10%  os.(*File).write (inline)
+         0     0% 84.51%      0.16s   0.7%  runtime.(*mcache).allocLarge
+         0     0% 84.51%      0.14s  0.61%  runtime.(*mcache).nextFree
+         0     0% 84.51%      0.13s  0.57%  runtime.(*mheap).alloc
+         0     0% 84.51%      0.12s  0.53%  runtime.deductAssistCredit
+         0     0% 84.51%      1.98s  8.69%  runtime.futexwakeup
+         0     0% 84.51%      0.44s  1.93%  runtime.gcBgMarkWorker
+         0     0% 84.51%      0.38s  1.67%  runtime.gcBgMarkWorker.func2
+         0     0% 84.51%      0.38s  1.67%  runtime.gcDrain
+         0     0% 84.51%      2.67s 11.72%  runtime.goexit0
+         0     0% 84.51%      0.23s  1.01%  runtime.lock (inline)
+         0     0% 84.51%      0.23s  1.01%  runtime.lockWithRank (inline)
+         0     0% 84.51%      0.15s  0.66%  runtime.main
+         0     0% 84.51%      9.57s 41.99%  runtime.mcall
+         0     0% 84.51%      0.26s  1.14%  runtime.netpollBreak
+         0     0% 84.51%      0.34s  1.49%  runtime.newproc
+         0     0% 84.51%      0.34s  1.49%  runtime.newproc.func1
+         0     0% 84.51%      0.13s  0.57%  runtime.newstack
+         0     0% 84.51%      2.60s 11.41%  runtime.notesleep
+         0     0% 84.51%      1.95s  8.56%  runtime.notewakeup
+         0     0% 84.51%      6.88s 30.19%  runtime.park_m
+         0     0% 84.51%      0.51s  2.24%  runtime.ready
+         0     0% 84.51%      0.18s  0.79%  runtime.runqsteal
+         0     0% 84.51%      0.42s  1.84%  runtime.send.goready.func1
+         0     0% 84.51%      1.35s  5.92%  runtime.startm
+         0     0% 84.51%      2.61s 11.45%  runtime.stopm
+         0     0% 84.51%      2.27s  9.96%  runtime.systemstack
+         0     0% 84.51%      0.20s  0.88%  runtime.unlock (inline)
+         0     0% 84.51%      0.20s  0.88%  runtime.unlockWithRank (inline)
+         0     0% 84.51%      0.83s  3.64%  runtime.wakep
+         0     0% 84.51%      0.26s  1.14%  runtime.write
+         0     0% 84.51%      5.37s 23.56%  syscall.RawSyscall6
+         0     0% 84.51%      1.85s  8.12%  syscall.Read (inline)
+         0     0% 84.51%      0.18s  0.79%  syscall.Syscall6
+         0     0% 84.51%      3.93s 17.24%  syscall.Write (inline)
+         0     0% 84.51%      3.93s 17.24%  syscall.write

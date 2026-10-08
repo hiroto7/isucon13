@@ -196,29 +196,17 @@ func postLivecommentHandler(c echo.Context) error {
 		}
 	}
 
-	// スパム判定
-	var ngwords []*NGWord
-	if err := tx.SelectContext(ctx, &ngwords, "SELECT id, user_id, livestream_id, word FROM ng_words WHERE user_id = ? AND livestream_id = ?", livestreamModel.UserID, livestreamModel.ID); err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get NG words: "+err.Error())
-	}
-
+	// Keep MySQL LIKE wildcard, accent and case semantics of the original parameters.
 	var hitSpam int
-	for _, ngword := range ngwords {
-		query := `
-		SELECT COUNT(*)
-		FROM
-		(SELECT ? AS text) AS texts
-		INNER JOIN
-		(SELECT CONCAT('%', ?, '%')	AS pattern) AS patterns
-		ON texts.text LIKE patterns.pattern;
-		`
-		if err := tx.GetContext(ctx, &hitSpam, query, req.Comment, ngword.Word); err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get hitspam: "+err.Error())
-		}
-		c.Logger().Infof("[hitSpam=%d] comment = %s", hitSpam, req.Comment)
-		if hitSpam >= 1 {
-			return echo.NewHTTPError(http.StatusBadRequest, "このコメントがスパム判定されました")
-		}
+	query := `SELECT EXISTS(SELECT 1 FROM ng_words
+		WHERE user_id = ? AND livestream_id = ?
+		AND CONVERT(? USING utf8mb4) COLLATE utf8mb4_general_ci
+		LIKE CONCAT('%', CONVERT(word USING utf8mb4) COLLATE utf8mb4_general_ci, '%'))`
+	if err := tx.GetContext(ctx, &hitSpam, query, livestreamModel.UserID, livestreamModel.ID, req.Comment); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to check spam: "+err.Error())
+	}
+	if hitSpam >= 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, "このコメントがスパム判定されました")
 	}
 
 	now := time.Now().Unix()
@@ -381,36 +369,14 @@ func moderateHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get last inserted NG word id: "+err.Error())
 	}
 
-	var ngwords []*NGWord
-	if err := tx.SelectContext(ctx, &ngwords, "SELECT * FROM ng_words WHERE livestream_id = ?", livestreamID); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get NG words: "+err.Error())
-	}
-
-	// NGワードにヒットする過去の投稿も全削除する
-	for _, ngword := range ngwords {
-		// ライブコメント一覧取得
-		var livecomments []*LivecommentModel
-		if err := tx.SelectContext(ctx, &livecomments, "SELECT * FROM livecomments"); err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livecomments: "+err.Error())
-		}
-
-		for _, livecomment := range livecomments {
-			query := `
-			DELETE FROM livecomments
-			WHERE
-			id = ? AND
-			livestream_id = ? AND
-			(SELECT COUNT(*)
-			FROM
-			(SELECT ? AS text) AS texts
-			INNER JOIN
-			(SELECT CONCAT('%', ?, '%')	AS pattern) AS patterns
-			ON texts.text LIKE patterns.pattern) >= 1;
-			`
-			if _, err := tx.ExecContext(ctx, query, livecomment.ID, livestreamID, livecomment.Comment, ngword.Word); err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete old livecomments that hit spams: "+err.Error())
-			}
-		}
+	// Insert the word and delete matching history in the same transaction.
+	// The old nested loop issued a DELETE for every comment for every NG word.
+	query := `DELETE FROM livecomments WHERE livestream_id = ?
+		AND EXISTS(SELECT 1 FROM ng_words WHERE livestream_id = ?
+			AND CONVERT(livecomments.comment USING utf8mb4) COLLATE utf8mb4_general_ci
+			LIKE CONCAT('%', CONVERT(word USING utf8mb4) COLLATE utf8mb4_general_ci, '%'))`
+	if _, err := tx.ExecContext(ctx, query, livestreamID, livestreamID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete spam comments: "+err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {

@@ -1,0 +1,115 @@
+File: isupipe
+Type: alloc_space
+Time: 2026-10-09 00:30:48 JST
+Showing nodes accounting for 807.06MB, 93.61% of 862.18MB total
+Dropped 159 nodes (cum <= 4.31MB)
+      flat  flat%   sum%        cum   cum%
+  565.81MB 65.63% 65.63%   565.81MB 65.63%  bytes.Clone (inline)
+   30.74MB  3.57% 69.19%    38.42MB  4.46%  encoding/json.appendIndent
+   30.67MB  3.56% 72.75%    30.67MB  3.56%  encoding/json.(*Decoder).refill
+   24.95MB  2.89% 75.64%    24.95MB  2.89%  github.com/go-sql-driver/mysql.(*buffer).fill
+   19.28MB  2.24% 77.88%    19.28MB  2.24%  bytes.growSlice
+   17.64MB  2.05% 79.93%    18.14MB  2.10%  os.ReadFile
+      13MB  1.51% 81.43%    47.50MB  5.51%  database/sql.(*DB).queryDC
+   11.50MB  1.33% 82.77%    11.50MB  1.33%  github.com/go-sql-driver/mysql.(*mysqlConn).readColumns
+    9.72MB  1.13% 83.89%     9.72MB  1.13%  encoding/json.(*decodeState).literalStore
+    7.68MB  0.89% 84.79%     7.68MB  0.89%  encoding/json.appendNewline (inline)
+    7.50MB  0.87% 85.66%     7.50MB  0.87%  database/sql.driverArgsConnLocked
+    6.50MB  0.75% 86.41%       18MB  2.09%  github.com/go-sql-driver/mysql.(*mysqlStmt).query
+       6MB   0.7% 87.10%   616.27MB 71.48%  github.com/jmoiron/sqlx.(*Row).scanAny
+       5MB  0.58% 87.68%       13MB  1.51%  encoding/gob.(*Decoder).getDecEnginePtr
+       5MB  0.58% 88.26%        5MB  0.58%  github.com/go-sql-driver/mysql.(*mysqlRows).Columns
+    4.54MB  0.53% 88.79%     4.54MB  0.53%  io.copyBuffer
+    4.50MB  0.52% 89.31%     4.50MB  0.52%  github.com/jmoiron/sqlx/reflectx.(*Mapper).TraversalsByName
+       4MB  0.46% 89.78%   569.82MB 66.09%  database/sql.convertAssignRows
+       4MB  0.46% 90.24%     4.50MB  0.52%  context.withCancel (inline)
+       3MB  0.35% 90.59%     9.50MB  1.10%  encoding/gob.(*Decoder).compileDec
+       3MB  0.35% 90.94%   397.29MB 46.08%  main.fillLivestreamResponse
+    2.50MB  0.29% 91.23%    33.95MB  3.94%  database/sql.(*Rows).nextLocked
+    2.50MB  0.29% 91.52%     6.50MB  0.75%  encoding/gob.(*Decoder).decOpFor
+    2.50MB  0.29% 91.81%    27.45MB  3.18%  github.com/go-sql-driver/mysql.(*binaryRows).readRow
+       2MB  0.23% 92.04%    19.50MB  2.26%  github.com/gorilla/sessions.(*Registry).Get
+    1.51MB  0.18% 92.21%   209.48MB 24.30%  main.searchLivestreamsHandler
+    1.50MB  0.17% 92.39%     6.50MB  0.75%  net/http.(*conn).readRequest
+    1.50MB  0.17% 92.56%     5.50MB  0.64%  database/sql.(*Rows).initContextClose
+    1.50MB  0.17% 92.74%    42.50MB  4.93%  github.com/jmoiron/sqlx.(*Tx).QueryRowxContext
+    1.50MB  0.17% 92.91%     4.64MB  0.54%  reflect.Value.extendSlice
+    1.50MB  0.17% 93.08%   539.22MB 62.54%  main.fillUserResponse
+       1MB  0.12% 93.20%     5.50MB  0.64%  context.WithCancel
+    0.50MB 0.058% 93.26%   157.35MB 18.25%  main.getReactionsHandler
+    0.50MB 0.058% 93.32%    15.50MB  1.80%  github.com/gorilla/securecookie.(*SecureCookie).Decode
+    0.50MB 0.058% 93.37%   226.01MB 26.21%  main.fillLivecommentResponse
+    0.50MB 0.058% 93.43%     7.50MB  0.87%  github.com/jmoiron/sqlx.(*Tx).QueryxContext
+    0.50MB 0.058% 93.49%    13.64MB  1.58%  github.com/jmoiron/sqlx.scanAll
+    0.50MB 0.058% 93.55%   855.10MB 99.18%  net/http.(*conn).serve
+    0.50MB 0.058% 93.61%    20.50MB  2.38%  github.com/go-sql-driver/mysql.(*mysqlStmt).QueryContext
+         0     0% 93.61%    15.69MB  1.82%  bytes.(*Buffer).Write
+         0     0% 93.61%    19.28MB  2.24%  bytes.(*Buffer).grow
+         0     0% 93.61%        5MB  0.58%  database/sql.(*Rows).Columns
+         0     0% 93.61%    33.95MB  3.94%  database/sql.(*Rows).Next
+         0     0% 93.61%    33.95MB  3.94%  database/sql.(*Rows).Next.func1
+         0     0% 93.61%   569.82MB 66.09%  database/sql.(*Rows).Scan
+         0     0% 93.61%       48MB  5.57%  database/sql.(*Tx).QueryContext
+         0     0% 93.61%    20.50MB  2.38%  database/sql.ctxDriverStmtQuery
+         0     0% 93.61%    25.50MB  2.96%  database/sql.rowsiFromStatement
+         0     0% 93.61%    38.45MB  4.46%  database/sql.withLock
+         0     0% 93.61%       14MB  1.62%  encoding/gob.(*Decoder).Decode
+         0     0% 93.61%       14MB  1.62%  encoding/gob.(*Decoder).DecodeValue
+         0     0% 93.61%     7.50MB  0.87%  encoding/gob.(*Decoder).decodeTypeSequence
+         0     0% 93.61%    13.50MB  1.57%  encoding/gob.(*Decoder).decodeValue
+         0     0% 93.61%        7MB  0.81%  encoding/gob.(*Decoder).recvType
+         0     0% 93.61%    40.39MB  4.68%  encoding/json.(*Decoder).Decode
+         0     0% 93.61%    30.67MB  3.56%  encoding/json.(*Decoder).readValue
+         0     0% 93.61%    58.20MB  6.75%  encoding/json.(*Encoder).Encode
+         0     0% 93.61%     9.72MB  1.13%  encoding/json.(*decodeState).object
+         0     0% 93.61%     9.72MB  1.13%  encoding/json.(*decodeState).unmarshal
+         0     0% 93.61%     9.72MB  1.13%  encoding/json.(*decodeState).value
+         0     0% 93.61%    19.78MB  2.29%  encoding/json.(*encodeState).marshal
+         0     0% 93.61%    19.78MB  2.29%  encoding/json.(*encodeState).reflectValue
+         0     0% 93.61%    18.78MB  2.18%  encoding/json.arrayEncoder.encode
+         0     0% 93.61%    18.78MB  2.18%  encoding/json.sliceEncoder.encode
+         0     0% 93.61%    14.15MB  1.64%  encoding/json.stringEncoder
+         0     0% 93.61%    19.78MB  2.29%  encoding/json.structEncoder.encode
+         0     0% 93.61%    27.45MB  3.18%  github.com/go-sql-driver/mysql.(*binaryRows).Next
+         0     0% 93.61%    24.95MB  2.89%  github.com/go-sql-driver/mysql.(*buffer).readNext
+         0     0% 93.61%    24.95MB  2.89%  github.com/go-sql-driver/mysql.(*mysqlConn).readPacket
+         0     0% 93.61%    15.50MB  1.80%  github.com/gorilla/securecookie.DecodeMulti
+         0     0% 93.61%       14MB  1.62%  github.com/gorilla/securecookie.GobEncoder.Deserialize
+         0     0% 93.61%    19.50MB  2.26%  github.com/gorilla/sessions.(*CookieStore).Get
+         0     0% 93.61%    17.50MB  2.03%  github.com/gorilla/sessions.(*CookieStore).New
+         0     0% 93.61%        5MB  0.58%  github.com/jmoiron/sqlx.(*Row).Columns (inline)
+         0     0% 93.61%   599.27MB 69.51%  github.com/jmoiron/sqlx.(*Row).Scan
+         0     0% 93.61%   658.77MB 76.41%  github.com/jmoiron/sqlx.(*Tx).GetContext (inline)
+         0     0% 93.61%    21.14MB  2.45%  github.com/jmoiron/sqlx.(*Tx).SelectContext (inline)
+         0     0% 93.61%   658.77MB 76.41%  github.com/jmoiron/sqlx.GetContext
+         0     0% 93.61%    21.14MB  2.45%  github.com/jmoiron/sqlx.SelectContext
+         0     0% 93.61%    19.50MB  2.26%  github.com/labstack/echo-contrib/session.Get
+         0     0% 93.61%   844.44MB 97.94%  github.com/labstack/echo/v4.(*Echo).ServeHTTP
+         0     0% 93.61%   838.94MB 97.30%  github.com/labstack/echo/v4.(*Echo).add.func1
+         0     0% 93.61%     5.04MB  0.58%  github.com/labstack/echo/v4.(*context).File
+         0     0% 93.61%    58.70MB  6.81%  github.com/labstack/echo/v4.(*context).JSON
+         0     0% 93.61%    58.70MB  6.81%  github.com/labstack/echo/v4.(*context).json
+         0     0% 93.61%    58.20MB  6.75%  github.com/labstack/echo/v4.DefaultJSONSerializer.Serialize
+         0     0% 93.61%     5.04MB  0.58%  github.com/labstack/echo/v4.fsFile
+         0     0% 93.61%   842.44MB 97.71%  github.com/labstack/echo/v4/middleware.LoggerWithConfig.func2.1
+         0     0% 93.61%     4.54MB  0.53%  io.Copy (inline)
+         0     0% 93.61%     4.54MB  0.53%  io.CopyN
+         0     0% 93.61%    12.37MB  1.44%  main.fillLivecommentReportResponse
+         0     0% 93.61%   169.41MB 19.65%  main.fillReactionResponse
+         0     0% 93.61%    95.22MB 11.04%  main.getIconHandler
+         0     0% 93.61%     7.97MB  0.92%  main.getLivecommentReportsHandler
+         0     0% 93.61%   206.41MB 23.94%  main.getLivecommentsHandler
+         0     0% 93.61%     4.62MB  0.54%  main.getLivestreamStatisticsHandler
+         0     0% 93.61%     7.88MB  0.91%  main.getMyLivestreamsHandler
+         0     0% 93.61%   841.44MB 97.59%  main.main.Middleware.MiddlewareWithConfig.func1.1
+         0     0% 93.61%    44.63MB  5.18%  main.postIconHandler
+         0     0% 93.61%    41.19MB  4.78%  main.postLivecommentHandler
+         0     0% 93.61%    30.19MB  3.50%  main.postReactionHandler
+         0     0% 93.61%     6.02MB   0.7%  main.registerHandler
+         0     0% 93.61%     7.41MB  0.86%  main.reportLivecommentHandler
+         0     0% 93.61%    10.97MB  1.27%  main.reserveLivestreamHandler
+         0     0% 93.61%    19.50MB  2.26%  main.verifyUserSession
+         0     0% 93.61%     5.04MB  0.58%  net/http.ServeContent
+         0     0% 93.61%     5.04MB  0.58%  net/http.serveContent
+         0     0% 93.61%   845.59MB 98.08%  net/http.serverHandler.ServeHTTP
+         0     0% 93.61%     4.64MB  0.54%  reflect.Append

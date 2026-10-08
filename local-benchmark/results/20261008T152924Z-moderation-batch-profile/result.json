@@ -1,0 +1,27 @@
+{
+  "started_at": "20261008T152924Z",
+  "stage": "moderation-batch-profile",
+  "decision": "pending",
+  "commit": "4f5b2279d23ea9a3d5342514c2a59b8b28fac2da",
+  "diff_sha256": "daa2b68ce3629e0bd8b7ec7a5ee3708f1133cf793dd9acb7ed2f91320febee40",
+  "status": "passed",
+  "score": 3583,
+  "reported_score": 3583,
+  "app": "isucon13-app",
+  "benchmark": "isucon13-bench",
+  "ip": "192.168.2.7",
+  "resources": "app:4vCPU/8GiB;bench:4vCPU/4GiB",
+  "diagnostics": "nginx timing, MySQL digests, vmstat",
+  "cpu_profile": true,
+  "profiler_exit_code": 0,
+  "exit_code": 0,
+  "resolved_count": 13240,
+  "messages": [
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7525/livecomment/1020/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7525/livecomment/1018/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "[\u4e00\u822c\u30a8\u30e9\u30fc] POST /api/livestream/7528/livecomment/1042/report \u3078\u306e\u30ea\u30af\u30a8\u30b9\u30c8\u306b\u5bfe\u3057\u3066\u3001\u671f\u5f85\u3055\u308c\u305fHTTP\u30b9\u30c6\u30fc\u30bf\u30b9\u30b3\u30fc\u30c9\u304c\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f (expected:201, actual:404)",
+    "\u540d\u524d\u89e3\u6c7a\u6210\u529f\u6570 13240",
+    "\u58f2\u4e0a: 3583"
+  ],
+  "finished_at": "2026-10-08T15:30:51.161880+00:00"
+}
