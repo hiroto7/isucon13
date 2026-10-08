@@ -18,11 +18,11 @@ import (
 
 // The SQL registry remains the durable source of truth and pdnsutil validates names.
 var dnsLifecycle sync.RWMutex
-var dnsPublishMu sync.Mutex
 var dnsRegistryConn *sqlx.DB
 var dnsAuthorityService atomic.Pointer[dnsAuthority]
 
 type dnsRecord struct {
+	ID      int64  `db:"id"`
 	Name    string `db:"name"`
 	Type    string `db:"type"`
 	Content string `db:"content"`
@@ -37,13 +37,15 @@ type dnsRate struct {
 	lastSeen time.Time
 }
 type dnsAuthority struct {
-	zone     atomic.Pointer[dnsZone]
-	mu       sync.Mutex
-	clients  map[string]*dnsRate
-	fallback *rate.Limiter
-	positive atomic.Uint64
-	negative atomic.Uint64
-	dropped  atomic.Uint64
+	zone      atomic.Pointer[dnsZone]
+	publishMu sync.Mutex
+	seenIDs   map[int64]struct{}
+	mu        sync.Mutex
+	clients   map[string]*dnsRate
+	fallback  *rate.Limiter
+	positive  atomic.Uint64
+	negative  atomic.Uint64
+	dropped   atomic.Uint64
 }
 
 func newDNSAuthority() *dnsAuthority {
@@ -150,7 +152,7 @@ func buildDNSZone(old *dnsZone, records []dnsRecord) (*dnsZone, error) {
 	return zone, nil
 }
 
-const dnsRecordsSQL = `SELECT r.name,r.type,r.content,r.ttl FROM records r
+const dnsRecordsSQL = `SELECT r.id,r.name,r.type,r.content,r.ttl FROM records r
  JOIN domains d ON d.id=r.domain_id WHERE d.name='u.isucon.dev' AND r.disabled=0`
 
 func refreshDNSZone() error {
@@ -158,8 +160,6 @@ func refreshDNSZone() error {
 	if authority == nil {
 		return nil
 	}
-	dnsPublishMu.Lock()
-	defer dnsPublishMu.Unlock()
 	var records []dnsRecord
 	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" ORDER BY r.id"); err != nil {
 		return err
@@ -167,6 +167,12 @@ func refreshDNSZone() error {
 	zone, err := buildDNSZone(nil, records)
 	if err != nil {
 		return err
+	}
+	authority.publishMu.Lock()
+	defer authority.publishMu.Unlock()
+	authority.seenIDs = make(map[int64]struct{}, len(records))
+	for _, record := range records {
+		authority.seenIDs[record.ID] = struct{}{}
 	}
 	authority.zone.Store(zone)
 	return nil
@@ -177,8 +183,6 @@ func registerDNS(name string) ([]byte, error) {
 	if authority == nil {
 		return command.CombinedOutput()
 	}
-	dnsPublishMu.Lock()
-	defer dnsPublishMu.Unlock()
 	var maximum int64
 	if err := dnsRegistryConn.Get(&maximum, "SELECT COALESCE(MAX(id),0) FROM records"); err != nil {
 		return nil, err
@@ -191,12 +195,35 @@ func registerDNS(name string) ([]byte, error) {
 	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" AND r.id>? ORDER BY r.id", maximum); err != nil {
 		return output, err
 	}
-	zone, err := buildDNSZone(authority.zone.Load(), records)
-	if err != nil {
-		return output, err
+	return output, authority.publishRecords(records)
+}
+
+// Each caller reads its lower ID bound before its own CLI insert. A global cursor
+// would lose older IDs whose transactions commit after a newer ID is published.
+func (a *dnsAuthority) publishRecords(records []dnsRecord) error {
+	a.publishMu.Lock()
+	defer a.publishMu.Unlock()
+	fresh := make([]dnsRecord, 0, len(records))
+	for _, record := range records {
+		if _, exists := a.seenIDs[record.ID]; !exists {
+			fresh = append(fresh, record)
+		}
 	}
-	authority.zone.Store(zone)
-	return output, nil
+	if len(fresh) == 0 {
+		return nil
+	}
+	zone, err := buildDNSZone(a.zone.Load(), fresh)
+	if err != nil {
+		return err
+	}
+	if a.seenIDs == nil {
+		a.seenIDs = make(map[int64]struct{})
+	}
+	for _, record := range fresh {
+		a.seenIDs[record.ID] = struct{}{}
+	}
+	a.zone.Store(zone)
+	return nil
 }
 func startDNSAuthority() error {
 	if os.Getenv("ISUCON13_POWERDNS_BACKEND") != "go" {

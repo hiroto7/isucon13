@@ -1,0 +1,161 @@
+diff --git a/webapp/go/dns_backend.go b/webapp/go/dns_backend.go
+index 5152d01..50f5e28 100644
+--- a/webapp/go/dns_backend.go
++++ b/webapp/go/dns_backend.go
+@@ -18,11 +18,11 @@ import (
+ 
+ // The SQL registry remains the durable source of truth and pdnsutil validates names.
+ var dnsLifecycle sync.RWMutex
+-var dnsPublishMu sync.Mutex
+ var dnsRegistryConn *sqlx.DB
+ var dnsAuthorityService atomic.Pointer[dnsAuthority]
+ 
+ type dnsRecord struct {
++	ID      int64  `db:"id"`
+ 	Name    string `db:"name"`
+ 	Type    string `db:"type"`
+ 	Content string `db:"content"`
+@@ -37,13 +37,15 @@ type dnsRate struct {
+ 	lastSeen time.Time
+ }
+ type dnsAuthority struct {
+-	zone     atomic.Pointer[dnsZone]
+-	mu       sync.Mutex
+-	clients  map[string]*dnsRate
+-	fallback *rate.Limiter
+-	positive atomic.Uint64
+-	negative atomic.Uint64
+-	dropped  atomic.Uint64
++	zone      atomic.Pointer[dnsZone]
++	publishMu sync.Mutex
++	seenIDs   map[int64]struct{}
++	mu        sync.Mutex
++	clients   map[string]*dnsRate
++	fallback  *rate.Limiter
++	positive  atomic.Uint64
++	negative  atomic.Uint64
++	dropped   atomic.Uint64
+ }
+ 
+ func newDNSAuthority() *dnsAuthority {
+@@ -150,7 +152,7 @@ func buildDNSZone(old *dnsZone, records []dnsRecord) (*dnsZone, error) {
+ 	return zone, nil
+ }
+ 
+-const dnsRecordsSQL = `SELECT r.name,r.type,r.content,r.ttl FROM records r
++const dnsRecordsSQL = `SELECT r.id,r.name,r.type,r.content,r.ttl FROM records r
+  JOIN domains d ON d.id=r.domain_id WHERE d.name='u.isucon.dev' AND r.disabled=0`
+ 
+ func refreshDNSZone() error {
+@@ -158,8 +160,6 @@ func refreshDNSZone() error {
+ 	if authority == nil {
+ 		return nil
+ 	}
+-	dnsPublishMu.Lock()
+-	defer dnsPublishMu.Unlock()
+ 	var records []dnsRecord
+ 	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" ORDER BY r.id"); err != nil {
+ 		return err
+@@ -168,6 +168,12 @@ func refreshDNSZone() error {
+ 	if err != nil {
+ 		return err
+ 	}
++	authority.publishMu.Lock()
++	defer authority.publishMu.Unlock()
++	authority.seenIDs = make(map[int64]struct{}, len(records))
++	for _, record := range records {
++		authority.seenIDs[record.ID] = struct{}{}
++	}
+ 	authority.zone.Store(zone)
+ 	return nil
+ }
+@@ -177,8 +183,6 @@ func registerDNS(name string) ([]byte, error) {
+ 	if authority == nil {
+ 		return command.CombinedOutput()
+ 	}
+-	dnsPublishMu.Lock()
+-	defer dnsPublishMu.Unlock()
+ 	var maximum int64
+ 	if err := dnsRegistryConn.Get(&maximum, "SELECT COALESCE(MAX(id),0) FROM records"); err != nil {
+ 		return nil, err
+@@ -191,12 +195,35 @@ func registerDNS(name string) ([]byte, error) {
+ 	if err := dnsRegistryConn.Select(&records, dnsRecordsSQL+" AND r.id>? ORDER BY r.id", maximum); err != nil {
+ 		return output, err
+ 	}
+-	zone, err := buildDNSZone(authority.zone.Load(), records)
++	return output, authority.publishRecords(records)
++}
++
++// Each caller reads its lower ID bound before its own CLI insert. A global cursor
++// would lose older IDs whose transactions commit after a newer ID is published.
++func (a *dnsAuthority) publishRecords(records []dnsRecord) error {
++	a.publishMu.Lock()
++	defer a.publishMu.Unlock()
++	fresh := make([]dnsRecord, 0, len(records))
++	for _, record := range records {
++		if _, exists := a.seenIDs[record.ID]; !exists {
++			fresh = append(fresh, record)
++		}
++	}
++	if len(fresh) == 0 {
++		return nil
++	}
++	zone, err := buildDNSZone(a.zone.Load(), fresh)
+ 	if err != nil {
+-		return output, err
++		return err
+ 	}
+-	authority.zone.Store(zone)
+-	return output, nil
++	if a.seenIDs == nil {
++		a.seenIDs = make(map[int64]struct{})
++	}
++	for _, record := range fresh {
++		a.seenIDs[record.ID] = struct{}{}
++	}
++	a.zone.Store(zone)
++	return nil
+ }
+ func startDNSAuthority() error {
+ 	if os.Getenv("ISUCON13_POWERDNS_BACKEND") != "go" {
+diff --git a/webapp/go/dns_backend_test.go b/webapp/go/dns_backend_test.go
+index 854bea9..a186047 100644
+--- a/webapp/go/dns_backend_test.go
++++ b/webapp/go/dns_backend_test.go
+@@ -123,3 +123,36 @@ func TestDNSNegativeClientStateIsBounded(t *testing.T) {
+ 		t.Fatal("unbounded client limiter state")
+ 	}
+ }
++
++func TestDNSOverlappingConcurrentPublications(t *testing.T) {
++	a := dnsFixture(t)
++	before := a.zone.Load()
++	shared := dnsRecord{ID: 1000, Name: "shared.u.isucon.dev", Type: "A", Content: "192.0.2.7"}
++	var group sync.WaitGroup
++	for n := 0; n < 64; n++ {
++		group.Add(1)
++		go func(n int) {
++			defer group.Done()
++			record := dnsRecord{ID: int64(n + 1), Name: fmt.Sprintf("parallel%d.u.isucon.dev", n), Type: "A", Content: "192.0.2.8"}
++			if err := a.publishRecords([]dnsRecord{shared, record}); err != nil {
++				t.Error(err)
++			}
++			dnsRequest(a, "known.u.isucon.dev.", dns.TypeA, false)
++		}(n)
++	}
++	group.Wait()
++	if len(a.seenIDs) != 65 {
++		t.Fatalf("published IDs: %d", len(a.seenIDs))
++	}
++	if _, exists := before.names["shared.u.isucon.dev."]; exists {
++		t.Fatal("old snapshot mutated")
++	}
++	for n := 0; n < 64; n++ {
++		if len(dnsRequest(a, fmt.Sprintf("parallel%d.u.isucon.dev.", n), dns.TypeA, false).messages[0].Answer) != 1 {
++			t.Fatal("record lost or duplicated")
++		}
++	}
++	if len(dnsRequest(a, "shared.u.isucon.dev.", dns.TypeA, false).messages[0].Answer) != 1 {
++		t.Fatal("overlapping record duplicated")
++	}
++}
